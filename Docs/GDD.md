@@ -11,16 +11,16 @@
 | Engine | Unity 6.3 LTS, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
-| Document version | v0.1, 2026-09-05 |
+| Document version | v0.2, 2026-09-05 |
 
 ## 1. High Concept
 
-BomberBird is a single-player action-puzzle game inspired by Bomberman. The player controls an Israeli bird in compact grid arenas, places timed seed pods that burst in four directions, clears obstacles and hazards, and reaches the exit. Each stage may also contain an optional bird rescue that rewards exploration without blocking progress.
+BomberBird is a single-player action-puzzle game inspired by Bomberman. The player controls an Israeli bird defending local habitats from invasive common mynas in grid arenas, using timed seed pods that burst in four directions to clear obstacles, defeat enemies, and reach the exit. Each stage may also contain an optional bird rescue that rewards exploration without blocking progress.
 
 ### Design Pillars
 
 1. **Readable chain reactions**: attacks follow simple grid, timing, and blocking rules.
-2. **Israeli bird identity**: local birds and habitats give the classic formula a distinct theme.
+2. **Israeli bird identity**: local birds defend recognizable habitats from invasive common mynas, giving the classic formula a distinct theme.
 3. **Short handmade challenges**: every arena has a clear goal, quick retries, and room for playful level ideas.
 
 ## 2. Reference and Inspiration
@@ -30,12 +30,12 @@ BomberBird is a single-player action-puzzle game inspired by Bomberman. The play
 - **Primary reference:** [Super Bomberman R](https://www.konami.com/games/asia/en/products/bomberman_r/).
 - **Video:** [Official Konami gameplay trailer](https://www.youtube.com/watch?v=ZMuRtNADbpA).
 - **Taking:** grid arenas, timed placement, cross-shaped attacks, destructible obstacles, and chain reactions.
-- **Changing:** a single-player focus, Israeli birds and habitats, original art, and seed-and-wind effects instead of traditional bombs.
+- **Changing:** a single-player focus, Israeli birds defending local habitats from common mynas, original art, and seed-and-wind effects instead of traditional bombs.
 - **Not taking:** Bomberman characters, assets, levels, competitive multiplayer, online systems, or a stage editor.
 
 ### Visual Direction
 
-The intended style is colorful, readable, and viewed from above. Different stages can draw inspiration from Israeli environments such as wetlands, coast, desert, or urban gardens. The exact art style, bird roster, palette, and effects will be explored during prototyping rather than fixed by this document.
+The intended style is colorful, readable, and viewed from above. Different stages can draw inspiration from Israeli environments such as wetlands, coast, desert, or urban gardens. Common mynas are the enemy birds and must remain visually distinct from playable and rescued birds. The exact art style, playable bird roster, palette, and effects will be explored during prototyping rather than fixed by this document.
 
 ## 3. Core Game Loop
 
@@ -59,7 +59,8 @@ flowchart TD
 - The pod bursts outward in four directions.
 - Solid objects stop the burst. Some obstacles can be destroyed.
 - A burst can trigger another pod and create a chain reaction.
-- The player loses when hit by a hazard or an active burst, then can retry quickly.
+- Common mynas act as the enemy birds. Their exact movement behavior will be selected during prototyping.
+- The player loses when hit by a common myna, another hazard, or an active burst, then can retry quickly.
 - Completing the arena objective opens the exit.
 - An optional rescue may provide an additional stage reward.
 
@@ -121,7 +122,7 @@ The final placement and visual treatment will be decided after the first playabl
 | Effects and UI | Original or clearly licensed assets | Record creator, source, and license |
 | Sound and music | Original or clearly licensed audio | Record creator, source, and license |
 
-Birds should be recognizable at gameplay scale, but the exact species list is intentionally open. Candidate birds include the Eurasian hoopoe, barn owl, and common kingfisher. Hazards will use fictional or abstract designs rather than presenting real wildlife as enemies.
+Birds should be recognizable at gameplay scale. Candidate playable birds include the Eurasian hoopoe, barn owl, and common kingfisher. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
 
 All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission. Art format, animation counts, and audio style will be chosen after a small visual prototype proves what is practical.
 
@@ -169,7 +170,7 @@ Only features that improve the actual implementation will remain. The architectu
 - [ ] One complete loop from menu to playable stage, result, and retry.
 - [ ] Four-direction movement in a grid arena.
 - [ ] Timed pods, cross-shaped bursts, obstacles, and chain reactions.
-- [ ] At least one clear hazard or enemy behavior.
+- [ ] At least one clear common myna enemy behavior.
 - [ ] A clear completion condition and exit.
 - [ ] A small set of handmade stages.
 - [ ] A choice between at least two cosmetic birds.
@@ -177,7 +178,7 @@ Only features that improve the actual implementation will remain. The architectu
 
 ### 8.2 Polish
 
-- [ ] Additional birds, habitats, stages, hazards, or optional rescues.
+- [ ] Additional playable birds, habitats, stages, hazards, common myna behaviors, or optional rescues.
 - [ ] A simple feather rating or collection screen.
 - [ ] A small choice of gameplay modifiers built from existing values.
 - [ ] Gamepad support and stronger visual or audio feedback.
@@ -200,3 +201,4 @@ This document is a proposal. The concept and scope may change in response to lec
 | Version | Date | Change |
 |---|---|---|
 | v0.1 | 2026-09-05 | Initial proposal |
+| v0.2 | 2026-09-05 | Replaced ghost enemies with invasive common mynas and aligned the theme, rules, art direction, and scope |
