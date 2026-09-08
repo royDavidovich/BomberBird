@@ -11,7 +11,7 @@
 | Engine | Unity 6.3 LTS, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
-| Document version | v0.2, 2026-09-05 |
+| Document version | v0.3, 2026-09-08 |
 
 ## 1. High Concept
 
@@ -122,7 +122,7 @@ The final placement and visual treatment will be decided after the first playabl
 | Effects and UI | Original or clearly licensed assets | Record creator, source, and license |
 | Sound and music | Original or clearly licensed audio | Record creator, source, and license |
 
-Birds should be recognizable at gameplay scale. Candidate playable birds include the Eurasian hoopoe, barn owl, and common kingfisher. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
+Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna has been discussed, but its design and gameplay remain open. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
 
 All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission. Art format, animation counts, and audio style will be chosen after a small visual prototype proves what is practical.
 
@@ -202,3 +202,4 @@ This document is a proposal. The concept and scope may change in response to lec
 |---|---|---|
 | v0.1 | 2026-09-05 | Initial proposal |
 | v0.2 | 2026-09-05 | Replaced ghost enemies with invasive common mynas and aligned the theme, rules, art direction, and scope |
+| v0.3 | 2026-09-08 | Confirmed the four playable bird species and preserved the approved retro concept references |
