@@ -71,3 +71,14 @@ FR2_Cache.asset
 # User Settings are meant to be personal
 UserSettings
 UserSettings/*
+
+# Local course and agent guidance
+# Local assistant support files. Never part of the submitted project.
+/CONVENTIONS.md
+/COURSE_CONSTITUTION.md
+/CLAUDE.md
+/AGENTS.md
+/PROJECT_AGENT_RULES.md
+/.claude/
+/.agents/
+/.codex/

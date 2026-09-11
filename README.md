@@ -6,7 +6,7 @@ The game uses Israeli birds and habitats as its original theme: the player contr
 
 ## Status
 
-This project is currently awaiting GDD and concept approval. Gameplay development has not started.
+The concept and GDD are approved, so development is open. Gameplay implementation has not started yet.
 
 The full design proposal is available at [Docs/GDD.md](Docs/GDD.md).
 
