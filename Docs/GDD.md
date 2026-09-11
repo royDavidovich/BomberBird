@@ -8,10 +8,10 @@
 | Team | Roy Davidovich, game design and development |
 | Genre | Single-player top-down grid action-puzzle |
 | Target platform | Windows PC |
-| Engine | Unity 6.3 LTS, 2D |
+| Engine | Unity 6.3 LTS, 6000.3.21f1, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
-| Document version | v0.3, 2026-09-08 |
+| Document version | v0.4, 2026-09-11 |
 
 ## 1. High Concept
 
@@ -130,7 +130,7 @@ All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission.
 
 **Scenes:** a menu scene and one reusable gameplay scene are the current starting point. This may be simplified if a single-scene structure proves clearer.
 
-**Systems:** Unity 2D, the Input System, grid-based level data, and inspector-editable tuning values.
+**Systems:** Unity 2D, the built-in Input Manager, grid-based level data, and inspector-editable tuning values.
 
 **Target device:** the Windows computer used for the class demonstration.
 
@@ -203,3 +203,4 @@ This document is a proposal. The concept and scope may change in response to lec
 | v0.1 | 2026-09-05 | Initial proposal |
 | v0.2 | 2026-09-05 | Replaced ghost enemies with invasive common mynas and aligned the theme, rules, art direction, and scope |
 | v0.3 | 2026-09-08 | Confirmed the four playable bird species and preserved the approved retro concept references |
+| v0.4 | 2026-09-11 | Pinned the exact Unity editor version required by the GDD template, and named the built-in Input Manager as the input system |
