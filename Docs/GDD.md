@@ -4,14 +4,14 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposal for lecturer approval |
+| Status | Approved by the lecturer through the designated course GDD Google Sheet |
 | Team | Roy Davidovich, game design and development |
 | Genre | Single-player top-down grid action-puzzle |
 | Target platform | Windows PC |
 | Engine | Unity 6.3 LTS, 6000.3.21f1, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
-| Document version | v0.4, 2026-09-11 |
+| Document version | v0.5, 2026-09-11 |
 
 ## 1. High Concept
 
@@ -194,7 +194,7 @@ Only features that improve the actual implementation will remain. The architectu
 
 ## Approval Gate
 
-This document is a proposal. The concept and scope may change in response to lecturer feedback. Full production begins only after the idea and GDD are approved, and approved changes will be recorded in this file.
+The idea and this GDD were approved by the lecturer through the designated course GDD Google Sheet, so production may begin. The concept and scope may still change in response to lecturer feedback, and every approved change will be recorded in the changelog below.
 
 ## Changelog
 
@@ -204,3 +204,4 @@ This document is a proposal. The concept and scope may change in response to lec
 | v0.2 | 2026-09-05 | Replaced ghost enemies with invasive common mynas and aligned the theme, rules, art direction, and scope |
 | v0.3 | 2026-09-08 | Confirmed the four playable bird species and preserved the approved retro concept references |
 | v0.4 | 2026-09-11 | Pinned the exact Unity editor version required by the GDD template, and named the built-in Input Manager as the input system |
+| v0.5 | 2026-09-11 | Recorded lecturer approval of the idea and GDD through the designated course Google Sheet, opening the approval gate |
