@@ -6,34 +6,31 @@ namespace BomberBird.Arena
 	/// Draws an <see cref="ArenaGrid"/>. Presentation only: it reads the grid and follows
 	/// its changes, and removing it would not alter a single gameplay rule.
 	/// </summary>
+	[RequireComponent(typeof(Arena))]
 	public class ArenaRenderer : MonoBehaviour
 	{
 		[Header("Data")]
-		[SerializeField] private ArenaLayout m_Layout;
 		[SerializeField] private ArenaTileSet m_TileSet;
 
 		[Header("Rendering")]
 		[Tooltip("Sorting order for arena tiles. Birds, pods, and bursts draw above this.")]
 		[SerializeField] private int m_SortingOrder = 0;
 
+		private Arena m_Arena;
 		private ArenaGrid m_Grid;
 		private SpriteRenderer[,] m_Tiles;
 
-		/// <summary>The grid being drawn, once it has been built.</summary>
-		public ArenaGrid Grid
-		{
-			get { return m_Grid; }
-		}
-
 		private void Awake()
 		{
+			m_Arena = GetComponent<Arena>();
+
 			if (!hasRequiredReferences())
 			{
 				enabled = false;
 				return;
 			}
 
-			m_Grid = m_Layout.CreateGrid();
+			m_Grid = m_Arena.Grid;
 			buildTiles();
 		}
 
@@ -60,9 +57,9 @@ namespace BomberBird.Arena
 
 		private bool hasRequiredReferences()
 		{
-			if (m_Layout == null)
+			if (m_Arena.Grid == null)
 			{
-				Debug.LogError(name + ": m_Layout is not assigned.", this);
+				Debug.LogError(name + ": the Arena component has no grid. Check its layout.", this);
 				return false;
 			}
 

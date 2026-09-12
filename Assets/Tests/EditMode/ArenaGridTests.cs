@@ -184,6 +184,67 @@ namespace BomberBird.Arena.Tests
 		}
 
 		[Test]
+		public void WorldToCell_IsTheInverseOfCellToWorld()
+		{
+			ArenaGrid grid = makeGrid();
+
+			for (int y = 0; y < grid.Height; ++y)
+			{
+				for (int x = 0; x < grid.Width; ++x)
+				{
+					Vector2Int cell = new Vector2Int(x, y);
+					Assert.AreEqual(cell, grid.WorldToCell(grid.CellToWorld(cell)));
+				}
+			}
+		}
+
+		[Test]
+		public void WorldToCell_SnapsToTheNearerCell()
+		{
+			ArenaGrid grid = makeGrid();
+
+			// Cell (6, 5) is centred on the origin, so it owns everything within half a unit.
+			Assert.AreEqual(new Vector2Int(6, 5), grid.WorldToCell(new Vector3(0.49f, -0.49f, 0f)));
+			Assert.AreEqual(new Vector2Int(7, 5), grid.WorldToCell(new Vector3(0.51f, 0f, 0f)));
+			Assert.AreEqual(new Vector2Int(6, 6), grid.WorldToCell(new Vector3(0f, 0.51f, 0f)));
+		}
+
+		[Test]
+		public void IsAreaWalkable_RejectsABodyOverlappingABlock()
+		{
+			ArenaGrid grid = makeGrid();
+			const float halfExtent = 0.35f;
+
+			// (1, 1) is open floor with a hard block diagonally at (2, 2).
+			Vector3 openCentre = grid.CellToWorld(new Vector2Int(1, 1));
+			Assert.IsTrue(grid.IsAreaWalkable(openCentre, halfExtent));
+
+			// Nudged far enough toward the block at (2, 1)? That cell is floor, so still fine.
+			Assert.IsTrue(grid.IsAreaWalkable(openCentre + new Vector3(0.4f, 0f, 0f), halfExtent));
+
+			// Sitting on the hard block itself must fail.
+			Vector3 blockCentre = grid.CellToWorld(new Vector2Int(2, 2));
+			Assert.IsFalse(grid.IsAreaWalkable(blockCentre, halfExtent));
+
+			// Straddling the boundary into the block must also fail.
+			Assert.IsFalse(grid.IsAreaWalkable(blockCentre + new Vector3(-0.5f, 0f, 0f), halfExtent));
+		}
+
+		[Test]
+		public void IsAreaWalkable_LetsABodyFitAlongACorridor()
+		{
+			ArenaGrid grid = makeGrid();
+			const float halfExtent = 0.35f;
+
+			// Row y = 1 is open all the way across the interior.
+			for (int x = 1; x <= 11; ++x)
+			{
+				Vector3 centre = grid.CellToWorld(new Vector2Int(x, 1));
+				Assert.IsTrue(grid.IsAreaWalkable(centre, halfExtent), "blocked at x=" + x);
+			}
+		}
+
+		[Test]
 		public void RaggedMap_FailsLoudlyWithTheOffendingRow()
 		{
 			string ragged = "####\n#..#\n###";

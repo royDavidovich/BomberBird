@@ -140,6 +140,35 @@ namespace BomberBird.Arena
 				0f);
 		}
 
+		/// <summary>
+		/// The cell a world position falls in. Inverse of <see cref="CellToWorld"/>. A body
+		/// standing between two cells counts as being in the nearer one.
+		/// </summary>
+		public Vector2Int WorldToCell(Vector3 i_World)
+		{
+			return new Vector2Int(
+				Mathf.RoundToInt(i_World.x + (r_Width - 1) * 0.5f),
+				Mathf.RoundToInt(i_World.y + (r_Height - 1) * 0.5f));
+		}
+
+		/// <summary>
+		/// True when an axis-aligned square centred on a world position sits entirely on
+		/// walkable cells. Used for smooth movement, where a body can straddle a boundary.
+		/// The square must be smaller than one cell, so testing its four corners is enough.
+		/// </summary>
+		public bool IsAreaWalkable(Vector2 i_Centre, float i_HalfExtent)
+		{
+			float left = i_Centre.x - i_HalfExtent;
+			float right = i_Centre.x + i_HalfExtent;
+			float bottom = i_Centre.y - i_HalfExtent;
+			float top = i_Centre.y + i_HalfExtent;
+
+			return IsWalkable(WorldToCell(new Vector3(left, bottom, 0f)))
+				&& IsWalkable(WorldToCell(new Vector3(right, bottom, 0f)))
+				&& IsWalkable(WorldToCell(new Vector3(left, top, 0f)))
+				&& IsWalkable(WorldToCell(new Vector3(right, top, 0f)));
+		}
+
 		protected virtual void OnCellChanged(Vector2Int i_Cell)
 		{
 			Action<Vector2Int> handler = CellChanged;
