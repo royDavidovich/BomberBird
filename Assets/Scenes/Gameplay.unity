@@ -119,6 +119,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &476257615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 476257617}
+  - component: {fileID: 476257616}
+  m_Layer: 0
+  m_Name: GameFlow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &476257616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476257615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4ce4f5b8dc9f4c2fac44bae70fa77fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.GameFlow
+  m_StartingLives: 3
+--- !u!4 &476257617
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476257615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1600481131
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,6 +179,7 @@ GameObject:
   - component: {fileID: 1600481133}
   - component: {fileID: 1600481132}
   - component: {fileID: 1600481138}
+  - component: {fileID: 1600481139}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -332,6 +378,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdPodPlacer
   m_Pods: {fileID: 1688113800}
+--- !u!114 &1600481139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600481131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c800ee7bc1d87491c937992cc109cad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.BirdDeath
+  m_Pods: {fileID: 1688113800}
+  m_LethalSeconds: 0.45
+  m_DeathBeat: 1
+  m_FlashRate: 10
 --- !u!1 &1688113796
 GameObject:
   m_ObjectHideFlags: 0
@@ -526,3 +588,4 @@ SceneRoots:
   - {fileID: 1939443380}
   - {fileID: 1688113798}
   - {fileID: 1600481137}
+  - {fileID: 476257617}

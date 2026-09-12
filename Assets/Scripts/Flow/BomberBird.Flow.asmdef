@@ -1,7 +1,11 @@
 {
     "name": "BomberBird.Flow",
     "rootNamespace": "BomberBird.Flow",
-    "references": [],
+    "references": [
+        "BomberBird.Arena",
+        "BomberBird.Pods",
+        "BomberBird.Player"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
