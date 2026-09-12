@@ -52,6 +52,12 @@ namespace BomberBird.Player
 			get { return m_IsMoving; }
 		}
 
+		/// <summary>Half the bird's collision square, in cells.</summary>
+		public float HalfExtent
+		{
+			get { return m_HalfExtent; }
+		}
+
 		/// <summary>The cell the bird counts as standing on.</summary>
 		public Vector2Int Cell
 		{

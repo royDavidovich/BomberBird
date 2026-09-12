@@ -95,15 +95,19 @@ namespace BomberBird.Pods
 		}
 
 		/// <summary>
-		/// Tells the field that the only cell still occupied is this one, which turns every
-		/// other freshly placed pod solid. Single-player, so one bird is the whole story.
-		/// Safe to call every frame.
+		/// Tells the field where the bird's body is. Every pod that body no longer covers
+		/// turns solid. Single-player, so one bird is the whole story. Safe to call every
+		/// frame.
+		///
+		/// The body, not the cell its centre falls in: stepping off a pod is continuous, and
+		/// the centre reaches the next cell while the body still overlaps the one behind it.
+		/// A pod that turned solid then would wall the bird in where it stands.
 		/// </summary>
-		public void MarkVacatedExcept(Vector2Int i_OccupiedCell)
+		public void MarkVacatedExcept(Vector2 i_BodyCentre, float i_BodyHalfExtent)
 		{
 			foreach (Pod pod in r_Pods)
 			{
-				if (pod.Cell != i_OccupiedCell)
+				if (!covers(i_BodyCentre, i_BodyHalfExtent, pod.Cell))
 				{
 					pod.IsSolid = true;
 				}
@@ -210,6 +214,25 @@ namespace BomberBird.Pods
 			{
 				detonate(pod);
 			}
+		}
+
+		/// <summary>
+		/// Whether a body of this size, centred here, covers any part of this cell. Asks the
+		/// grid the same four corners <see cref="ArenaGrid.IsAreaWalkable"/> asks, so the
+		/// moment a pod stops being stood on and the moment it starts blocking cannot drift
+		/// apart.
+		/// </summary>
+		private bool covers(Vector2 i_BodyCentre, float i_BodyHalfExtent, Vector2Int i_Cell)
+		{
+			float left = i_BodyCentre.x - i_BodyHalfExtent;
+			float right = i_BodyCentre.x + i_BodyHalfExtent;
+			float bottom = i_BodyCentre.y - i_BodyHalfExtent;
+			float top = i_BodyCentre.y + i_BodyHalfExtent;
+
+			return r_Grid.WorldToCell(new Vector3(left, bottom, 0f)) == i_Cell
+				|| r_Grid.WorldToCell(new Vector3(right, bottom, 0f)) == i_Cell
+				|| r_Grid.WorldToCell(new Vector3(left, top, 0f)) == i_Cell
+				|| r_Grid.WorldToCell(new Vector3(right, top, 0f)) == i_Cell;
 		}
 
 		private Pod findPod(Vector2Int i_Cell)
