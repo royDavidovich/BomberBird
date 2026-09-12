@@ -75,6 +75,7 @@ UserSettings/*
 
 # Editor screenshots and capture output
 /Captures/
+/Assets/Screenshots/
 
 # Local scratch: asset-generation prompts and verification scripts.
 # Note the Unity rule above is /[Tt]emp/, which does not cover this.
