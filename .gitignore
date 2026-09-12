@@ -75,6 +75,10 @@ UserSettings/*
 # Editor screenshots and capture output
 /Captures/
 
+# Local scratch: asset-generation prompts and verification scripts.
+# Note the Unity rule above is /[Tt]emp/, which does not cover this.
+/tmp/
+
 # Local course and agent guidance
 # Local assistant support files. Never part of the submitted project.
 /CONVENTIONS.md
