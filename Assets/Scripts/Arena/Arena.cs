@@ -31,6 +31,12 @@ namespace BomberBird.Arena
 			}
 		}
 
+		/// <summary>The stage this arena was built from, for anything that needs its data.</summary>
+		public ArenaLayout Layout
+		{
+			get { return m_Layout; }
+		}
+
 		private void Awake()
 		{
 			ensureGrid();

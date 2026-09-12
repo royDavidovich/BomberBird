@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f69d0d978404b455eb2a099d13d98b6e, type: 3}
   m_Name: stage-01
   m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaLayout
+  m_ExitCell: {x: 11, y: 1}
   m_Rows: '#############
 
     #...........#
