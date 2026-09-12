@@ -95,16 +95,18 @@ namespace BomberBird.Pods
 		}
 
 		/// <summary>
-		/// Tells the field that nothing is standing on this cell any more, which turns a
-		/// freshly placed pod solid. Safe to call every frame.
+		/// Tells the field that the only cell still occupied is this one, which turns every
+		/// other freshly placed pod solid. Single-player, so one bird is the whole story.
+		/// Safe to call every frame.
 		/// </summary>
-		public void MarkVacated(Vector2Int i_Cell)
+		public void MarkVacatedExcept(Vector2Int i_OccupiedCell)
 		{
-			Pod pod = findPod(i_Cell);
-
-			if (pod != null)
+			foreach (Pod pod in r_Pods)
 			{
-				pod.IsSolid = true;
+				if (pod.Cell != i_OccupiedCell)
+				{
+					pod.IsSolid = true;
+				}
 			}
 		}
 

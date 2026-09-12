@@ -2,7 +2,8 @@
     "name": "BomberBird.Player",
     "rootNamespace": "BomberBird.Player",
     "references": [
-        "BomberBird.Arena"
+        "BomberBird.Arena",
+        "BomberBird.Pods"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

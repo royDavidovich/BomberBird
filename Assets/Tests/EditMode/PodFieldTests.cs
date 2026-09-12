@@ -80,22 +80,39 @@ namespace BomberBird.Tests
 			field.TryPlace(cell);
 			Assert.IsFalse(field.IsBlocking(cell), "the bird is still standing on it");
 
-			field.MarkVacated(cell);
+			// The bird has walked one cell over, so it no longer occupies the pod's cell.
+			field.MarkVacatedExcept(new Vector2Int(2, 1));
 			Assert.IsTrue(field.IsBlocking(cell), "having stepped off, it cannot step back on");
 		}
 
 		[Test]
-		public void MarkVacated_IsSafeToCallRepeatedlyAndOnEmptyCells()
+		public void MarkVacatedExcept_IsSafeToCallRepeatedlyAndOnAnEmptyField()
 		{
 			PodField field = makeField(makeGrid());
 
-			Assert.DoesNotThrow(() => field.MarkVacated(new Vector2Int(5, 5)));
+			Assert.DoesNotThrow(() => field.MarkVacatedExcept(new Vector2Int(5, 5)));
 
 			field.TryPlace(new Vector2Int(1, 1));
-			field.MarkVacated(new Vector2Int(1, 1));
-			field.MarkVacated(new Vector2Int(1, 1));
+			field.MarkVacatedExcept(new Vector2Int(2, 1));
+			field.MarkVacatedExcept(new Vector2Int(2, 1));
 
 			Assert.IsTrue(field.IsBlocking(new Vector2Int(1, 1)));
+		}
+
+		[Test]
+		public void MarkVacatedExcept_LeavesThePodTheBirdIsStandingOnPassable()
+		{
+			PodField field = makeField(makeGrid(), 5);
+			Vector2Int standingOn = new Vector2Int(1, 1);
+			Vector2Int steppedOff = new Vector2Int(2, 1);
+
+			field.TryPlace(steppedOff);
+			field.TryPlace(standingOn);
+
+			field.MarkVacatedExcept(standingOn);
+
+			Assert.IsFalse(field.IsBlocking(standingOn), "the bird is still on this one");
+			Assert.IsTrue(field.IsBlocking(steppedOff), "this one was left behind");
 		}
 
 		[Test]
