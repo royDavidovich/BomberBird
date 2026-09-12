@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcdc6c29547894af5bd83815a4f63cce, type: 3}
+  m_Name: seed-pod
+  m_EditorClassIdentifier: BomberBird.Pods::BomberBird.Pods.PodSpriteSet
+  m_PodPulse:
+  - {fileID: 21300000, guid: 8229e7f4acd5c43248bde870a83005cc, type: 3}
+  - {fileID: 21300000, guid: 77c69539b4e1245ef86c2171343f465e, type: 3}
+  - {fileID: 21300000, guid: 834dc5ce72a3a4c4c9e82c5e84389807, type: 3}
+  m_BurstCentre:
+  - {fileID: 21300000, guid: 38e9788fced8f47d5b33ba7b7ab59f9c, type: 3}
+  - {fileID: 21300000, guid: 3008617dc21f344fa9cf98dd6ffad75f, type: 3}
+  - {fileID: 21300000, guid: 0ea05d9ad6f13469084c869bf4ff4e55, type: 3}
+  m_BurstArm:
+  - {fileID: 21300000, guid: acc9af10a3e8b40c2a07cbfe9d5e00f7, type: 3}
+  - {fileID: 21300000, guid: af66c3e8c46954ee69c86d3e264bad32, type: 3}
+  - {fileID: 21300000, guid: c7081057e49094fb294a6cf1e7bb483b, type: 3}
+  m_BurstEnd:
+  - {fileID: 21300000, guid: 2ea0bf0f536cb416cb8f5d2b1ee530f6, type: 3}
+  - {fileID: 21300000, guid: 1c71e9bb9b0dd46f386bf14b18a99dfc, type: 3}
+  - {fileID: 21300000, guid: 54ac1153527bf4428b9e5a44cdb23c32, type: 3}
