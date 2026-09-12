@@ -1,0 +1,17 @@
+{
+    "name": "BomberBird.Player",
+    "rootNamespace": "BomberBird.Player",
+    "references": [
+        "BomberBird.Arena",
+        "BomberBird.Pods"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
