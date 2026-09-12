@@ -72,6 +72,9 @@ FR2_Cache.asset
 UserSettings
 UserSettings/*
 
+# Editor screenshots and capture output
+/Captures/
+
 # Local course and agent guidance
 # Local assistant support files. Never part of the submitted project.
 /CONVENTIONS.md

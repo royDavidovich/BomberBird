@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a44d81819fdf463b9442bf26b8fbd0d, type: 3}
+  m_Name: first-steps-garden
+  m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaTileSet
+  m_Floor: {fileID: 21300000, guid: 5c65d42ecf58149cdab6a0241db0abe4, type: 3}
+  m_Border: {fileID: 21300000, guid: 0d2ed071e88144f39bf0614b1aefca49, type: 3}
+  m_HardBlock: {fileID: 21300000, guid: 784cf04f014cc4fd99d7b1a399309833, type: 3}
+  m_SoftBlockVariants:
+  - {fileID: 21300000, guid: 0e59792a9816447a19adab607d37b18f, type: 3}
+  - {fileID: 21300000, guid: 27724ff218f6542a290b7b87e42c27ae, type: 3}
+  - {fileID: 21300000, guid: e4c151a1972124e6c8256837a6028055, type: 3}
+  - {fileID: 21300000, guid: 909b6e3ae2796404a9cb0175fe3c72ae, type: 3}
+  - {fileID: 21300000, guid: 29300a8743e5f45e8b912974d6c90f70, type: 3}
+  - {fileID: 21300000, guid: 450c40ee2e0ba472aae1c7cb0c4d6306, type: 3}
+  - {fileID: 21300000, guid: c474d4e7b378d4c8bbfc275876caa05e, type: 3}
+  - {fileID: 21300000, guid: c3a67d5eebab849aeaf4bbbdc9475281, type: 3}
