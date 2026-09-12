@@ -4,6 +4,7 @@
     "references": [
         "BomberBird.Arena",
         "BomberBird.Player",
+        "BomberBird.Pods",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
