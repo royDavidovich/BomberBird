@@ -3,6 +3,7 @@
     "rootNamespace": "BomberBird.Arena.Tests",
     "references": [
         "BomberBird.Arena",
+        "BomberBird.Player",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -24,7 +24,8 @@ namespace BomberBird.Player
 		[Tooltip("Half the bird's collision square, in cells. Must stay below 0.5.")]
 		[SerializeField] private float m_HalfExtent = 0.35f;
 
-		[Tooltip("How far off a corridor's centre line the bird can be and still be nudged into it.")]
+		[Tooltip("How far off a corridor's centre line the bird can be and still be nudged into it. "
+			+ "Only nudges when that would actually open the path. Set to 0 to disable.")]
 		[SerializeField] private float m_CornerAssist = 0.4f;
 
 		private Rigidbody2D m_Body;
@@ -106,7 +107,10 @@ namespace BomberBird.Player
 
 			if (!m_Grid.IsAreaWalkable(to, m_HalfExtent))
 			{
-				to = assistAroundCorner(from, step);
+				Vector2 assisted;
+				to = TryCornerAssist(m_Grid, from, m_Intent, step, m_HalfExtent, m_CornerAssist, out assisted)
+					? assisted
+					: from;
 			}
 
 			m_IsMoving = to != from;
@@ -137,21 +141,49 @@ namespace BomberBird.Player
 		}
 
 		/// <summary>
-		/// Blocked head-on, but only because the bird is off the corridor's centre line.
-		/// Slide it toward that line so a near-miss becomes a turn instead of a stop. This
-		/// is most of why the movement feels forgiving rather than sticky.
+		/// Blocked head-on, but only because the bird sits off the corridor's centre line.
+		/// Slides it toward that line so a near-miss becomes a turn instead of a stop.
+		///
+		/// Only assists when reaching the centre line would genuinely open the path.
+		/// Walking into a solid wall leaves the bird exactly where it is, rather than
+		/// dragging it sideways into a wall it still cannot pass.
+		///
+		/// Set <paramref name="i_MaxAssist"/> to zero to turn the behaviour off entirely.
 		/// </summary>
-		private Vector2 assistAroundCorner(Vector2 i_From, float i_Step)
+		public static bool TryCornerAssist(
+			ArenaGrid i_Grid,
+			Vector2 i_From,
+			Vector2Int i_Intent,
+			float i_Step,
+			float i_HalfExtent,
+			float i_MaxAssist,
+			out Vector2 o_Next)
 		{
-			bool movingHorizontally = m_Intent.x != 0;
-			Vector2Int cell = m_Grid.WorldToCell(i_From);
-			Vector3 centre = m_Grid.CellToWorld(cell);
+			o_Next = i_From;
 
+			if (i_Grid == null || i_MaxAssist <= 0f || i_Intent == Vector2Int.zero)
+			{
+				return false;
+			}
+
+			bool movingHorizontally = i_Intent.x != 0;
+			Vector3 centre = i_Grid.CellToWorld(i_Grid.WorldToCell(i_From));
 			float offset = movingHorizontally ? centre.y - i_From.y : centre.x - i_From.x;
 
-			if (Mathf.Approximately(offset, 0f) || Mathf.Abs(offset) > m_CornerAssist)
+			if (Mathf.Approximately(offset, 0f) || Mathf.Abs(offset) > i_MaxAssist)
 			{
-				return i_From;
+				return false;
+			}
+
+			// Would standing on the centre line actually let the bird through? If not, the
+			// slide would be pointless sideways drift against a wall.
+			Vector2 aligned = movingHorizontally
+				? new Vector2(i_From.x, centre.y)
+				: new Vector2(centre.x, i_From.y);
+
+			if (!i_Grid.IsAreaWalkable(aligned + (Vector2)i_Intent * i_Step, i_HalfExtent))
+			{
+				return false;
 			}
 
 			float slide = Mathf.Sign(offset) * Mathf.Min(i_Step, Mathf.Abs(offset));
@@ -159,7 +191,14 @@ namespace BomberBird.Player
 				? new Vector2(i_From.x, i_From.y + slide)
 				: new Vector2(i_From.x + slide, i_From.y);
 
-			return m_Grid.IsAreaWalkable(nudged, m_HalfExtent) ? nudged : i_From;
+			if (!i_Grid.IsAreaWalkable(nudged, i_HalfExtent))
+			{
+				return false;
+			}
+
+			o_Next = nudged;
+
+			return true;
 		}
 
 		private static eFacing toFacing(Vector2Int i_Intent)
