@@ -11,7 +11,8 @@
 | Engine | Unity 6.3 LTS, 6000.3.21f1, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
-| Document version | v0.5, 2026-09-11 |
+| Submission deadline | 4 October 2026 |
+| Document version | v0.6, 2026-09-12 |
 
 ## 1. High Concept
 
@@ -68,6 +69,25 @@ flowchart TD
 
 A stage is complete when its main objective is cleared and the player reaches the exit. Optional goals, such as finding a rescued bird or meeting a time target, may award additional feathers. The precise rating rules will be tested during development and will not block basic progression.
 
+### Campaign and Unlocks
+
+The campaign is six handmade levels. Each level is themed around one bird and set in the habitat that bird belongs to, so every stage has its own visual identity rather than reskinning a single arena.
+
+| Level | Habitat | Themed around |
+|---|---|---|
+| 1. Intro | Garden | Eurasian hoopoe, the starting bird |
+| 2. Orchard | Orchard grove | Eurasian hoopoe |
+| 3. Stream | Stream bank | White-throated kingfisher |
+| 4. Lagoon | Lagoon shore | Great white pelican |
+| 5. Upland | Rocky upland | Chukar partridge |
+| 6. Boss | Overgrown courtyard | Common myna, as the boss |
+
+Finishing a level that introduces a new bird awards that bird's feather, and the bird becomes playable from that point on. The player carries the growing roster forward and chooses from it at the start of later levels.
+
+Four birds are playable: the Eurasian hoopoe, the white-throated kingfisher, the great white pelican, and the chukar partridge. The player starts as the hoopoe, so the intro level teaches the core rules with a character already in hand. The common myna is the enemy species and the final boss, and is never playable.
+
+Exactly which level awards which feather is a pacing decision and will be settled during prototyping. The rule above holds regardless: a bird becomes playable by being discovered at the end of a level, never by being available from the start.
+
 ### Parameters to Tune
 
 | Parameter | What it controls | First guess |
@@ -122,7 +142,7 @@ The final placement and visual treatment will be decided after the first playabl
 | Effects and UI | Original or clearly licensed assets | Record creator, source, and license |
 | Sound and music | Original or clearly licensed audio | Record creator, source, and license |
 
-Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna has been discussed, but its design and gameplay remain open. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
+Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna closes the campaign in level 6; its exact design and attack behavior remain open. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
 
 All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission. Art format, animation counts, and audio style will be chosen after a small visual prototype proves what is practical.
 
@@ -172,8 +192,8 @@ Only features that improve the actual implementation will remain. The architectu
 - [ ] Timed pods, cross-shaped bursts, obstacles, and chain reactions.
 - [ ] At least one clear common myna enemy behavior.
 - [ ] A clear completion condition and exit.
-- [ ] A small set of handmade stages.
-- [ ] A choice between at least two cosmetic birds.
+- [ ] Six handmade levels, each in its own habitat, ending in the common myna boss level.
+- [ ] Four playable birds unlocked in order by collecting a feather at the end of a level.
 - [ ] Essential UI, feedback, and a working Windows build.
 
 ### 8.2 Polish
@@ -205,3 +225,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.3 | 2026-09-08 | Confirmed the four playable bird species and preserved the approved retro concept references |
 | v0.4 | 2026-09-11 | Pinned the exact Unity editor version required by the GDD template, and named the built-in Input Manager as the input system |
 | v0.5 | 2026-09-11 | Recorded lecturer approval of the idea and GDD through the designated course Google Sheet, opening the approval gate |
+| v0.6 | 2026-09-12 | Defined the six-level campaign, the feather unlock progression, and the four playable birds; confirmed the common myna as the boss and never playable; recorded the submission deadline |
