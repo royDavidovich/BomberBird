@@ -1,0 +1,21 @@
+{
+    "name": "BomberBird.UI",
+    "rootNamespace": "BomberBird.UI",
+    "references": [
+        "BomberBird.Arena",
+        "BomberBird.Pods",
+        "BomberBird.Player",
+        "BomberBird.Flow",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
