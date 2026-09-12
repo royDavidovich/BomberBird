@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdMovement
   m_Arena: {fileID: 1688113799}
+  m_Pods: {fileID: 1688113800}
   m_Speed: 4
   m_HalfExtent: 0.35
   m_CornerAssist: 0.4

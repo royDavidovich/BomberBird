@@ -12,6 +12,9 @@ namespace BomberBird.Tests
 		private const int k_Range = 2;
 		private const int k_MaxPods = 1;
 
+		// Matches BirdMovement's default body size, so these read as the bird's own rule.
+		private const float k_BirdHalfExtent = 0.35f;
+
 		private const string k_Rows =
 			"#############\n" +
 			"#...........#\n" +
@@ -97,6 +100,65 @@ namespace BomberBird.Tests
 			field.MarkVacatedExcept(new Vector2Int(2, 1));
 
 			Assert.IsTrue(field.IsBlocking(new Vector2Int(1, 1)));
+		}
+
+		[Test]
+		public void ASolidPodBlocksABirdSizedBodyFromEnteringItsCell()
+		{
+			// The rule as the bird experiences it: the grid alone says the cell is floor, and
+			// only the pod field makes it impassable.
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int podCell = new Vector2Int(1, 1);
+
+			field.TryPlace(podCell);
+			field.MarkVacatedExcept(new Vector2Int(2, 1));
+
+			Vector2 centre = grid.CellToWorld(podCell);
+
+			Assert.IsTrue(
+				grid.IsAreaWalkable(centre, k_BirdHalfExtent),
+				"the cell itself is still open floor");
+			Assert.IsFalse(
+				grid.IsAreaWalkable(centre, k_BirdHalfExtent, field.IsBlocking),
+				"the pod left behind must block the way back on");
+		}
+
+		[Test]
+		public void AFreshPodDoesNotBlockTheBirdStandingOnIt()
+		{
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int podCell = new Vector2Int(1, 1);
+
+			field.TryPlace(podCell);
+
+			Assert.IsTrue(
+				grid.IsAreaWalkable(grid.CellToWorld(podCell), k_BirdHalfExtent, field.IsBlocking),
+				"the bird must be able to step off the pod it just placed");
+		}
+
+		[Test]
+		public void ABodyStraddlingIntoASolidPodsCellIsBlocked()
+		{
+			// Half a step short of the boundary is still an overlap, and the bird's body is
+			// what matters, not the cell its centre happens to fall in.
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int podCell = new Vector2Int(2, 1);
+
+			field.TryPlace(podCell);
+			field.MarkVacatedExcept(new Vector2Int(1, 1));
+
+			Vector3 neighbour = grid.CellToWorld(new Vector2Int(1, 1));
+			Vector2 leaning = new Vector2(neighbour.x + 0.5f - (k_BirdHalfExtent * 0.5f), neighbour.y);
+
+			Assert.IsTrue(
+				grid.IsAreaWalkable(leaning, k_BirdHalfExtent),
+				"nothing in the arena itself stops the bird here");
+			Assert.IsFalse(
+				grid.IsAreaWalkable(leaning, k_BirdHalfExtent, field.IsBlocking),
+				"the body overlaps the pod's cell, so it is blocked");
 		}
 
 		[Test]

@@ -62,7 +62,7 @@ namespace BomberBird.Tests
 
 			Vector2 next;
 			bool assisted = BirdMovement.TryCornerAssist(
-				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, out next);
+				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, null, out next);
 
 			Assert.IsFalse(assisted, "must not slide along a wall that spans the whole row");
 			Assert.AreEqual(from, next, "the bird must stay exactly where it is");
@@ -86,7 +86,7 @@ namespace BomberBird.Tests
 
 			Vector2 next;
 			bool assisted = BirdMovement.TryCornerAssist(
-				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, out next);
+				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, null, out next);
 
 			Assert.IsTrue(assisted, "aligning would clear the gap, so it should assist");
 			Assert.Greater(next.x, from.x, "should slide toward the gap's centre line");
@@ -101,7 +101,7 @@ namespace BomberBird.Tests
 
 			Vector2 next;
 			bool assisted = BirdMovement.TryCornerAssist(
-				grid, from, Vector2Int.up, k_Step, k_HalfExtent, 0f, out next);
+				grid, from, Vector2Int.up, k_Step, k_HalfExtent, 0f, null, out next);
 
 			Assert.IsFalse(assisted, "zero tolerance must disable the behaviour entirely");
 			Assert.AreEqual(from, next);
@@ -115,7 +115,7 @@ namespace BomberBird.Tests
 
 			Vector2 next;
 			bool assisted = BirdMovement.TryCornerAssist(
-				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, out next);
+				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, null, out next);
 
 			Assert.IsFalse(assisted, "beyond the tolerance the bird is not 'nearly aligned'");
 			Assert.AreEqual(from, next);
@@ -130,7 +130,7 @@ namespace BomberBird.Tests
 
 			Vector2 next;
 			bool assisted = BirdMovement.TryCornerAssist(
-				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, out next);
+				grid, from, Vector2Int.up, k_Step, k_HalfExtent, k_MaxAssist, null, out next);
 
 			Assert.IsTrue(assisted);
 			Assert.AreEqual(centre.x, next.x, 0.0001f, "should land on the centre line, not overshoot it");

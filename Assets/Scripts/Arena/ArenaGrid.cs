@@ -158,15 +158,32 @@ namespace BomberBird.Arena
 		/// </summary>
 		public bool IsAreaWalkable(Vector2 i_Centre, float i_HalfExtent)
 		{
+			return IsAreaWalkable(i_Centre, i_HalfExtent, null);
+		}
+
+		/// <summary>
+		/// The same test, with one addition: a caller may name cells the grid knows nothing
+		/// about, such as a placed pod. Passing null asks the arena's own contents only.
+		///
+		/// The grid never learns what the extra blocker is. It asks a question and believes
+		/// the answer, which keeps pods and, later, enemies out of the map's own rules.
+		/// </summary>
+		public bool IsAreaWalkable(Vector2 i_Centre, float i_HalfExtent, Predicate<Vector2Int> i_AlsoBlocked)
+		{
 			float left = i_Centre.x - i_HalfExtent;
 			float right = i_Centre.x + i_HalfExtent;
 			float bottom = i_Centre.y - i_HalfExtent;
 			float top = i_Centre.y + i_HalfExtent;
 
-			return IsWalkable(WorldToCell(new Vector3(left, bottom, 0f)))
-				&& IsWalkable(WorldToCell(new Vector3(right, bottom, 0f)))
-				&& IsWalkable(WorldToCell(new Vector3(left, top, 0f)))
-				&& IsWalkable(WorldToCell(new Vector3(right, top, 0f)));
+			return isCellFree(WorldToCell(new Vector3(left, bottom, 0f)), i_AlsoBlocked)
+				&& isCellFree(WorldToCell(new Vector3(right, bottom, 0f)), i_AlsoBlocked)
+				&& isCellFree(WorldToCell(new Vector3(left, top, 0f)), i_AlsoBlocked)
+				&& isCellFree(WorldToCell(new Vector3(right, top, 0f)), i_AlsoBlocked);
+		}
+
+		private bool isCellFree(Vector2Int i_Cell, Predicate<Vector2Int> i_AlsoBlocked)
+		{
+			return IsWalkable(i_Cell) && (i_AlsoBlocked == null || !i_AlsoBlocked(i_Cell));
 		}
 
 		protected virtual void OnCellChanged(Vector2Int i_Cell)

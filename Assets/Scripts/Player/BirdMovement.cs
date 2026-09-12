@@ -1,4 +1,6 @@
+using System;
 using BomberBird.Arena;
+using BomberBird.Pods;
 using UnityEngine;
 
 namespace BomberBird.Player
@@ -17,6 +19,9 @@ namespace BomberBird.Player
 		[Header("Arena")]
 		[SerializeField] private BomberBird.Arena.Arena m_Arena;
 
+		[Tooltip("Optional. Assign it and a pod the bird has stepped off blocks the way back on.")]
+		[SerializeField] private ArenaPods m_Pods;
+
 		[Header("Movement")]
 		[Tooltip("Cells per second.")]
 		[SerializeField] private float m_Speed = 4f;
@@ -30,6 +35,7 @@ namespace BomberBird.Player
 
 		private Rigidbody2D m_Body;
 		private ArenaGrid m_Grid;
+		private Predicate<Vector2Int> m_IsPodBlocking;
 		private Vector2Int m_Intent;
 		private eFacing m_Facing = eFacing.Down;
 		private bool m_IsMoving;
@@ -79,6 +85,14 @@ namespace BomberBird.Player
 			{
 				Debug.LogError(name + ": the Arena has no grid.", this);
 				enabled = false;
+				return;
+			}
+
+			// Cached once: converting a method group every frame would allocate on the
+			// movement path for no reason.
+			if (m_Pods != null && m_Pods.Field != null)
+			{
+				m_IsPodBlocking = m_Pods.Field.IsBlocking;
 			}
 		}
 
@@ -105,10 +119,11 @@ namespace BomberBird.Player
 			float step = m_Speed * Time.fixedDeltaTime;
 			Vector2 to = from + (Vector2)m_Intent * step;
 
-			if (!m_Grid.IsAreaWalkable(to, m_HalfExtent))
+			if (!m_Grid.IsAreaWalkable(to, m_HalfExtent, m_IsPodBlocking))
 			{
 				Vector2 assisted;
-				to = TryCornerAssist(m_Grid, from, m_Intent, step, m_HalfExtent, m_CornerAssist, out assisted)
+				to = TryCornerAssist(
+					m_Grid, from, m_Intent, step, m_HalfExtent, m_CornerAssist, m_IsPodBlocking, out assisted)
 					? assisted
 					: from;
 			}
@@ -148,6 +163,9 @@ namespace BomberBird.Player
 		/// Walking into a solid wall leaves the bird exactly where it is, rather than
 		/// dragging it sideways into a wall it still cannot pass.
 		///
+		/// <paramref name="i_AlsoBlocked"/> carries anything the grid itself does not know
+		/// about, such as a pod the bird has already stepped off. Null asks the grid alone.
+		///
 		/// Set <paramref name="i_MaxAssist"/> to zero to turn the behaviour off entirely.
 		/// </summary>
 		public static bool TryCornerAssist(
@@ -157,6 +175,7 @@ namespace BomberBird.Player
 			float i_Step,
 			float i_HalfExtent,
 			float i_MaxAssist,
+			Predicate<Vector2Int> i_AlsoBlocked,
 			out Vector2 o_Next)
 		{
 			o_Next = i_From;
@@ -181,7 +200,7 @@ namespace BomberBird.Player
 				? new Vector2(i_From.x, centre.y)
 				: new Vector2(centre.x, i_From.y);
 
-			if (!i_Grid.IsAreaWalkable(aligned + (Vector2)i_Intent * i_Step, i_HalfExtent))
+			if (!i_Grid.IsAreaWalkable(aligned + (Vector2)i_Intent * i_Step, i_HalfExtent, i_AlsoBlocked))
 			{
 				return false;
 			}
@@ -191,7 +210,7 @@ namespace BomberBird.Player
 				? new Vector2(i_From.x, i_From.y + slide)
 				: new Vector2(i_From.x + slide, i_From.y);
 
-			if (!i_Grid.IsAreaWalkable(nudged, i_HalfExtent))
+			if (!i_Grid.IsAreaWalkable(nudged, i_HalfExtent, i_AlsoBlocked))
 			{
 				return false;
 			}
