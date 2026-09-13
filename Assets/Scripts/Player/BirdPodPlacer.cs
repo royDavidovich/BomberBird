@@ -40,16 +40,14 @@ namespace BomberBird.Player
 				return;
 			}
 
-			Vector2Int cell = m_Movement.Cell;
-
-			// Every cell except this one has been stepped off, so a pod waiting there turns
-			// solid. Checked every frame, because the bird slides between cells continuously.
-			field.MarkVacatedExcept(cell);
+			// Any pod the bird's body has cleared turns solid. Checked every frame, because
+			// the bird slides between cells continuously.
+			field.MarkVacatedExcept(transform.position, m_Movement.HalfExtent);
 
 			// Input belongs in Update, never in FixedUpdate.
 			if (Input.GetButtonDown(k_PlaceButton))
 			{
-				field.TryPlace(cell);
+				field.TryPlace(m_Movement.Cell);
 			}
 		}
 	}

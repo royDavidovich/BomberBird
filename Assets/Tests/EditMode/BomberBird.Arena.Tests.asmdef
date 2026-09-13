@@ -5,6 +5,7 @@
         "BomberBird.Arena",
         "BomberBird.Player",
         "BomberBird.Pods",
+        "BomberBird.Flow",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

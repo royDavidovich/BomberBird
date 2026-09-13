@@ -34,6 +34,15 @@ namespace BomberBird.Pods
 		}
 
 		/// <summary>
+		/// How many pods the player holds when none are placed. A pod is spent on placement
+		/// and returns when it bursts, so what is left is this minus the pods on the arena.
+		/// </summary>
+		public int MaxActivePods
+		{
+			get { return m_MaxActivePods; }
+		}
+
+		/// <summary>
 		/// The live pod rules, built on first access.
 		///
 		/// Built lazily for the same reason <see cref="BomberBird.Arena.Arena.Grid"/> is:

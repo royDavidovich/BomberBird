@@ -38,6 +38,12 @@ namespace BomberBird.Tests
 			return new PodField(i_Grid, k_Fuse, k_Range, i_MaxPods);
 		}
 
+		/// <summary>The bird standing dead centre on a cell, as the placer reports it.</summary>
+		private static void markStandingOn(PodField i_Field, ArenaGrid i_Grid, Vector2Int i_Cell)
+		{
+			i_Field.MarkVacatedExcept(i_Grid.CellToWorld(i_Cell), k_BirdHalfExtent);
+		}
+
 		[Test]
 		public void PlacesOnFloorAndRaisesTheEvent()
 		{
@@ -77,27 +83,29 @@ namespace BomberBird.Tests
 		public void AFreshPodDoesNotBlockUntilTheBirdStepsOff()
 		{
 			// The classic rule: you can walk off the pod you just placed, but not back on.
-			PodField field = makeField(makeGrid());
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
 			Vector2Int cell = new Vector2Int(1, 1);
 
 			field.TryPlace(cell);
 			Assert.IsFalse(field.IsBlocking(cell), "the bird is still standing on it");
 
-			// The bird has walked one cell over, so it no longer occupies the pod's cell.
-			field.MarkVacatedExcept(new Vector2Int(2, 1));
+			// The bird has walked one cell over, so its body is clear of the pod's cell.
+			markStandingOn(field, grid, new Vector2Int(2, 1));
 			Assert.IsTrue(field.IsBlocking(cell), "having stepped off, it cannot step back on");
 		}
 
 		[Test]
 		public void MarkVacatedExcept_IsSafeToCallRepeatedlyAndOnAnEmptyField()
 		{
-			PodField field = makeField(makeGrid());
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
 
-			Assert.DoesNotThrow(() => field.MarkVacatedExcept(new Vector2Int(5, 5)));
+			Assert.DoesNotThrow(() => markStandingOn(field, grid, new Vector2Int(5, 5)));
 
 			field.TryPlace(new Vector2Int(1, 1));
-			field.MarkVacatedExcept(new Vector2Int(2, 1));
-			field.MarkVacatedExcept(new Vector2Int(2, 1));
+			markStandingOn(field, grid, new Vector2Int(2, 1));
+			markStandingOn(field, grid, new Vector2Int(2, 1));
 
 			Assert.IsTrue(field.IsBlocking(new Vector2Int(1, 1)));
 		}
@@ -112,7 +120,7 @@ namespace BomberBird.Tests
 			Vector2Int podCell = new Vector2Int(1, 1);
 
 			field.TryPlace(podCell);
-			field.MarkVacatedExcept(new Vector2Int(2, 1));
+			markStandingOn(field, grid, new Vector2Int(2, 1));
 
 			Vector2 centre = grid.CellToWorld(podCell);
 
@@ -148,7 +156,7 @@ namespace BomberBird.Tests
 			Vector2Int podCell = new Vector2Int(2, 1);
 
 			field.TryPlace(podCell);
-			field.MarkVacatedExcept(new Vector2Int(1, 1));
+			markStandingOn(field, grid, new Vector2Int(1, 1));
 
 			Vector3 neighbour = grid.CellToWorld(new Vector2Int(1, 1));
 			Vector2 leaning = new Vector2(neighbour.x + 0.5f - (k_BirdHalfExtent * 0.5f), neighbour.y);
@@ -164,17 +172,47 @@ namespace BomberBird.Tests
 		[Test]
 		public void MarkVacatedExcept_LeavesThePodTheBirdIsStandingOnPassable()
 		{
-			PodField field = makeField(makeGrid(), 5);
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid, 5);
 			Vector2Int standingOn = new Vector2Int(1, 1);
 			Vector2Int steppedOff = new Vector2Int(2, 1);
 
 			field.TryPlace(steppedOff);
 			field.TryPlace(standingOn);
 
-			field.MarkVacatedExcept(standingOn);
+			markStandingOn(field, grid, standingOn);
 
 			Assert.IsFalse(field.IsBlocking(standingOn), "the bird is still on this one");
 			Assert.IsTrue(field.IsBlocking(steppedOff), "this one was left behind");
+		}
+
+		[Test]
+		public void MarkVacatedExcept_DoesNotTrapTheBirdSteppingOffThePod()
+		{
+			// Stepping off is continuous: the bird's centre enters the next cell while its
+			// body still covers part of the pod's cell. If the pod turns solid at that
+			// moment, the bird is walled in where it stands and can never move again.
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int podCell = new Vector2Int(1, 1);
+
+			field.TryPlace(podCell);
+
+			Vector3 podCentre = grid.CellToWorld(podCell);
+
+			// One whole cell to the right, in steps the size of a movement frame.
+			for (float travelled = 0f; travelled <= 1f; travelled += 0.05f)
+			{
+				Vector2 body = new Vector2(podCentre.x + travelled, podCentre.y);
+
+				field.MarkVacatedExcept(body, k_BirdHalfExtent);
+
+				Assert.IsTrue(
+					grid.IsAreaWalkable(body, k_BirdHalfExtent, field.IsBlocking),
+					"the bird must never be blocked where it already stands, " + travelled + " cells off the pod");
+			}
+
+			Assert.IsTrue(field.IsBlocking(podCell), "a full cell clear of it, the pod is solid");
 		}
 
 		[Test]

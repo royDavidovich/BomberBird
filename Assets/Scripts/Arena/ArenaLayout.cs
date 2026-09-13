@@ -25,6 +25,10 @@ namespace BomberBird.Arena
 			"#...........#\n" +
 			"#############";
 
+		[Header("Stage")]
+		[Tooltip("The cell the exit sits on. It must be open floor in the map below.")]
+		[SerializeField] private Vector2Int m_ExitCell = new Vector2Int(11, 1);
+
 		[Header("Arena map")]
 		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, '.' floor.")]
 		[SerializeField]
@@ -34,6 +38,12 @@ namespace BomberBird.Arena
 		public string Rows
 		{
 			get { return m_Rows; }
+		}
+
+		/// <summary>Where this stage's exit sits. Authored with the map, because it is part of it.</summary>
+		public Vector2Int ExitCell
+		{
+			get { return m_ExitCell; }
 		}
 
 		/// <summary>Builds the runtime grid for this stage.</summary>

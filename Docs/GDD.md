@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.6, 2026-09-12 |
+| Document version | v0.7, 2026-09-13 |
 
 ## 1. High Concept
 
@@ -61,8 +61,11 @@ flowchart TD
 - Solid objects stop the burst. Some obstacles can be destroyed.
 - A burst can trigger another pod and create a chain reaction.
 - Common mynas act as the enemy birds. Their exact movement behavior will be selected during prototyping.
-- The player loses when hit by a common myna, another hazard, or an active burst, then can retry quickly.
-- Completing the arena objective opens the exit.
+- The player loses a life when hit by a common myna, another hazard, or an active burst, then retries the stage immediately. The run ends when no lives remain.
+- The stage objective is to defeat every common myna in the arena.
+- On a regular stage, defeating the last myna makes a new bird's feather appear. The player must collect it, and only then does the exit open.
+- The intro stage and the boss stage award no feather, so defeating the last myna opens their exit directly.
+- Reaching an open exit completes the stage.
 - An optional rescue may provide an additional stage reward.
 
 ### Progress and Scoring
@@ -82,11 +85,11 @@ The campaign is six handmade levels. Each level is themed around one bird and se
 | 5. Upland | Rocky upland | Chukar partridge |
 | 6. Boss | Overgrown courtyard | Common myna, as the boss |
 
-Finishing a level that introduces a new bird awards that bird's feather, and the bird becomes playable from that point on. The player carries the growing roster forward and chooses from it at the start of later levels.
+A level that introduces a new bird drops that bird's feather into the arena once the last myna is defeated. Collecting it opens the exit and makes the bird playable from that point on. The player carries the growing roster forward and chooses from it at the start of later levels.
 
 Four birds are playable: the Eurasian hoopoe, the white-throated kingfisher, the great white pelican, and the chukar partridge. The player starts as the hoopoe, so the intro level teaches the core rules with a character already in hand. The common myna is the enemy species and the final boss, and is never playable.
 
-Exactly which level awards which feather is a pacing decision and will be settled during prototyping. The rule above holds regardless: a bird becomes playable by being discovered at the end of a level, never by being available from the start.
+Exactly which level awards which feather is a pacing decision and will be settled during prototyping. The rule above holds regardless: a bird becomes playable by being discovered inside a level, never by being available from the start.
 
 ### Parameters to Tune
 
@@ -96,6 +99,7 @@ Exactly which level awards which feather is a pacing decision and will be settle
 | Fuse duration | Time available to escape or prepare a chain | 2 seconds |
 | Burst range | Area affected in each direction | 2 cells |
 | Active pod limit | Number of simultaneous placed pods | 1 |
+| Starting lives | Attempts before the run ends | 3 |
 | Enemy speed | Pressure inside the arena | To be tested |
 
 These values will be editable in the Unity Inspector or a configuration asset.
@@ -117,17 +121,17 @@ Gameplay input is disabled while paused and during stage transitions. Losing foc
 
 1. **Main menu:** title, Play, and Quit.
 2. **Bird selection:** available bird choices and Continue.
-3. **Gameplay:** the arena and a compact HUD with only information needed for the current stage.
+3. **Gameplay:** the arena and a compact HUD carrying the pods available to place, the current stage, and the lives remaining. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
 4. **Pause overlay:** Resume, Restart, and Main Menu.
 5. **Results:** completion, optional rewards, Retry, and Next Stage.
 
 ```text
 +----------------------------------------------------+
-| Stage / objective                    Pause          |
+| Stage                                Pause          |
 |                                                    |
 |                 GAMEPLAY ARENA                     |
 |                                                    |
-| Pods available              Optional goal status   |
+| Pods available                            Lives    |
 +----------------------------------------------------+
 ```
 
@@ -226,3 +230,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.4 | 2026-09-11 | Pinned the exact Unity editor version required by the GDD template, and named the built-in Input Manager as the input system |
 | v0.5 | 2026-09-11 | Recorded lecturer approval of the idea and GDD through the designated course Google Sheet, opening the approval gate |
 | v0.6 | 2026-09-12 | Defined the six-level campaign, the feather unlock progression, and the four playable birds; confirmed the common myna as the boss and never playable; recorded the submission deadline |
+| v0.7 | 2026-09-13 | Defined the stage objective as defeating every myna, turned the feather into a collectible that opens the exit on regular stages, added lives and the retry rule, and fixed the gameplay HUD to pods, stage, and lives |
