@@ -74,6 +74,27 @@ namespace BomberBird.Enemies
 			return found;
 		}
 
+		/// <summary>
+		/// True when any living myna has claimed this cell, either standing on it or walking
+		/// into it.
+		///
+		/// Separate from <see cref="IsMynaAt"/> on purpose, because they answer different
+		/// questions. That one asks where a myna appears to be, which is what decides whether
+		/// it kills the bird. This one asks what is spoken for, which is what decides where
+		/// another myna is allowed to walk.
+		/// </summary>
+		private bool isClaimedByAMyna(Vector2Int i_Cell)
+		{
+			bool claimed = false;
+
+			for (int i = 0; i < r_Living.Count && !claimed; ++i)
+			{
+				claimed = r_Living[i].Occupies(i_Cell);
+			}
+
+			return claimed;
+		}
+
 		private void Awake()
 		{
 			m_Arena = GetComponent<BomberBird.Arena.Arena>();
@@ -145,7 +166,12 @@ namespace BomberBird.Enemies
 				? new System.Random()
 				: new System.Random(m_RandomSeed);
 
-			System.Predicate<Vector2Int> alsoBlocked = m_Field == null ? null : m_Field.IsBlocking;
+			// Shared by every myna, and read live, so a myna deciding where to go sees the
+			// cells its neighbours have already claimed this frame. A myna is never its own
+			// neighbour, so it cannot block itself.
+			System.Predicate<Vector2Int> alsoBlocked =
+				cell => (m_Field != null && m_Field.IsBlocking(cell)) || isClaimedByAMyna(cell);
+
 			IList<Vector2Int> cells = m_Arena.Layout.MynaSpawnCells;
 
 			for (int i = 0; i < cells.Count; ++i)
