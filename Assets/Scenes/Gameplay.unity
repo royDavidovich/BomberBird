@@ -1621,6 +1621,7 @@ GameObject:
   - component: {fileID: 1688113801}
   - component: {fileID: 1688113802}
   - component: {fileID: 1688113803}
+  - component: {fileID: 1688113804}
   m_Layer: 0
   m_Name: Arena
   m_TagString: Untagged
@@ -1716,8 +1717,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageExit
   m_Bird: {fileID: 1600481133}
+  m_Objective: {fileID: 1688113804}
   m_Sprite: {fileID: 21300000, guid: 5c65d42ecf58149cdab6a0241db0abe4, type: 3}
-  m_Tint: {r: 0.96, g: 0.8, b: 0.47, a: 1}
+  m_ClosedTint: {r: 0.45, g: 0.42, b: 0.35, a: 1}
+  m_OpenTint: {r: 1, g: 1, b: 1, a: 1}
   m_SortingOrder: 2
 --- !u!114 &1688113803
 MonoBehaviour:
@@ -1735,6 +1738,22 @@ MonoBehaviour:
   m_Prefab: {fileID: 2916023543840682989, guid: baa97522c9bd3405b950ea94b136bd34, type: 3}
   m_RandomSeed: 0
   m_LethalSeconds: 0.45
+--- !u!114 &1688113804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688113796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a66944f7dd2374a62ae6444126abf840, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageObjective
+  m_Mynas: {fileID: 1688113803}
+  m_Bird: {fileID: 1600481133}
+  m_FrameRate: 4
+  m_SortingOrder: 5
 --- !u!1 &1813632424
 GameObject:
   m_ObjectHideFlags: 0

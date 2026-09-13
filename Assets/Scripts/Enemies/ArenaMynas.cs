@@ -34,11 +34,31 @@ namespace BomberBird.Enemies
 
 		private BomberBird.Arena.Arena m_Arena;
 		private PodField m_Field;
+		private Vector2Int m_LastDefeatedCell;
+		private int m_SpawnedCount;
 
 		/// <summary>How many mynas are still alive. Zero is the stage objective met.</summary>
 		public int LivingCount
 		{
 			get { return r_Living.Count; }
+		}
+
+		/// <summary>
+		/// How many this stage started with. Zero means there was never anything to defeat,
+		/// which is not the same as having defeated them all.
+		/// </summary>
+		public int SpawnedCount
+		{
+			get { return m_SpawnedCount; }
+		}
+
+		/// <summary>
+		/// Where the most recently killed myna fell, which is where the feather drops so the
+		/// player is already looking at that part of the arena.
+		/// </summary>
+		public Vector2Int LastDefeatedCell
+		{
+			get { return m_LastDefeatedCell; }
 		}
 
 		/// <summary>True when a living myna is standing on this cell.</summary>
@@ -105,6 +125,7 @@ namespace BomberBird.Enemies
 
 				if (r_Danger.IsBurning(myna.Cell, Time.time))
 				{
+					m_LastDefeatedCell = myna.Cell;
 					r_Living.RemoveAt(i);
 					Destroy(myna.gameObject);
 				}
@@ -143,6 +164,7 @@ namespace BomberBird.Enemies
 				myna.Initialise(m_Arena.Grid, cell, alsoBlocked, random);
 
 				r_Living.Add(myna);
+				++m_SpawnedCount;
 			}
 		}
 	}

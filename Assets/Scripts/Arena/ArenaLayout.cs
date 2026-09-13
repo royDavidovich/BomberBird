@@ -40,6 +40,13 @@ namespace BomberBird.Arena
 			new Vector2Int(7, 5),
 		};
 
+		[Header("Reward")]
+		[Tooltip("The feather this stage awards, as its shimmer frames. Leave empty for a stage "
+			+ "that awards none, which is the intro and the boss: their exit opens as soon as "
+			+ "the last myna falls.")]
+		[SerializeField]
+		private Sprite[] m_FeatherFrames;
+
 		[Header("Arena map")]
 		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, '.' floor.")]
 		[SerializeField]
@@ -64,6 +71,14 @@ namespace BomberBird.Arena
 		public IList<Vector2Int> MynaSpawnCells
 		{
 			get { return m_MynaSpawnCells; }
+		}
+
+		/// <summary>
+		/// The frames of the feather this stage awards, or empty when it awards none.
+		/// </summary>
+		public Sprite[] FeatherFrames
+		{
+			get { return m_FeatherFrames; }
 		}
 
 		/// <summary>Builds the runtime grid for this stage.</summary>
