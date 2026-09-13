@@ -24,8 +24,8 @@ namespace BomberBird.Pods
 		/// <paramref name="i_Range"/> cells along each of the four directions.
 		///
 		/// An arm stops at the first cell it cannot pass. A soft block is included and then
-		/// stops the arm, so clearing a path takes more than one pod. A hard block or the
-		/// border stops the arm without being included.
+		/// stops the arm, so clearing a path takes more than one pod. A hard block, a cage,
+		/// or the border stops the arm without being included.
 		/// </summary>
 		public static List<Vector2Int> GetCoveredCells(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range)
 		{
@@ -64,9 +64,11 @@ namespace BomberBird.Pods
 
 				eCell contents = i_Grid.GetCell(cell);
 
-				if (contents == eCell.Border || contents == eCell.HardBlock)
+				if (contents == eCell.Border || contents == eCell.HardBlock || contents == eCell.Cage)
 				{
-					// Indestructible: the arm stops short and does not cover this cell.
+					// Indestructible: the arm stops short and does not cover this cell. A cage
+					// belongs here and not with the soft blocks - nothing the player aims at it
+					// opens it, because clearing the arena is what earns the feather inside.
 					break;
 				}
 

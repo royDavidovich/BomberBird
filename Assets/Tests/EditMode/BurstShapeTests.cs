@@ -139,5 +139,65 @@ namespace BomberBird.Tests
 
 			Assert.AreEqual(covered.Count, unique.Count, "arms must not overlap the centre or each other");
 		}
+
+		/// <summary>
+		/// The cage holds the stage's feather and only clearing the arena opens it. If a
+		/// burst could reach through it, a player could blow the lock off and take the
+		/// reward without earning it.
+		///
+		/// This is also the case that fails silently: BurstShape switches on eCell, so a
+		/// cell kind it does not name is treated as open floor.
+		/// </summary>
+		[Test]
+		public void ABurstStopsAtACageAndDoesNotCoverIt()
+		{
+			ArenaGrid grid = new ArenaGrid(
+				"#######\n" +
+				"#.....#\n" +
+				"#..c..#\n" +
+				"#.....#\n" +
+				"#######");
+
+			Vector2Int cage = grid.CageCell;
+			Vector2Int origin = cage + Vector2Int.left;
+
+			List<Vector2Int> covered = BurstShape.GetCoveredCells(grid, origin, k_Range);
+
+			Assert.IsFalse(covered.Contains(cage), "the cage itself is never caught in a burst");
+			Assert.IsFalse(covered.Contains(cage + Vector2Int.right), "and nothing behind it is either");
+			Assert.IsTrue(covered.Contains(origin), "the burst still goes off where it was placed");
+			Assert.IsTrue(covered.Contains(origin + Vector2Int.left), "and reaches away from the cage");
+		}
+
+		/// <summary>
+		/// A soft block is caught and destroyed; a cage in the same position is not. Worth
+		/// asserting side by side, because the two are one enum value apart.
+		/// </summary>
+		[Test]
+		public void ACageIsNotJustAnotherSoftBlock()
+		{
+			Vector2Int target = new Vector2Int(3, 2);
+			Vector2Int origin = target + Vector2Int.left;
+
+			ArenaGrid soft = new ArenaGrid(
+				"#######\n" +
+				"#.....#\n" +
+				"#..s..#\n" +
+				"#.....#\n" +
+				"#######");
+			ArenaGrid caged = new ArenaGrid(
+				"#######\n" +
+				"#.....#\n" +
+				"#..c..#\n" +
+				"#.....#\n" +
+				"#######");
+
+			Assert.IsTrue(
+				BurstShape.GetCoveredCells(soft, origin, k_Range).Contains(target),
+				"a soft block is caught in the burst that destroys it");
+			Assert.IsFalse(
+				BurstShape.GetCoveredCells(caged, origin, k_Range).Contains(target),
+				"a cage in the same place is not");
+		}
 	}
 }

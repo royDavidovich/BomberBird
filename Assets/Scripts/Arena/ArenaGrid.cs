@@ -14,10 +14,14 @@ namespace BomberBird.Arena
 		private const char k_BorderChar = '#';
 		private const char k_HardBlockChar = 'H';
 		private const char k_SoftBlockChar = 's';
+		private const char k_CageChar = 'c';
 
 		private readonly eCell[,] r_Cells;
 		private readonly int r_Width;
 		private readonly int r_Height;
+
+		private Vector2Int m_CageCell;
+		private bool m_HasCage;
 
 		/// <summary>Raised with the cell whose contents actually changed.</summary>
 		public event Action<Vector2Int> CellChanged;
@@ -32,9 +36,27 @@ namespace BomberBird.Arena
 			get { return r_Height; }
 		}
 
+		/// <summary>Whether this stage authored a cage for its feather.</summary>
+		public bool HasCage
+		{
+			get { return m_HasCage; }
+		}
+
+		/// <summary>
+		/// Where the cage stands, which is where the feather sits. Meaningless unless
+		/// <see cref="HasCage"/>, and recorded while parsing so nothing has to sweep the
+		/// grid looking for it.
+		/// </summary>
+		public Vector2Int CageCell
+		{
+			get { return m_CageCell; }
+		}
+
 		/// <summary>
 		/// Parses an authored map. Row 0 of the text is the TOP row, because that is how a
 		/// person reads a map, so y is flipped here and nowhere else.
+		///
+		/// '#' border, 'H' hard block, 's' soft block, 'c' cage, '.' floor.
 		/// </summary>
 		public ArenaGrid(string i_Rows)
 		{
@@ -68,7 +90,22 @@ namespace BomberBird.Arena
 
 				for (int x = 0; x < r_Width; ++x)
 				{
-					r_Cells[x, y] = parseCell(rows[row][x], row, x);
+					eCell cell = parseCell(rows[row][x], row, x);
+
+					if (cell == eCell.Cage)
+					{
+						if (m_HasCage)
+						{
+							throw new ArgumentException(string.Format(
+								"Arena layout has a second cage at row {0}, column {1}. A stage "
+								+ "awards one feather, so it holds one cage.", row, x), "i_Rows");
+						}
+
+						m_HasCage = true;
+						m_CageCell = new Vector2Int(x, y);
+					}
+
+					r_Cells[x, y] = cell;
 				}
 			}
 		}
@@ -118,6 +155,34 @@ namespace BomberBird.Arena
 		public bool TryDestroy(Vector2Int i_Cell)
 		{
 			if (!IsDestructible(i_Cell))
+			{
+				return false;
+			}
+
+			r_Cells[i_Cell.x, i_Cell.y] = eCell.Floor;
+			OnCellChanged(i_Cell);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Opens a cell the objective has unlocked, turning it into floor and announcing the
+		/// change so the display follows. Returns whether anything actually changed.
+		///
+		/// Deliberately narrow: only a cage and the border cell the gate sits in may be
+		/// opened this way. A soft block is <see cref="TryDestroy"/>'s business, and nothing
+		/// should be able to punch a hole through the rest of the wall.
+		/// </summary>
+		public bool TryOpen(Vector2Int i_Cell)
+		{
+			if (!IsInside(i_Cell))
+			{
+				return false;
+			}
+
+			eCell contents = r_Cells[i_Cell.x, i_Cell.y];
+
+			if (contents != eCell.Cage && contents != eCell.Border)
 			{
 				return false;
 			}
@@ -225,6 +290,10 @@ namespace BomberBird.Arena
 
 				case k_SoftBlockChar:
 					cell = eCell.SoftBlock;
+					break;
+
+				case k_CageChar:
+					cell = eCell.Cage;
 					break;
 
 				default:

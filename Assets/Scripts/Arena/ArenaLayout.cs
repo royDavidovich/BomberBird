@@ -17,7 +17,7 @@ namespace BomberBird.Arena
 			"#############\n" +
 			"#...........#\n" +
 			"#.H.H.H.H.H.#\n" +
-			"#...ssss....#\n" +
+			"#...scss....#\n" +
 			"#.H.HsH.H.H.#\n" +
 			"#....ss.....#\n" +
 			"#.H.H.H.H.H.#\n" +
@@ -25,10 +25,6 @@ namespace BomberBird.Arena
 			"#.H.H.H.H.H.#\n" +
 			"#...........#\n" +
 			"#############";
-
-		[Header("Stage")]
-		[Tooltip("The cell the exit sits on. It must be open floor in the map below.")]
-		[SerializeField] private Vector2Int m_ExitCell = new Vector2Int(11, 1);
 
 		[Tooltip("Cells the mynas start on. Each must be open floor in the map below, and none "
 			+ "may sit on the bird's start cell or it dies the instant the stage loads.")]
@@ -41,7 +37,8 @@ namespace BomberBird.Arena
 		};
 
 		[Header("Arena map")]
-		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, '.' floor.")]
+		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, "
+			+ "'c' the feather's cage, '.' floor.  A stage that awards a bird needs exactly one 'c'.")]
 		[SerializeField]
 		[TextArea(k_Height, k_Height)]
 		private string m_Rows = k_DefaultRows;
@@ -49,12 +46,6 @@ namespace BomberBird.Arena
 		public string Rows
 		{
 			get { return m_Rows; }
-		}
-
-		/// <summary>Where this stage's exit sits. Authored with the map, because it is part of it.</summary>
-		public Vector2Int ExitCell
-		{
-			get { return m_ExitCell; }
 		}
 
 		/// <summary>
