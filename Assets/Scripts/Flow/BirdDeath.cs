@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using BomberBird.Enemies;
@@ -45,6 +46,12 @@ namespace BomberBird.Flow
 		private SpriteRenderer m_Renderer;
 		private PodField m_Field;
 		private bool m_IsDying;
+
+		/// <summary>
+		/// Raised once, the instant the bird is hit. Fires at the start of the death beat
+		/// rather than the end of it, so the sound lands with the hit the player saw.
+		/// </summary>
+		public event Action BirdDied;
 
 		private void Awake()
 		{
@@ -108,6 +115,8 @@ namespace BomberBird.Flow
 		{
 			m_IsDying = true;
 
+			OnBirdDied();
+
 			// The bird is out of the player's hands from here.
 			m_Movement.enabled = false;
 
@@ -125,6 +134,11 @@ namespace BomberBird.Flow
 			}
 
 			GameFlow.Instance.ReportDeath();
+		}
+
+		private void OnBirdDied()
+		{
+			BirdDied?.Invoke();
 		}
 
 		private IEnumerator flash()

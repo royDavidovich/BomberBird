@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BomberBird.Pods;
 using UnityEngine;
@@ -35,6 +36,9 @@ namespace BomberBird.Enemies
 		private BomberBird.Arena.Arena m_Arena;
 		private PodField m_Field;
 		private int m_SpawnedCount;
+
+		/// <summary>Raised when a burst catches a myna, with the cell it fell on.</summary>
+		public event Action<Vector2Int> MynaDefeated;
 
 		/// <summary>How many mynas are still alive. Zero is the stage objective met.</summary>
 		public int LivingCount
@@ -115,10 +119,21 @@ namespace BomberBird.Enemies
 
 				if (r_Danger.IsBurning(myna.Cell, Time.time))
 				{
+					Vector2Int cell = myna.Cell;
+
 					r_Living.RemoveAt(i);
 					Destroy(myna.gameObject);
+
+					// Read before the destroy, because the myna is gone by the time anyone
+					// listening gets to ask it where it was.
+					OnMynaDefeated(cell);
 				}
 			}
+		}
+
+		private void OnMynaDefeated(Vector2Int i_Cell)
+		{
+			MynaDefeated?.Invoke(i_Cell);
 		}
 
 		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)

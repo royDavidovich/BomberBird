@@ -1,3 +1,4 @@
+using System;
 using BomberBird.Enemies;
 using BomberBird.Player;
 using UnityEngine;
@@ -46,6 +47,9 @@ namespace BomberBird.Flow
 		private bool m_AwardsFeather;
 		private bool m_IsCageOpen;
 		private bool m_IsFeatherCollected;
+
+		/// <summary>Raised the moment the bird walks onto the freed feather.</summary>
+		public event Action FeatherCollected;
 
 		/// <summary>Whether the bird may leave through the gate.</summary>
 		public bool IsExitOpen
@@ -170,6 +174,13 @@ namespace BomberBird.Flow
 			{
 				GameFlow.Instance.UnlockBird(m_AwardedBird);
 			}
+
+			OnFeatherCollected();
+		}
+
+		private void OnFeatherCollected()
+		{
+			FeatherCollected?.Invoke();
 		}
 
 		/// <summary>
