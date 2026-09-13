@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.8, 2026-09-13 |
+| Document version | v0.9, 2026-09-13 |
 
 ## 1. High Concept
 
@@ -63,9 +63,11 @@ flowchart TD
 - Common mynas act as the enemy birds. Their exact movement behavior will be selected during prototyping.
 - The player loses a life when hit by a common myna, another hazard, or an active burst, then retries the stage immediately. The run ends when no lives remain.
 - The stage objective is to defeat every common myna in the arena.
-- On a regular stage, defeating the last myna makes a new bird's feather appear. The player must collect it, and only then does the exit open.
-- The intro stage and the boss stage award no feather, so defeating the last myna opens their exit directly.
-- Reaching an open exit completes the stage.
+- On a regular stage, a new bird's feather sits locked inside a cage from the moment the stage begins, so the player can see the reward and the bars around it for the whole level. The cage is solid: it blocks movement and stops bursts, and no amount of firepower opens it.
+- Defeating the last myna opens the cage. The player then walks over the feather to collect it, and only then does the exit open.
+- The intro stage and the boss stage award no feather and carry no cage, so defeating the last myna opens their exit directly.
+- The exit is a gate set in the middle of the arena's right-hand wall, in the same place on every stage, so the player learns where the way out is once. It stands visibly shut until the stage is finished with them.
+- When the gate opens, a bright arrow flashes beside it. Walking into the gate completes the stage.
 - An optional rescue may provide an additional stage reward.
 
 ### Progress and Scoring
@@ -265,3 +267,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.6 | 2026-09-12 | Defined the six-level campaign, the feather unlock progression, and the four playable birds; confirmed the common myna as the boss and never playable; recorded the submission deadline |
 | v0.7 | 2026-09-13 | Defined the stage objective as defeating every myna, turned the feather into a collectible that opens the exit on regular stages, added lives and the retry rule, and fixed the gameplay HUD to pods, stage, and lives |
 | v0.8 | 2026-09-13 | Made the four playable birds differ by tuned movement speed, burst range, and active pod limit rather than by sprite alone; settled the level 6 boss as a three-hit myna that accelerates and calls escorts; added the habitat card, closing screen, and closing note to the screen list; and committed the object pool to the burst effects |
+| v0.9 | 2026-09-13 | Gave the objective a physical form: the feather is caged in plain sight from the start of the stage and the cage is indestructible, and the exit became a gate fixed in the middle of the right-hand wall that opens with a flashing arrow |
