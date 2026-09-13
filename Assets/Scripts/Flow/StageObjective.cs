@@ -29,6 +29,7 @@ namespace BomberBird.Flow
 
 		private BomberBird.Arena.Arena m_Arena;
 		private FeatherPickup m_Feather;
+		private BirdProfile m_AwardedBird;
 		private bool m_AwardsFeather;
 		private bool m_IsFeatherDropped;
 		private bool m_IsFeatherCollected;
@@ -52,12 +53,17 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			Sprite[] frames = m_Arena.Layout.FeatherFrames;
+			// Read once. The run stops offering the bird the moment it is collected, so
+			// asking again mid-stage would quietly reopen the exit's gate.
+			m_AwardedBird = GameFlow.Instance == null ? null : GameFlow.Instance.AwardedBird;
 
-			// A stage awards a feather only if it was authored with one and has a myna to
-			// drop it. The intro and the boss award none, and an arena with nothing to
-			// defeat has nowhere to drop one from.
-			m_AwardsFeather = frames != null && frames.Length > 0 && m_Mynas.SpawnedCount > 0;
+			// A stage awards a feather only if the campaign names a bird for it, that bird
+			// has frames to show, and there is a myna to drop it. The intro and the boss
+			// name none, and an arena with nothing to defeat has nowhere to drop one from.
+			m_AwardsFeather = m_AwardedBird != null
+				&& m_AwardedBird.FeatherFrames != null
+				&& m_AwardedBird.FeatherFrames.Length > 0
+				&& m_Mynas.SpawnedCount > 0;
 		}
 
 		private void Update()
@@ -94,7 +100,7 @@ namespace BomberBird.Flow
 
 			m_Feather = visual.AddComponent<FeatherPickup>();
 			m_Feather.Initialise(
-				m_Arena.Grid, m_Mynas.LastDefeatedCell, m_Arena.Layout.FeatherFrames, m_FrameRate);
+				m_Arena.Grid, m_Mynas.LastDefeatedCell, m_AwardedBird.FeatherFrames, m_FrameRate);
 		}
 
 		private void collectFeather()
@@ -103,6 +109,13 @@ namespace BomberBird.Flow
 
 			Destroy(m_Feather.gameObject);
 			m_Feather = null;
+
+			// The whole point of the pickup: the bird joins the roster here, not on a
+			// results screen.
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.UnlockBird(m_AwardedBird);
+			}
 		}
 
 		private bool hasRequiredReferences()

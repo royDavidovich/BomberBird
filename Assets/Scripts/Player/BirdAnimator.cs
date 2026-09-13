@@ -23,6 +23,29 @@ namespace BomberBird.Player
 		private float m_StepTimer;
 		private int m_Step;
 
+		/// <summary>
+		/// Swaps which bird is drawn. The scene is authored with the starter's frames; the
+		/// bird actually chosen for the run replaces them at stage setup.
+		/// </summary>
+		public void SetSprites(BirdSpriteSet i_Sprites)
+		{
+			if (i_Sprites == null)
+			{
+				Debug.LogError(name + ": SetSprites was given nothing to draw.", this);
+				return;
+			}
+
+			string missing = i_Sprites.DescribeMissingSprites();
+
+			if (missing != null)
+			{
+				Debug.LogError(name + ": sprite set '" + i_Sprites.name + "' is missing:" + missing, this);
+				return;
+			}
+
+			m_Sprites = i_Sprites;
+		}
+
 		private void Awake()
 		{
 			m_Renderer = GetComponent<SpriteRenderer>();
