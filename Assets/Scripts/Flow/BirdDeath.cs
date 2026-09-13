@@ -30,7 +30,7 @@ namespace BomberBird.Flow
 		[Tooltip("Flashes per second while the bird is dying.")]
 		[SerializeField] private float m_FlashRate = 10f;
 
-		private readonly Dictionary<Vector2Int, float> r_BurningUntil = new Dictionary<Vector2Int, float>();
+		private readonly BurstDanger r_Danger = new BurstDanger();
 
 		private BirdMovement m_Movement;
 		private BirdPodPlacer m_Placer;
@@ -83,7 +83,7 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			if (isBurning(m_Movement.Cell))
+			if (r_Danger.IsBurning(m_Movement.Cell, Time.time))
 			{
 				StartCoroutine(die());
 			}
@@ -91,20 +91,7 @@ namespace BomberBird.Flow
 
 		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
 		{
-			float expiry = Time.time + m_LethalSeconds;
-
-			foreach (Vector2Int cell in i_Covered)
-			{
-				// A later burst over the same cell extends the danger rather than shortening it.
-				r_BurningUntil[cell] = expiry;
-			}
-		}
-
-		private bool isBurning(Vector2Int i_Cell)
-		{
-			float expiry;
-
-			return r_BurningUntil.TryGetValue(i_Cell, out expiry) && Time.time < expiry;
+			r_Danger.Mark(i_Covered, Time.time, m_LethalSeconds);
 		}
 
 		private IEnumerator die()
