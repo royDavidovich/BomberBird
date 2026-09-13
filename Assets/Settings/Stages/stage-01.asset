@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: stage-01
   m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaLayout
   m_ExitCell: {x: 11, y: 1}
+  m_MynaSpawnCells:
+  - {x: 11, y: 9}
+  - {x: 1, y: 1}
+  - {x: 7, y: 5}
+  m_FeatherFrames: []
   m_Rows: '#############
 
     #...........#

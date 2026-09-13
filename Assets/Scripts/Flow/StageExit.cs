@@ -7,9 +7,12 @@ namespace BomberBird.Flow
 	/// <summary>
 	/// Draws the stage's exit and clears the stage when the bird reaches it.
 	///
-	/// <see cref="IsOpen"/> is the gate the design asks for: defeat every myna, collect the
-	/// feather on a regular stage, and only then may the exit be used. Until mynas exist there
-	/// is nothing to defeat, so it opens immediately and the gate goes in front of it later.
+	/// The gate itself belongs to <see cref="StageObjective"/>, because it is a rule about the
+	/// whole arena rather than about this one tile. All the exit does is ask, refuse to be used
+	/// while the answer is no, and look different depending on the answer.
+	///
+	/// The two tints stand in for the authored open and closed exit art, which has not arrived.
+	/// Without some visible difference the player has no way to know the stage has let them go.
 	/// </summary>
 	[RequireComponent(typeof(BomberBird.Arena.Arena))]
 	public class StageExit : MonoBehaviour
@@ -17,27 +20,36 @@ namespace BomberBird.Flow
 		[Header("Who reaches it")]
 		[SerializeField] private BirdMovement m_Bird;
 
+		[Header("What opens it")]
+		[SerializeField] private StageObjective m_Objective;
+
 		[Header("Rendering")]
 		[Tooltip("Placeholder until the authored exit tile arrives.")]
 		[SerializeField] private Sprite m_Sprite;
 
-		[SerializeField] private Color m_Tint = Color.white;
+		[Tooltip("While the objective is unfinished. Dimmer, clearly not usable yet.")]
+		[SerializeField] private Color m_ClosedTint = new Color(0.45f, 0.42f, 0.35f, 1f);
+
+		[Tooltip("Once the stage lets the bird leave.")]
+		[SerializeField] private Color m_OpenTint = Color.white;
 
 		[Tooltip("Sorting order. Above the arena tiles, below the pods and the birds.")]
 		[SerializeField] private int m_SortingOrder = 2;
 
 		private BomberBird.Arena.Arena m_Arena;
 		private ArenaGrid m_Grid;
+		private SpriteRenderer m_Renderer;
 		private Vector2Int m_Cell;
 		private bool m_IsCleared;
+		private bool m_WasOpen;
 
 		/// <summary>
-		/// Whether the exit may be used. Always true for now; the myna-and-feather objective
-		/// will drive it once there are mynas to defeat.
+		/// Whether the exit may be used. An exit with no objective assigned stays usable, so
+		/// a stage built without one is playable rather than unfinishable.
 		/// </summary>
 		public bool IsOpen
 		{
-			get { return true; }
+			get { return m_Objective == null || m_Objective.IsExitOpen; }
 		}
 
 		private void Awake()
@@ -66,7 +78,15 @@ namespace BomberBird.Flow
 
 		private void Update()
 		{
-			if (m_IsCleared || !IsOpen || m_Bird.Cell != m_Cell)
+			bool isOpen = IsOpen;
+
+			if (isOpen != m_WasOpen)
+			{
+				m_WasOpen = isOpen;
+				m_Renderer.color = isOpen ? m_OpenTint : m_ClosedTint;
+			}
+
+			if (m_IsCleared || !isOpen || m_Bird.Cell != m_Cell)
 			{
 				return;
 			}
@@ -88,10 +108,12 @@ namespace BomberBird.Flow
 			visual.transform.SetParent(transform, false);
 			visual.transform.localPosition = m_Grid.CellToWorld(m_Cell);
 
-			SpriteRenderer renderer = visual.AddComponent<SpriteRenderer>();
-			renderer.sprite = m_Sprite;
-			renderer.color = m_Tint;
-			renderer.sortingOrder = m_SortingOrder;
+			m_Renderer = visual.AddComponent<SpriteRenderer>();
+			m_Renderer.sprite = m_Sprite;
+			m_Renderer.color = IsOpen ? m_OpenTint : m_ClosedTint;
+			m_Renderer.sortingOrder = m_SortingOrder;
+
+			m_WasOpen = IsOpen;
 		}
 
 		private bool hasRequiredReferences()

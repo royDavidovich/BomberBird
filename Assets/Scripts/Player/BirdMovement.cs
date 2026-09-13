@@ -11,7 +11,7 @@ namespace BomberBird.Player
 	/// <see cref="ArenaGrid"/>, never from the scene.
 	/// </summary>
 	[RequireComponent(typeof(Rigidbody2D))]
-	public class BirdMovement : MonoBehaviour
+	public class BirdMovement : MonoBehaviour, IGridWalker
 	{
 		private const string k_HorizontalAxis = "Horizontal";
 		private const string k_VerticalAxis = "Vertical";
@@ -109,7 +109,7 @@ namespace BomberBird.Player
 
 			if (m_Intent != Vector2Int.zero)
 			{
-				m_Facing = toFacing(m_Intent);
+				m_Facing = Facings.FromStep(m_Intent, m_Facing);
 			}
 		}
 
@@ -224,30 +224,6 @@ namespace BomberBird.Player
 			o_Next = nudged;
 
 			return true;
-		}
-
-		private static eFacing toFacing(Vector2Int i_Intent)
-		{
-			eFacing facing;
-
-			if (i_Intent.x > 0)
-			{
-				facing = eFacing.Right;
-			}
-			else if (i_Intent.x < 0)
-			{
-				facing = eFacing.Left;
-			}
-			else if (i_Intent.y > 0)
-			{
-				facing = eFacing.Up;
-			}
-			else
-			{
-				facing = eFacing.Down;
-			}
-
-			return facing;
 		}
 	}
 }

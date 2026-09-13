@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using BomberBird.Enemies;
 using BomberBird.Player;
 using BomberBird.Pods;
 using UnityEngine;
@@ -7,8 +8,12 @@ using UnityEngine;
 namespace BomberBird.Flow
 {
 	/// <summary>
-	/// Kills the bird when a burst catches it, then hands the death to <see cref="GameFlow"/>
-	/// after a short beat so the player sees what hit them.
+	/// Kills the bird, then hands the death to <see cref="GameFlow"/> after a short beat so
+	/// the player sees what hit them.
+	///
+	/// Both ways of dying live here rather than one here and one in the myna, so there is a
+	/// single answer to what killed the bird: a burst it is standing in, or a myna that has
+	/// reached it.
 	///
 	/// A burst stays lethal for as long as it is on screen, not only for the instant it goes
 	/// off. Walking through a drawn burst unharmed would make failures unreadable, which is
@@ -18,6 +23,9 @@ namespace BomberBird.Flow
 	public class BirdDeath : MonoBehaviour
 	{
 		[SerializeField] private ArenaPods m_Pods;
+
+		[Tooltip("Optional. Assign it and touching a myna kills the bird.")]
+		[SerializeField] private ArenaMynas m_Mynas;
 
 		[Header("Danger")]
 		[Tooltip("Seconds a burst keeps killing. Keep this in step with the burst's time on screen.")]
@@ -30,7 +38,7 @@ namespace BomberBird.Flow
 		[Tooltip("Flashes per second while the bird is dying.")]
 		[SerializeField] private float m_FlashRate = 10f;
 
-		private readonly Dictionary<Vector2Int, float> r_BurningUntil = new Dictionary<Vector2Int, float>();
+		private readonly BurstDanger r_Danger = new BurstDanger();
 
 		private BirdMovement m_Movement;
 		private BirdPodPlacer m_Placer;
@@ -83,7 +91,9 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			if (isBurning(m_Movement.Cell))
+			Vector2Int cell = m_Movement.Cell;
+
+			if (r_Danger.IsBurning(cell, Time.time) || (m_Mynas != null && m_Mynas.IsMynaAt(cell)))
 			{
 				StartCoroutine(die());
 			}
@@ -91,20 +101,7 @@ namespace BomberBird.Flow
 
 		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
 		{
-			float expiry = Time.time + m_LethalSeconds;
-
-			foreach (Vector2Int cell in i_Covered)
-			{
-				// A later burst over the same cell extends the danger rather than shortening it.
-				r_BurningUntil[cell] = expiry;
-			}
-		}
-
-		private bool isBurning(Vector2Int i_Cell)
-		{
-			float expiry;
-
-			return r_BurningUntil.TryGetValue(i_Cell, out expiry) && Time.time < expiry;
+			r_Danger.Mark(i_Covered, Time.time, m_LethalSeconds);
 		}
 
 		private IEnumerator die()

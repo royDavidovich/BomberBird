@@ -3,11 +3,14 @@ using UnityEngine;
 namespace BomberBird.Player
 {
 	/// <summary>
-	/// Shows the right frame for what the bird is doing. Presentation only: it reads
-	/// <see cref="BirdMovement"/> and never decides anything about movement itself.
+	/// Shows the right frame for what a bird is doing. Presentation only: it reads an
+	/// <see cref="IGridWalker"/> and never decides anything about movement itself.
+	///
+	/// It asks for the interface rather than for <see cref="BirdMovement"/> so the mynas,
+	/// which move by their own decisions rather than by input, are drawn by this same
+	/// component instead of by a copy of it.
 	/// </summary>
 	[RequireComponent(typeof(SpriteRenderer))]
-	[RequireComponent(typeof(BirdMovement))]
 	public class BirdAnimator : MonoBehaviour
 	{
 		[SerializeField] private BirdSpriteSet m_Sprites;
@@ -16,14 +19,22 @@ namespace BomberBird.Player
 		[SerializeField] private float m_FrameRate = 8f;
 
 		private SpriteRenderer m_Renderer;
-		private BirdMovement m_Movement;
+		private IGridWalker m_Movement;
 		private float m_StepTimer;
 		private int m_Step;
 
 		private void Awake()
 		{
 			m_Renderer = GetComponent<SpriteRenderer>();
-			m_Movement = GetComponent<BirdMovement>();
+			m_Movement = GetComponent<IGridWalker>();
+
+			// RequireComponent cannot name an interface, so the check is made here instead.
+			if (m_Movement == null)
+			{
+				Debug.LogError(name + ": no IGridWalker component to animate.", this);
+				enabled = false;
+				return;
+			}
 
 			if (m_Sprites == null)
 			{
