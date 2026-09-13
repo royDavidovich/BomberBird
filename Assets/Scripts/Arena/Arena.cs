@@ -37,6 +37,33 @@ namespace BomberBird.Arena
 			get { return m_Layout; }
 		}
 
+		/// <summary>
+		/// Replaces the stage this arena builds, for a run that picks the arena rather than
+		/// playing the one the scene was authored with.
+		///
+		/// It refuses once the grid exists rather than rebuilding it, because by then the
+		/// mynas, the pods, and the bird are all holding cells from the old map. Swapping
+		/// underneath them would leave them standing in walls, so a late call is a bug in the
+		/// caller's timing and says so.
+		/// </summary>
+		public void UseLayout(ArenaLayout i_Layout)
+		{
+			if (i_Layout == null)
+			{
+				Debug.LogError(name + ": UseLayout was given no layout.", this);
+				return;
+			}
+
+			if (m_Grid != null)
+			{
+				Debug.LogError(
+					name + ": the grid is already built, so the layout cannot change now.", this);
+				return;
+			}
+
+			m_Layout = i_Layout;
+		}
+
 		private void Awake()
 		{
 			ensureGrid();
