@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d9c48c6d618149f69c4c6d3f060b277, type: 3}
+  m_Name: myna-boss
+  m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdSpriteSet
+  m_DownIdle: {fileID: 21300000, guid: 06f87c4f07e0e4dd68a282fc73e19504, type: 3}
+  m_DownWalk:
+  - {fileID: 21300000, guid: e8dc28e8d6fc142859875f7f7cacb6cd, type: 3}
+  - {fileID: 21300000, guid: effdb47d46495485ba05aa27863a5811, type: 3}
+  m_UpIdle: {fileID: 21300000, guid: 949d96228ae7a4cbda2b7e6ab21a2e50, type: 3}
+  m_UpWalk:
+  - {fileID: 21300000, guid: c268823e115354a31a057c67eea14091, type: 3}
+  - {fileID: 21300000, guid: 70cd983e28f3a447ea73d5d97a0400b3, type: 3}
+  m_SideIdle: {fileID: 21300000, guid: 921cf48cd71d14800a927eeb4ddc1a70, type: 3}
+  m_SideWalk:
+  - {fileID: 21300000, guid: 7fd67321ec6464b049e18f76c9e6aa5c, type: 3}
+  - {fileID: 21300000, guid: 6a476db3cc6774e5683886acd30b7538, type: 3}
