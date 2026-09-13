@@ -268,22 +268,12 @@ namespace BomberBird.Pods
 
 		private void OnPodPlaced(Vector2Int i_Cell)
 		{
-			Action<Vector2Int> handler = PodPlaced;
-
-			if (handler != null)
-			{
-				handler(i_Cell);
-			}
+			PodPlaced?.Invoke(i_Cell);
 		}
 
 		private void OnPodExploded(Vector2Int i_Cell, IList<Vector2Int> i_Covered)
 		{
-			Action<Vector2Int, IList<Vector2Int>> handler = PodExploded;
-
-			if (handler != null)
-			{
-				handler(i_Cell, i_Covered);
-			}
+			PodExploded?.Invoke(i_Cell, i_Covered);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using BomberBird.Arena;
 using BomberBird.Player;
@@ -50,6 +51,12 @@ namespace BomberBird.Flow
 		private Vector2Int m_Cell;
 		private bool m_IsCleared;
 		private bool m_WasOpen;
+
+		/// <summary>
+		/// Raised once, when the bird reaches the open gate. It fires before the stage
+		/// advances, which is the only moment a listener in this scene still exists.
+		/// </summary>
+		public event Action StageCleared;
 
 		/// <summary>
 		/// Whether the gate may be used. An exit with no objective assigned stays usable, so
@@ -113,6 +120,10 @@ namespace BomberBird.Flow
 
 			m_IsCleared = true;
 
+			// Before the null check below, so a stage built without a GameFlow still tells
+			// its listeners the gate was reached.
+			OnStageCleared();
+
 			if (GameFlow.Instance == null)
 			{
 				Debug.LogError(name + ": no GameFlow in the scene, so the stage cannot be cleared.", this);
@@ -120,6 +131,11 @@ namespace BomberBird.Flow
 			}
 
 			GameFlow.Instance.CompleteStage();
+		}
+
+		private void OnStageCleared()
+		{
+			StageCleared?.Invoke();
 		}
 
 		/// <summary>

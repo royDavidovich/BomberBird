@@ -6,6 +6,7 @@
         "BomberBird.Pods",
         "BomberBird.Player",
         "BomberBird.Flow",
+        "BomberBird.Enemies",
         "Unity.TextMeshPro",
         "UnityEngine.UI"
     ],
