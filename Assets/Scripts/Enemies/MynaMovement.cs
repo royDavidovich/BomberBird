@@ -54,6 +54,21 @@ namespace BomberBird.Enemies
 		}
 
 		/// <summary>
+		/// True while this myna has a claim on the cell, which lasts a whole step: from the
+		/// cell it left until it reaches the one it is walking into.
+		///
+		/// Deliberately not <see cref="Cell"/>. That one reports where the myna appears to
+		/// be, which flips to the target half way through a step - so two mynas swapping
+		/// places in a corridor would each see the other's cell go free and walk straight
+		/// through one another. Holding both ends of the step is what stops that, and what
+		/// stops two mynas reserving the same empty cell from opposite sides on one frame.
+		/// </summary>
+		public bool Occupies(Vector2Int i_Cell)
+		{
+			return i_Cell == m_Cell || i_Cell == m_TargetCell;
+		}
+
+		/// <summary>
 		/// Places the myna on a cell and starts it walking. Until this is called the myna
 		/// has no arena and stands still.
 		/// </summary>
