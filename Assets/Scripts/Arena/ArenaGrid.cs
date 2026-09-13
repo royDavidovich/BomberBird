@@ -253,12 +253,7 @@ namespace BomberBird.Arena
 
 		protected virtual void OnCellChanged(Vector2Int i_Cell)
 		{
-			Action<Vector2Int> handler = CellChanged;
-
-			if (handler != null)
-			{
-				handler(i_Cell);
-			}
+			CellChanged?.Invoke(i_Cell);
 		}
 
 		private static string[] splitRows(string i_Rows)
