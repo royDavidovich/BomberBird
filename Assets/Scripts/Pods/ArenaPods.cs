@@ -17,10 +17,10 @@ namespace BomberBird.Pods
 		[Tooltip("Seconds between placing a pod and its burst.")]
 		[SerializeField] private float m_FuseSeconds = 2f;
 
-		[Tooltip("How many cells a burst reaches along each of the four directions.")]
+		[Tooltip("Starting burst reach. The bird being played overrides this at stage setup.")]
 		[SerializeField] private int m_BurstRange = 2;
 
-		[Tooltip("How many pods may sit on the arena at once.")]
+		[Tooltip("Starting pod limit. The bird being played overrides this at stage setup.")]
 		[SerializeField] private int m_MaxActivePods = 1;
 
 		private BomberBird.Arena.Arena m_Arena;
@@ -36,10 +36,14 @@ namespace BomberBird.Pods
 		/// <summary>
 		/// How many pods the player holds when none are placed. A pod is spent on placement
 		/// and returns when it bursts, so what is left is this minus the pods on the arena.
+		///
+		/// Read from the live rules rather than from the Inspector value that seeded them,
+		/// because the bird being played sets its own limit and the HUD has to show the
+		/// player's actual hand, not the scene's default.
 		/// </summary>
 		public int MaxActivePods
 		{
-			get { return m_MaxActivePods; }
+			get { return Field == null ? m_MaxActivePods : Field.MaxActivePods; }
 		}
 
 		/// <summary>

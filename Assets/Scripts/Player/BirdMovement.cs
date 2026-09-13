@@ -58,6 +58,16 @@ namespace BomberBird.Player
 			get { return m_HalfExtent; }
 		}
 
+		/// <summary>
+		/// Cells per second. Settable because the bird being played brings its own, and a
+		/// standstill is never a valid one however the profile is configured.
+		/// </summary>
+		public float Speed
+		{
+			get { return m_Speed; }
+			set { m_Speed = Mathf.Max(0.01f, value); }
+		}
+
 		/// <summary>The cell the bird counts as standing on.</summary>
 		public Vector2Int Cell
 		{
