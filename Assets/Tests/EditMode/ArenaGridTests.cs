@@ -265,5 +265,106 @@ namespace BomberBird.Arena.Tests
 			StringAssert.Contains("row 1", error.Message);
 			StringAssert.Contains("column 2", error.Message);
 		}
+
+		private const string k_CagedRows =
+			"#######\n" +
+			"#..c..#\n" +
+			"#.....#\n" +
+			"#######";
+
+		[Test]
+		public void ParsesTheCageCharacter()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CagedRows);
+
+			Assert.IsTrue(grid.HasCage);
+			Assert.AreEqual(new Vector2Int(3, 2), grid.CageCell);
+			Assert.AreEqual(eCell.Cage, grid.GetCell(grid.CageCell));
+		}
+
+		[Test]
+		public void AMapWithoutACageSaysSo()
+		{
+			ArenaGrid grid = new ArenaGrid(
+				"#####\n" +
+				"#...#\n" +
+				"#####");
+
+			Assert.IsFalse(grid.HasCage);
+		}
+
+		/// <summary>
+		/// The cage is the feather's lock: solid, and proof against anything the player can
+		/// aim at it. Clearing the arena is the only thing that opens it.
+		/// </summary>
+		[Test]
+		public void ACageBlocksAndCannotBeDestroyed()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CagedRows);
+			Vector2Int cage = grid.CageCell;
+
+			Assert.IsTrue(grid.IsBlocking(cage));
+			Assert.IsFalse(grid.IsWalkable(cage));
+			Assert.IsFalse(grid.IsDestructible(cage));
+			Assert.IsFalse(grid.TryDestroy(cage), "a burst must not open the cage");
+			Assert.AreEqual(eCell.Cage, grid.GetCell(cage), "and it is still standing");
+		}
+
+		[Test]
+		public void OpeningTheCageTurnsItToFloorAndAnnouncesIt()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CagedRows);
+			Vector2Int cage = grid.CageCell;
+			List<Vector2Int> changed = new List<Vector2Int>();
+			grid.CellChanged += changed.Add;
+
+			Assert.IsTrue(grid.TryOpen(cage));
+			Assert.IsTrue(grid.IsWalkable(cage), "the feather is now reachable");
+			Assert.AreEqual(1, changed.Count, "the display has to hear about it");
+			Assert.AreEqual(cage, changed[0]);
+			Assert.IsFalse(grid.TryOpen(cage), "opening an already-open cell changes nothing");
+		}
+
+		/// <summary>The gate is a hole opened in the wall, by the same mechanism.</summary>
+		[Test]
+		public void OpeningTheGatesBorderCellLetsTheBirdThrough()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CagedRows);
+			Vector2Int gate = new Vector2Int(grid.Width - 1, grid.Height / 2);
+
+			Assert.AreEqual(eCell.Border, grid.GetCell(gate));
+			Assert.IsFalse(grid.IsWalkable(gate));
+
+			Assert.IsTrue(grid.TryOpen(gate));
+			Assert.IsTrue(grid.IsWalkable(gate));
+		}
+
+		/// <summary>
+		/// Nothing else may be opened. A hard block that could be opened would let the
+		/// objective quietly rewrite the arena.
+		/// </summary>
+		[Test]
+		public void NothingElseCanBeOpened()
+		{
+			ArenaGrid grid = new ArenaGrid(
+				"#####\n" +
+				"#.Hs#\n" +
+				"#####");
+
+			Assert.IsFalse(grid.TryOpen(new Vector2Int(2, 1)), "hard block");
+			Assert.IsFalse(grid.TryOpen(new Vector2Int(3, 1)), "soft block - that is TryDestroy's job");
+			Assert.IsFalse(grid.TryOpen(new Vector2Int(1, 1)), "already floor");
+			Assert.IsFalse(grid.TryOpen(new Vector2Int(99, 99)), "outside the arena");
+		}
+
+		/// <summary>A stage awards one feather, so a second cage is an authoring mistake.</summary>
+		[Test]
+		public void RefusesAMapWithTwoCages()
+		{
+			Assert.Throws<ArgumentException>(() => new ArenaGrid(
+				"#######\n" +
+				"#.c.c.#\n" +
+				"#######"));
+		}
 	}
 }

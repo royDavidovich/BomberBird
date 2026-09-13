@@ -1,3 +1,4 @@
+using System.Collections;
 using BomberBird.Arena;
 using BomberBird.Player;
 using UnityEngine;
@@ -5,14 +6,15 @@ using UnityEngine;
 namespace BomberBird.Flow
 {
 	/// <summary>
-	/// Draws the stage's exit and clears the stage when the bird reaches it.
+	/// The gate in the arena wall: the way out, and the thing that ends the stage.
 	///
-	/// The gate itself belongs to <see cref="StageObjective"/>, because it is a rule about the
-	/// whole arena rather than about this one tile. All the exit does is ask, refuse to be used
-	/// while the answer is no, and look different depending on the answer.
+	/// It sits in the middle of the right-hand wall on every stage, derived rather than
+	/// authored, so the player learns where the exit is once instead of hunting for it each
+	/// level. It stands visibly shut until <see cref="StageObjective"/> says the stage is
+	/// finished with them, then opens with a flashing arrow beside it.
 	///
-	/// The two tints stand in for the authored open and closed exit art, which has not arrived.
-	/// Without some visible difference the player has no way to know the stage has let them go.
+	/// The gate holds no rules. <see cref="StageObjective"/> decides when it may be used and
+	/// this asks; all this owns is the hole in the wall and the signal that it is there.
 	/// </summary>
 	[RequireComponent(typeof(BomberBird.Arena.Arena))]
 	public class StageExit : MonoBehaviour
@@ -24,27 +26,33 @@ namespace BomberBird.Flow
 		[SerializeField] private StageObjective m_Objective;
 
 		[Header("Rendering")]
-		[Tooltip("Placeholder until the authored exit tile arrives.")]
-		[SerializeField] private Sprite m_Sprite;
+		[SerializeField] private Sprite m_GateClosed;
 
-		[Tooltip("While the objective is unfinished. Dimmer, clearly not usable yet.")]
-		[SerializeField] private Color m_ClosedTint = new Color(0.45f, 0.42f, 0.35f, 1f);
+		[Tooltip("Must be fully opaque: the cell becomes walkable floor underneath it.")]
+		[SerializeField] private Sprite m_GateOpen;
 
-		[Tooltip("Once the stage lets the bird leave.")]
-		[SerializeField] private Color m_OpenTint = Color.white;
+		[Tooltip("Flashes one cell inside the gate once the stage lets the bird leave.")]
+		[SerializeField] private Sprite m_Arrow;
 
-		[Tooltip("Sorting order. Above the arena tiles, below the pods and the birds.")]
+		[Tooltip("Arrow flashes per second.")]
+		[SerializeField] private float m_ArrowFlashRate = 3f;
+
+		[Tooltip("Sorting order for the gate. Above the arena tiles, below the birds.")]
 		[SerializeField] private int m_SortingOrder = 2;
+
+		[Tooltip("Sorting order for the arrow. Above the gate, below the birds.")]
+		[SerializeField] private int m_ArrowSortingOrder = 7;
 
 		private BomberBird.Arena.Arena m_Arena;
 		private ArenaGrid m_Grid;
 		private SpriteRenderer m_Renderer;
+		private SpriteRenderer m_ArrowRenderer;
 		private Vector2Int m_Cell;
 		private bool m_IsCleared;
 		private bool m_WasOpen;
 
 		/// <summary>
-		/// Whether the exit may be used. An exit with no objective assigned stays usable, so
+		/// Whether the gate may be used. An exit with no objective assigned stays usable, so
 		/// a stage built without one is playable rather than unfinishable.
 		/// </summary>
 		public bool IsOpen
@@ -63,17 +71,25 @@ namespace BomberBird.Flow
 			}
 
 			m_Grid = m_Arena.Grid;
-			m_Cell = m_Arena.Layout.ExitCell;
+			m_Cell = GateCellFor(m_Grid);
 
-			if (!m_Grid.IsWalkable(m_Cell))
+			if (!validatePlacement())
 			{
-				Debug.LogError(
-					name + ": the exit at " + m_Cell + " is not open floor. Check the stage layout.", this);
 				enabled = false;
 				return;
 			}
 
 			createVisual();
+		}
+
+		/// <summary>
+		/// Where the gate goes: the middle of the right-hand wall. Derived from the arena's
+		/// own size rather than authored, because a gate that moves between stages is a gate
+		/// the player has to find again, and a mis-typed one is an unfinishable stage.
+		/// </summary>
+		public static Vector2Int GateCellFor(ArenaGrid i_Grid)
+		{
+			return new Vector2Int(i_Grid.Width - 1, i_Grid.Height / 2);
 		}
 
 		private void Update()
@@ -83,7 +99,11 @@ namespace BomberBird.Flow
 			if (isOpen != m_WasOpen)
 			{
 				m_WasOpen = isOpen;
-				m_Renderer.color = isOpen ? m_OpenTint : m_ClosedTint;
+
+				if (isOpen)
+				{
+					openGate();
+				}
 			}
 
 			if (m_IsCleared || !isOpen || m_Bird.Cell != m_Cell)
@@ -102,18 +122,91 @@ namespace BomberBird.Flow
 			GameFlow.Instance.CompleteStage();
 		}
 
+		/// <summary>
+		/// Opens the wall so the bird can walk into it, shows the open gate, and starts the
+		/// arrow. The grid change is what actually lets the bird through; the rest is signal.
+		/// </summary>
+		private void openGate()
+		{
+			m_Grid.TryOpen(m_Cell);
+
+			if (m_GateOpen != null)
+			{
+				m_Renderer.sprite = m_GateOpen;
+			}
+
+			if (m_Arrow != null)
+			{
+				StartCoroutine(flashArrow());
+			}
+		}
+
+		private IEnumerator flashArrow()
+		{
+			GameObject visual = new GameObject("ExitArrow");
+			visual.transform.SetParent(transform, false);
+
+			// One cell inside the gate, on the floor the bird has to cross to reach it.
+			visual.transform.localPosition = m_Grid.CellToWorld(m_Cell + Vector2Int.left);
+
+			m_ArrowRenderer = visual.AddComponent<SpriteRenderer>();
+			m_ArrowRenderer.sprite = m_Arrow;
+			m_ArrowRenderer.sortingOrder = m_ArrowSortingOrder;
+
+			float secondsPerFlash = m_ArrowFlashRate <= 0f ? 0.25f : 1f / m_ArrowFlashRate;
+
+			// Runs until the stage ends, which is what the player is being told to do.
+			while (true)
+			{
+				m_ArrowRenderer.enabled = !m_ArrowRenderer.enabled;
+
+				yield return new WaitForSeconds(secondsPerFlash);
+			}
+		}
+
 		private void createVisual()
 		{
-			GameObject visual = new GameObject("Exit");
+			GameObject visual = new GameObject("Gate");
 			visual.transform.SetParent(transform, false);
 			visual.transform.localPosition = m_Grid.CellToWorld(m_Cell);
 
 			m_Renderer = visual.AddComponent<SpriteRenderer>();
-			m_Renderer.sprite = m_Sprite;
-			m_Renderer.color = IsOpen ? m_OpenTint : m_ClosedTint;
+			m_Renderer.sprite = m_GateClosed;
 			m_Renderer.sortingOrder = m_SortingOrder;
 
-			m_WasOpen = IsOpen;
+			// Deliberately not asking whether the stage is already clear. This runs in Awake,
+			// and the mynas may not have spawned yet, so "nothing left alive" would be read
+			// as "stage finished" and the gate would be drawn open before the level began.
+			// Starting shut and letting the first Update correct it costs one frame and
+			// cannot be wrong.
+			m_WasOpen = false;
+		}
+
+		/// <summary>
+		/// The gate replaces a piece of wall, and the bird has to be able to walk up to it.
+		/// Both are level-design mistakes rather than runtime conditions, so they are worth
+		/// saying loudly the moment the stage loads.
+		/// </summary>
+		private bool validatePlacement()
+		{
+			if (m_Grid.GetCell(m_Cell) != eCell.Border)
+			{
+				Debug.LogError(
+					name + ": the gate at " + m_Cell + " is not border wall. The arena's right-hand "
+					+ "wall must be solid border for the gate to sit in.", this);
+				return false;
+			}
+
+			Vector2Int approach = m_Cell + Vector2Int.left;
+
+			if (!m_Grid.IsWalkable(approach))
+			{
+				Debug.LogWarning(
+					name + ": the cell inside the gate at " + approach + " is not open floor, so the "
+					+ "bird may not be able to reach the exit.", this);
+			}
+
+			return true;
 		}
 
 		private bool hasRequiredReferences()
@@ -130,9 +223,9 @@ namespace BomberBird.Flow
 				return false;
 			}
 
-			if (m_Sprite == null)
+			if (m_GateClosed == null || m_GateOpen == null)
 			{
-				Debug.LogError(name + ": m_Sprite is not assigned.", this);
+				Debug.LogError(name + ": the gate sprites are not assigned.", this);
 				return false;
 			}
 

@@ -1735,10 +1735,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageExit
   m_Bird: {fileID: 1600481133}
   m_Objective: {fileID: 1688113804}
-  m_Sprite: {fileID: 21300000, guid: 5c65d42ecf58149cdab6a0241db0abe4, type: 3}
-  m_ClosedTint: {r: 0.45, g: 0.42, b: 0.35, a: 1}
-  m_OpenTint: {r: 1, g: 1, b: 1, a: 1}
+  m_GateClosed: {fileID: 21300000, guid: 784cf04f014cc4fd99d7b1a399309833, type: 3}
+  m_GateOpen: {fileID: 21300000, guid: 5c65d42ecf58149cdab6a0241db0abe4, type: 3}
+  m_Arrow: {fileID: 21300000, guid: 2ea0bf0f536cb416cb8f5d2b1ee530f6, type: 3}
+  m_ArrowFlashRate: 3
   m_SortingOrder: 2
+  m_ArrowSortingOrder: 7
 --- !u!114 &1688113803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1769,6 +1771,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageObjective
   m_Mynas: {fileID: 1688113803}
   m_Bird: {fileID: 1600481133}
+  m_CageSprite: {fileID: 21300000, guid: 0e59792a9816447a19adab607d37b18f, type: 3}
+  m_CageSortingOrder: 6
   m_FrameRate: 4
   m_SortingOrder: 5
 --- !u!1 &1813632424
