@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a44d81819fdf463b9442bf26b8fbd0d, type: 3}
+  m_Name: lagoon-shore
+  m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaTileSet
+  m_Floor: {fileID: 21300000, guid: 176448625da304898be6fd3e6b277244, type: 3}
+  m_Border: {fileID: 21300000, guid: c8180fd80e6254b22a31ec63f673caa3, type: 3}
+  m_HardBlock: {fileID: 21300000, guid: 82680aabc6a644b469c827cc10238c52, type: 3}
+  m_SoftBlockVariants:
+  - {fileID: 21300000, guid: f0db79eb59f2644caae4de5f93daec3f, type: 3}
+  - {fileID: 21300000, guid: e5f43a87a666f4a40a06b5d97680a791, type: 3}
+  - {fileID: 21300000, guid: 77e5d9889e3664871be39c6b4bb65871, type: 3}
+  - {fileID: 21300000, guid: 0dac80040286941f3bf6ef31af2e7465, type: 3}
+  - {fileID: 21300000, guid: f742ac5a33f45473caab5ef2fa9a3831, type: 3}
+  - {fileID: 21300000, guid: 66d9157a1c75244168549d5eb7da07e9, type: 3}
+  - {fileID: 21300000, guid: 5e9a621e6fe494ebb802eea88e862830, type: 3}
+  - {fileID: 21300000, guid: 85d410b884c434711a89d2e4b51ffc36, type: 3}

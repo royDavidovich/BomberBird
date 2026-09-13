@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a44d81819fdf463b9442bf26b8fbd0d, type: 3}
+  m_Name: rocky-upland
+  m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaTileSet
+  m_Floor: {fileID: 21300000, guid: cde7f3a867f3a4e148a03df2d8001286, type: 3}
+  m_Border: {fileID: 21300000, guid: eb68ade8e6e884ea7bf24793466e6688, type: 3}
+  m_HardBlock: {fileID: 21300000, guid: a6e07814fd10747e8826edada326c2be, type: 3}
+  m_SoftBlockVariants:
+  - {fileID: 21300000, guid: f39b3db4f3630414d8f9a001cce531d6, type: 3}
+  - {fileID: 21300000, guid: 4972728a4cc514326b6121afffb073d1, type: 3}
+  - {fileID: 21300000, guid: 358fdc3f4264f4e4b998d19a5e8ffc99, type: 3}
+  - {fileID: 21300000, guid: 737351205c7114da7afe77ff97ff05f5, type: 3}
+  - {fileID: 21300000, guid: 0eda144c2575b4631bb8938ceb20ae71, type: 3}
+  - {fileID: 21300000, guid: 3ab61bb6bd4ea439fa3c1e8e94281a67, type: 3}
+  - {fileID: 21300000, guid: 6f7b0cd018a144c039fac3f3c8edd802, type: 3}
+  - {fileID: 21300000, guid: 1dc8eb2dbdd334a5f95528c8807f8925, type: 3}
