@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BomberBird.Arena
@@ -29,6 +30,16 @@ namespace BomberBird.Arena
 		[Tooltip("The cell the exit sits on. It must be open floor in the map below.")]
 		[SerializeField] private Vector2Int m_ExitCell = new Vector2Int(11, 1);
 
+		[Tooltip("Cells the mynas start on. Each must be open floor in the map below, and none "
+			+ "may sit on the bird's start cell or it dies the instant the stage loads.")]
+		[SerializeField]
+		private Vector2Int[] m_MynaSpawnCells =
+		{
+			new Vector2Int(11, 9),
+			new Vector2Int(1, 1),
+			new Vector2Int(7, 5),
+		};
+
 		[Header("Arena map")]
 		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, '.' floor.")]
 		[SerializeField]
@@ -44,6 +55,15 @@ namespace BomberBird.Arena
 		public Vector2Int ExitCell
 		{
 			get { return m_ExitCell; }
+		}
+
+		/// <summary>
+		/// Where this stage's mynas start. Authored with the map for the same reason the
+		/// exit is: moving an enemy should not mean opening a scene.
+		/// </summary>
+		public IList<Vector2Int> MynaSpawnCells
+		{
+			get { return m_MynaSpawnCells; }
 		}
 
 		/// <summary>Builds the runtime grid for this stage.</summary>

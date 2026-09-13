@@ -705,7 +705,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4290111224
   m_fontColor: {r: 0.973, g: 0.902, b: 0.71, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -979,7 +979,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4290111224
   m_fontColor: {r: 0.973, g: 0.902, b: 0.71, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -992,7 +992,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -1249,7 +1249,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4290111224
   m_fontColor: {r: 0.973, g: 0.902, b: 0.71, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1262,7 +1262,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -1602,6 +1602,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.BirdDeath
   m_Pods: {fileID: 1688113800}
+  m_Mynas: {fileID: 1688113803}
   m_LethalSeconds: 0.45
   m_DeathBeat: 1
   m_FlashRate: 10
@@ -1619,6 +1620,7 @@ GameObject:
   - component: {fileID: 1688113800}
   - component: {fileID: 1688113801}
   - component: {fileID: 1688113802}
+  - component: {fileID: 1688113803}
   m_Layer: 0
   m_Name: Arena
   m_TagString: Untagged
@@ -1717,6 +1719,22 @@ MonoBehaviour:
   m_Sprite: {fileID: 21300000, guid: 5c65d42ecf58149cdab6a0241db0abe4, type: 3}
   m_Tint: {r: 0.96, g: 0.8, b: 0.47, a: 1}
   m_SortingOrder: 2
+--- !u!114 &1688113803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688113796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 887ef1ff51ff84dfb90ae0d0fae45f0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.Enemies::BomberBird.Enemies.ArenaMynas
+  m_Pods: {fileID: 1688113800}
+  m_Prefab: {fileID: 2916023543840682989, guid: baa97522c9bd3405b950ea94b136bd34, type: 3}
+  m_RandomSeed: 0
+  m_LethalSeconds: 0.45
 --- !u!1 &1813632424
 GameObject:
   m_ObjectHideFlags: 0
@@ -1888,7 +1906,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0

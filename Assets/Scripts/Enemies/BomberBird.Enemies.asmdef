@@ -1,11 +1,10 @@
 {
-    "name": "BomberBird.Flow",
-    "rootNamespace": "BomberBird.Flow",
+    "name": "BomberBird.Enemies",
+    "rootNamespace": "BomberBird.Enemies",
     "references": [
         "BomberBird.Arena",
         "BomberBird.Pods",
-        "BomberBird.Player",
-        "BomberBird.Enemies"
+        "BomberBird.Player"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
