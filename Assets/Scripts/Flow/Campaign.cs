@@ -26,6 +26,9 @@ namespace BomberBird.Flow
 
 			[SerializeField] private ArenaLayout m_Layout;
 
+			[Tooltip("The habitat this stage is drawn with. Two stages may share one set.")]
+			[SerializeField] private ArenaTileSet m_TileSet;
+
 			[Tooltip("The bird this stage's feather unlocks. Leave empty for the intro and "
 				+ "the boss, which award none and open their exit as soon as the arena is clear.")]
 			[SerializeField] private BirdProfile m_AwardedBird;
@@ -38,6 +41,11 @@ namespace BomberBird.Flow
 			public ArenaLayout Layout
 			{
 				get { return m_Layout; }
+			}
+
+			public ArenaTileSet TileSet
+			{
+				get { return m_TileSet; }
 			}
 
 			/// <summary>The bird this stage awards, or null when it awards none.</summary>
@@ -95,6 +103,10 @@ namespace BomberBird.Flow
 				if (m_Stages[i] == null || m_Stages[i].Layout == null)
 				{
 					problems += " stage " + (i + 1) + " has no layout;";
+				}
+				else if (m_Stages[i].TileSet == null)
+				{
+					problems += " stage " + (i + 1) + " has no tile set;";
 				}
 			}
 
