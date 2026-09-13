@@ -1620,6 +1620,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e99bb913481c846a39f576320785de58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageSetup
+  m_Arena: {fileID: 1688113799}
+  m_Renderer: {fileID: 1688113797}
   m_Bird: {fileID: 1600481133}
   m_Animator: {fileID: 1600481132}
   m_Pods: {fileID: 1688113800}

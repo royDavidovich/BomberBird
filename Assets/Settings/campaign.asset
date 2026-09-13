@@ -15,5 +15,26 @@ MonoBehaviour:
   m_Stages:
   - m_HabitatName: First Steps Garden
     m_Layout: {fileID: 11400000, guid: ad78887da97f941a4a5617a1d8b023cd, type: 2}
+    m_TileSet: {fileID: 11400000, guid: d2b69b68d229c44ddbb6c383f04b4b30, type: 2}
+    m_AwardedBird: {fileID: 0}
+  - m_HabitatName: Orchard Grove
+    m_Layout: {fileID: 11400000, guid: 8d4d97ed16304302aea9e8fab15d9976, type: 2}
+    m_TileSet: {fileID: 11400000, guid: 21c11f90f54c4473a5b4dbe21560c915, type: 2}
+    m_AwardedBird: {fileID: 0}
+  - m_HabitatName: Stream Bank
+    m_Layout: {fileID: 11400000, guid: 8d7d2db47621481f8eeae48c18aee73f, type: 2}
+    m_TileSet: {fileID: 11400000, guid: ab40f6806b81454a99281f8948b67b40, type: 2}
+    m_AwardedBird: {fileID: 11400000, guid: 19a4810925a0b461e88f4aa6b90ae12e, type: 2}
+  - m_HabitatName: Lagoon Shore
+    m_Layout: {fileID: 11400000, guid: 924e4331b8ca49968c00ab6c11d79019, type: 2}
+    m_TileSet: {fileID: 11400000, guid: 2dfd643542e54515adb3f185a85d2042, type: 2}
+    m_AwardedBird: {fileID: 11400000, guid: 855760986c2b84e54bfa7256d7f25806, type: 2}
+  - m_HabitatName: Rocky Upland
+    m_Layout: {fileID: 11400000, guid: 8e7fe54346c5429f895d67c9ffcfd964, type: 2}
+    m_TileSet: {fileID: 11400000, guid: cd801a67ca214e2cb23b14ac64bdc6f9, type: 2}
+    m_AwardedBird: {fileID: 11400000, guid: b2b399ae04ee545fa85f0a12006dfc3e, type: 2}
+  - m_HabitatName: Overgrown Courtyard
+    m_Layout: {fileID: 11400000, guid: 2def2d1844324d6787441cb65f52b4cf, type: 2}
+    m_TileSet: {fileID: 11400000, guid: 106ca53536f74efda13d83b86e0e8cca, type: 2}
     m_AwardedBird: {fileID: 0}
   m_StartingBird: {fileID: 11400000, guid: c8039b8a2bc4c4fd4bb325bd11fb32c4, type: 2}

@@ -20,6 +20,30 @@ namespace BomberBird.Arena
 		private ArenaGrid m_Grid;
 		private SpriteRenderer[,] m_Tiles;
 
+		/// <summary>
+		/// Replaces the habitat this arena is drawn with, for a run that picks the stage.
+		/// Like <see cref="Arena.UseLayout"/>, it refuses once the tiles exist: the sprites
+		/// are already on screen by then, and a silent no-op would look exactly like a
+		/// mis-assigned tile set.
+		/// </summary>
+		public void UseTileSet(ArenaTileSet i_TileSet)
+		{
+			if (i_TileSet == null)
+			{
+				Debug.LogError(name + ": UseTileSet was given no tile set.", this);
+				return;
+			}
+
+			if (m_Tiles != null)
+			{
+				Debug.LogError(
+					name + ": the tiles are already built, so the tile set cannot change now.", this);
+				return;
+			}
+
+			m_TileSet = i_TileSet;
+		}
+
 		private void Awake()
 		{
 			m_Arena = GetComponent<Arena>();

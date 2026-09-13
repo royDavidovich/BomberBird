@@ -1,3 +1,4 @@
+using BomberBird.Arena;
 using BomberBird.Player;
 using BomberBird.Pods;
 using UnityEngine;
@@ -5,26 +6,69 @@ using UnityEngine;
 namespace BomberBird.Flow
 {
 	/// <summary>
-	/// Hands the stage the bird the player chose: its frames, its speed, and the pod rules
-	/// it plays by.
+	/// Hands the stage everything the run decided: the arena it is played in, the habitat
+	/// it is drawn with, and the bird flying it.
 	///
-	/// The scene is authored with the starter bird, so a gameplay scene opened on its own
-	/// is still playable. This replaces those values when there is a run to ask.
+	/// The scene is authored as the first stage with the starter bird, so a gameplay scene
+	/// opened on its own is still playable. This replaces those values when there is a run
+	/// to ask, and leaves them alone when there is not.
 	///
-	/// It runs in Start rather than Awake on purpose. <see cref="PodField"/> is built during
-	/// Awake by whichever consumer reaches it first, so Start is the earliest moment the
-	/// rules are guaranteed to exist - and it is still a whole frame before the player can
-	/// place anything.
+	/// The two halves run in different callbacks because they are needed at different
+	/// moments. The arena has to be chosen in Awake, before <see cref="Arena.Arena"/> builds
+	/// its grid; the bird cannot be, because <see cref="PodField"/> is built during Awake by
+	/// whichever consumer reaches it first, so Start is the earliest moment the pod rules are
+	/// guaranteed to exist - and it is still a whole frame before the player can place
+	/// anything.
+	///
+	/// The execution order is what makes the first half work: every Awake at the default
+	/// order, the arena's included, runs after this one.
 	/// </summary>
+	[DefaultExecutionOrder(-100)]
 	public class StageSetup : MonoBehaviour
 	{
+		[Header("The arena")]
+		[SerializeField] private BomberBird.Arena.Arena m_Arena;
+		[SerializeField] private ArenaRenderer m_Renderer;
+
+		[Header("The bird")]
 		[SerializeField] private BirdMovement m_Bird;
 		[SerializeField] private BirdAnimator m_Animator;
 		[SerializeField] private ArenaPods m_Pods;
 
+		private void Awake()
+		{
+			Campaign.Stage stage = GameFlow.Instance == null ? null : GameFlow.Instance.CurrentStage;
+
+			if (stage == null)
+			{
+				// No run, or a run past the end of the campaign: the scene's own arena stands.
+				return;
+			}
+
+			if (m_Arena == null || m_Renderer == null)
+			{
+				Debug.LogError(
+					name + ": the arena references are not assigned, so the stage keeps the "
+					+ "scene's arena.", this);
+				return;
+			}
+
+			// A stage missing either is already reported by Campaign.DescribeProblems, so
+			// keeping the scene's own is the recovery rather than a second complaint.
+			if (stage.Layout != null)
+			{
+				m_Arena.UseLayout(stage.Layout);
+			}
+
+			if (stage.TileSet != null)
+			{
+				m_Renderer.UseTileSet(stage.TileSet);
+			}
+		}
+
 		private void Start()
 		{
-			if (!hasRequiredReferences())
+			if (!hasRequiredBirdReferences())
 			{
 				enabled = false;
 				return;
@@ -63,7 +107,7 @@ namespace BomberBird.Flow
 			field.MaxActivePods = profile.MaxActivePods;
 		}
 
-		private bool hasRequiredReferences()
+		private bool hasRequiredBirdReferences()
 		{
 			if (m_Bird == null)
 			{
