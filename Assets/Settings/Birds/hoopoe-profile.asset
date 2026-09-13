@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba1d18a0a1d2646e18cf628d719a4d9e, type: 3}
+  m_Name: hoopoe-profile
+  m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdProfile
+  m_DisplayName: Eurasian hoopoe
+  m_Sprites: {fileID: 11400000, guid: ef61208fe01b04e539921048e46a0ec3, type: 2}
+  m_Speed: 4
+  m_BurstRange: 2
+  m_MaxActivePods: 1
+  m_FeatherFrames: []

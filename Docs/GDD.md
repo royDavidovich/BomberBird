@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.7, 2026-09-13 |
+| Document version | v0.8, 2026-09-13 |
 
 ## 1. High Concept
 
@@ -93,16 +93,35 @@ Exactly which level awards which feather is a pacing decision and will be settle
 
 ### Parameters to Tune
 
-| Parameter | What it controls | First guess |
-|---|---|---|
-| Movement speed | Responsiveness and navigation | To be tested |
-| Fuse duration | Time available to escape or prepare a chain | 2 seconds |
-| Burst range | Area affected in each direction | 2 cells |
-| Active pod limit | Number of simultaneous placed pods | 1 |
-| Starting lives | Attempts before the run ends | 3 |
-| Enemy speed | Pressure inside the arena | To be tested |
+| Parameter | What it controls | Scope | First guess |
+|---|---|---|---|
+| Movement speed | Responsiveness and navigation | Per bird | See the roster table below |
+| Burst range | Area affected in each direction | Per bird | See the roster table below |
+| Active pod limit | Number of simultaneous placed pods | Per bird | See the roster table below |
+| Fuse duration | Time available to escape or prepare a chain | Shared | 2 seconds |
+| Starting lives | Attempts before the run ends | Shared | 3 |
+| Enemy speed | Pressure inside the arena | Shared | To be tested |
 
 These values will be editable in the Unity Inspector or a configuration asset.
+
+#### How the birds differ
+
+The four playable birds share every rule. They differ only in the three tuned values
+above, carried on a per-bird configuration asset, so the roster the player has earned
+changes how a stage is approached without any bird needing rules of its own. This
+keeps the design clear of the "unique rule sets for every bird" exclusion in section
+8.3, and makes the feather unlock a mechanical reward rather than a costume.
+
+| Bird | Movement speed | Burst range | Active pods | Intended feel |
+|---|---|---|---|---|
+| Eurasian hoopoe | 4.0 | 2 | 1 | The starter. Balanced, and the baseline the others are read against |
+| White-throated kingfisher | 5.5 | 1 | 1 | Fast and nimble, but has to place pods close to what it wants to hit |
+| Great white pelican | 3.0 | 3 | 1 | Slow and deliberate, with reach that clears a corridor at once |
+| Chukar partridge | 4.5 | 2 | 2 | Brisk, and the only bird that can hold two pods on the arena |
+
+These numbers are first guesses to be settled by playtest, not balance decisions. The
+requirement they encode is that a player should feel the difference within one stage
+of switching bird.
 
 **Feel target:** a first-time player should understand the basic seed-pod interaction within the first stage and feel that failures were readable and avoidable.
 
@@ -119,11 +138,18 @@ Gameplay input is disabled while paused and during stage transitions. Losing foc
 
 ## 5. Screens and UI
 
-1. **Main menu:** title, Play, and Quit.
-2. **Bird selection:** available bird choices and Continue.
-3. **Gameplay:** the arena and a compact HUD carrying the pods available to place, the current stage, and the lives remaining. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
-4. **Pause overlay:** Resume, Restart, and Main Menu.
-5. **Results:** completion, optional rewards, Retry, and Next Stage.
+1. **Main menu:** title art, Play, and Quit.
+2. **Bird selection:** the birds unlocked so far, each showing the three values that make it different, and Continue.
+3. **Habitat card:** a brief card before each stage naming the habitat and the bird it belongs to.
+4. **Gameplay:** the arena and a compact HUD carrying the pods available to place, the current stage, and the lives remaining. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
+5. **Pause overlay:** Resume, Restart, and Main Menu.
+6. **Results:** completion, optional rewards, Retry, and Next Stage.
+7. **Closing screen:** shown when the boss falls, listing the birds the player rescued across the campaign.
+8. **Closing note:** a short factual card on the common myna as a real invasive species in Israel, with its source credited.
+
+Screens 1, 3, 7, and 8 exist to make six arenas read as one journey through Israeli
+habitats. They carry no gameplay rules: removing all of them would leave the campaign
+fully playable, which is the separation section 7 requires of presentation.
 
 ```text
 +----------------------------------------------------+
@@ -146,7 +172,12 @@ The final placement and visual treatment will be decided after the first playabl
 | Effects and UI | Original or clearly licensed assets | Record creator, source, and license |
 | Sound and music | Original or clearly licensed audio | Record creator, source, and license |
 
-Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna closes the campaign in level 6; its exact design and attack behavior remain open. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
+Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna closes the campaign in level 6. It is the same species as the regular
+enemy and moves by the same rules, but it survives three bursts instead of one. Each
+non-fatal hit makes it faster and calls two ordinary mynas into the arena, so the fight
+escalates as it is won. It has no attack of its own beyond touching the player, which
+every myna already does. This keeps the campaign's climax inside systems that already
+exist rather than adding a behaviour system in the final weeks. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
 
 All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission. Art format, animation counts, and audio style will be chosen after a small visual prototype proves what is practical.
 
@@ -181,7 +212,9 @@ The exact class names and boundaries will be chosen while building the first ver
 ### Course Features
 
 1. **Coroutine:** handle pod fuse timing and short transitions because both are time-based sequences.
-2. **Object pool:** reuse frequently appearing pod or burst effects if profiling or repeated spawning justifies it.
+2. **Object pool:** reuse the burst effect objects. Every detonation currently builds and
+   destroys a set of GameObjects, and chain reactions make that repeat in bursts, which is
+   the repeated-spawning case this was reserved for.
 3. **Events:** notify UI and audio about gameplay changes without coupling them directly to the player.
 4. **ScriptableObject or serialized configuration:** expose values that need playtesting without recompiling code.
 
@@ -231,3 +264,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.5 | 2026-09-11 | Recorded lecturer approval of the idea and GDD through the designated course Google Sheet, opening the approval gate |
 | v0.6 | 2026-09-12 | Defined the six-level campaign, the feather unlock progression, and the four playable birds; confirmed the common myna as the boss and never playable; recorded the submission deadline |
 | v0.7 | 2026-09-13 | Defined the stage objective as defeating every myna, turned the feather into a collectible that opens the exit on regular stages, added lives and the retry rule, and fixed the gameplay HUD to pods, stage, and lives |
+| v0.8 | 2026-09-13 | Made the four playable birds differ by tuned movement speed, burst range, and active pod limit rather than by sprite alone; settled the level 6 boss as a three-hit myna that accelerates and calls escorts; added the habitat card, closing screen, and closing note to the screen list; and committed the object pool to the burst effects |

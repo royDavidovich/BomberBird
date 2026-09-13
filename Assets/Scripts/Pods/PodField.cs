@@ -26,8 +26,12 @@ namespace BomberBird.Pods
 		private readonly List<Pod> r_Pods = new List<Pod>();
 
 		private readonly float r_FuseSeconds;
-		private readonly int r_BurstRange;
-		private readonly int r_MaxActivePods;
+
+		// Not readonly: the bird being played sets these, and the player may change bird
+		// between stages. Both are clamped to at least 1, because a burst that reaches
+		// nowhere and a limit of no pods are each an unplayable arena rather than a rule.
+		private int m_BurstRange;
+		private int m_MaxActivePods;
 
 		/// <summary>Raised when a pod is placed, with its cell.</summary>
 		public event Action<Vector2Int> PodPlaced;
@@ -40,6 +44,20 @@ namespace BomberBird.Pods
 			get { return r_Pods.Count; }
 		}
 
+		/// <summary>How many cells a burst reaches along each of the four directions.</summary>
+		public int BurstRange
+		{
+			get { return m_BurstRange; }
+			set { m_BurstRange = Math.Max(1, value); }
+		}
+
+		/// <summary>How many pods may sit on the arena at once.</summary>
+		public int MaxActivePods
+		{
+			get { return m_MaxActivePods; }
+			set { m_MaxActivePods = Math.Max(1, value); }
+		}
+
 		public PodField(ArenaGrid i_Grid, float i_FuseSeconds, int i_BurstRange, int i_MaxActivePods)
 		{
 			if (i_Grid == null)
@@ -49,8 +67,8 @@ namespace BomberBird.Pods
 
 			r_Grid = i_Grid;
 			r_FuseSeconds = i_FuseSeconds;
-			r_BurstRange = i_BurstRange;
-			r_MaxActivePods = i_MaxActivePods;
+			BurstRange = i_BurstRange;
+			MaxActivePods = i_MaxActivePods;
 		}
 
 		/// <summary>
@@ -59,7 +77,7 @@ namespace BomberBird.Pods
 		/// </summary>
 		public bool TryPlace(Vector2Int i_Cell)
 		{
-			if (r_Pods.Count >= r_MaxActivePods)
+			if (r_Pods.Count >= m_MaxActivePods)
 			{
 				return false;
 			}
@@ -174,7 +192,7 @@ namespace BomberBird.Pods
 			i_Pod.IsSpent = true;
 			r_Pods.Remove(i_Pod);
 
-			List<Vector2Int> covered = BurstShape.GetCoveredCells(r_Grid, i_Pod.Cell, r_BurstRange);
+			List<Vector2Int> covered = BurstShape.GetCoveredCells(r_Grid, i_Pod.Cell, m_BurstRange);
 
 			// Destroy first, so a listener drawing the burst sees the arena as it now is.
 			foreach (Vector2Int cell in covered)
