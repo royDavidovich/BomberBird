@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d9c48c6d618149f69c4c6d3f060b277, type: 3}
+  m_Name: chukar
+  m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdSpriteSet
+  m_DownIdle: {fileID: 21300000, guid: 2890a38df58d42c986fccb4e50c120b0, type: 3}
+  m_DownWalk:
+  - {fileID: 21300000, guid: c791867b8a294b3c99161a1d914a4bee, type: 3}
+  - {fileID: 21300000, guid: 3597caf3ca1a4f8cb66d7780540557af, type: 3}
+  m_UpIdle: {fileID: 21300000, guid: 7f33b9d3c2354252a0a5068b5b5d8bd8, type: 3}
+  m_UpWalk:
+  - {fileID: 21300000, guid: 1fab8670d5264a038a0910b59abd91d3, type: 3}
+  - {fileID: 21300000, guid: 591725fcbbe2455495a7dcac8816283e, type: 3}
+  m_SideIdle: {fileID: 21300000, guid: 92e5ce452f714c2188b9ea22be683acc, type: 3}
+  m_SideWalk:
+  - {fileID: 21300000, guid: 301aa7f9499d4fdc9955d0dbaba90604, type: 3}
+  - {fileID: 21300000, guid: f04b936b713849249fcc285a8c0c253d, type: 3}
