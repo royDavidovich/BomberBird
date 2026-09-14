@@ -37,8 +37,9 @@ namespace BomberBird.Enemies
 		[Tooltip("Seconds the slaves scatter for after the boss dies, before they are gone.")]
 		[SerializeField] private float m_ScatterSeconds = 1.25f;
 
-		[Tooltip("Speed the slaves scatter at. Faster than a walk, so the rout reads as panic.")]
-		[SerializeField] private float m_ScatterSpeed = 5f;
+		[Tooltip("Speed the slaves scatter at. A little above a walk - enough to read as a "
+			+ "rout, not so much that it looks like a glitch.")]
+		[SerializeField] private float m_ScatterSpeed = 3f;
 
 		// Far enough to clear a boss boxed in by pods and hard blocks, near enough that a
 		// summoned slave still reads as having come from the boss.

@@ -1860,7 +1860,7 @@ MonoBehaviour:
   m_RandomSeed: 0
   m_LethalSeconds: 0.45
   m_ScatterSeconds: 1.25
-  m_ScatterSpeed: 5
+  m_ScatterSpeed: 3
 --- !u!114 &1688113804
 MonoBehaviour:
   m_ObjectHideFlags: 0
