@@ -18,8 +18,15 @@ namespace BomberBird.Arena.Tests
 	{
 		private const string k_CampaignPath = "Assets/Settings/campaign.asset";
 
-		/// <summary>Where the bird is placed in the gameplay scene.</summary>
-		private static readonly Vector2Int sr_Start = new Vector2Int(1, 9);
+		/// <summary>
+		/// Where the bird stands in the gameplay scene. One scene serves every stage, so this
+		/// is a world position rather than a cell.
+		/// </summary>
+		private static readonly Vector3 sr_StartWorld = new Vector3(-5f, 4f, 0f);
+
+		/// <summary>The standard arena. The boss stage is wider, which is why this is not a rule.</summary>
+		private const int k_StandardWidth = 13;
+		private const int k_StandardHeight = 11;
 
 		/// <summary>The longest burst in the roster, the great white pelican's.</summary>
 		private const int k_LongestBurst = 3;
@@ -39,6 +46,16 @@ namespace BomberBird.Arena.Tests
 		private static readonly Vector2Int[] sr_Steps =
 			{ Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
 
+		/// <summary>
+		/// The cell the bird starts this stage on. Derived rather than written down, because
+		/// the arena is centred on the origin: a wider stage puts the same scene position on
+		/// a different cell, and the boss stage is wider.
+		/// </summary>
+		private static Vector2Int startCell(ArenaGrid i_Grid)
+		{
+			return i_Grid.WorldToCell(sr_StartWorld);
+		}
+
 		public static IEnumerable<int> StageNumbers()
 		{
 			Campaign campaign = loadCampaign();
@@ -57,9 +74,10 @@ namespace BomberBird.Arena.Tests
 		/// </summary>
 		private static HashSet<Vector2Int> reachable(ArenaGrid i_Grid, bool i_BreakablesPassable)
 		{
-			HashSet<Vector2Int> seen = new HashSet<Vector2Int> { sr_Start };
+			Vector2Int start = startCell(i_Grid);
+			HashSet<Vector2Int> seen = new HashSet<Vector2Int> { start };
 			Queue<Vector2Int> queue = new Queue<Vector2Int>();
-			queue.Enqueue(sr_Start);
+			queue.Enqueue(start);
 
 			while (queue.Count > 0)
 			{
@@ -92,14 +110,16 @@ namespace BomberBird.Arena.Tests
 		}
 
 		/// <summary>Every cell a pod on the start cell can reach, ignoring what stops it.</summary>
-		private static bool isOnStartBurstCross(Vector2Int i_Cell)
+		private static bool isOnStartBurstCross(ArenaGrid i_Grid, Vector2Int i_Cell)
 		{
-			if (i_Cell.x != sr_Start.x && i_Cell.y != sr_Start.y)
+			Vector2Int start = startCell(i_Grid);
+
+			if (i_Cell.x != start.x && i_Cell.y != start.y)
 			{
 				return false;
 			}
 
-			return Mathf.Abs(i_Cell.x - sr_Start.x) + Mathf.Abs(i_Cell.y - sr_Start.y)
+			return Mathf.Abs(i_Cell.x - start.x) + Mathf.Abs(i_Cell.y - start.y)
 				<= k_LongestBurst;
 		}
 
@@ -126,12 +146,25 @@ namespace BomberBird.Arena.Tests
 		}
 
 		[Test]
-		public void EveryArenaIsTheExpectedSize([ValueSource("StageNumbers")] int i_StageNumber)
+		public void EveryArenaIsAWorkableSize([ValueSource("StageNumbers")] int i_StageNumber)
 		{
 			ArenaGrid grid = loadCampaign().GetStage(i_StageNumber).Layout.CreateGrid();
 
-			Assert.AreEqual(ArenaLayout.k_Width, grid.Width);
-			Assert.AreEqual(ArenaLayout.k_Height, grid.Height);
+			// Not an equality check any more. A stage is allowed its own size - the boss
+			// stage is wider to give that fight room - so what is asserted is what actually
+			// breaks a map rather than what merely differs from the others.
+			Assert.AreEqual(1, grid.Width % 2,
+				"Stage " + i_StageNumber + " is " + grid.Width + " wide. An even width puts the "
+				+ "hard-block lattice against the border and closes the lanes.");
+			Assert.AreEqual(1, grid.Height % 2,
+				"Stage " + i_StageNumber + " is " + grid.Height + " tall, which must be odd for "
+				+ "the same reason.");
+
+			Assert.GreaterOrEqual(grid.Width, k_StandardWidth,
+				"Stage " + i_StageNumber + " is narrower than the standard arena.");
+			Assert.AreEqual(k_StandardHeight, grid.Height,
+				"Stage " + i_StageNumber + " is not the standard height. The gameplay camera is "
+				+ "fixed at 12 tiles tall, so a taller arena is drawn off screen.");
 		}
 
 		[Test]
@@ -139,7 +172,7 @@ namespace BomberBird.Arena.Tests
 		{
 			ArenaGrid grid = loadCampaign().GetStage(i_StageNumber).Layout.CreateGrid();
 
-			Assert.IsTrue(grid.IsWalkable(sr_Start),
+			Assert.IsTrue(grid.IsWalkable(startCell(grid)),
 				"Stage " + i_StageNumber + " starts the bird inside a wall.");
 
 			// Nothing is broken yet at stage start, so the escape has to use open floor.
@@ -147,7 +180,7 @@ namespace BomberBird.Arena.Tests
 
 			foreach (Vector2Int cell in reachable(grid, false))
 			{
-				if (!isOnStartBurstCross(cell))
+				if (!isOnStartBurstCross(grid, cell))
 				{
 					hasRefuge = true;
 					break;
@@ -210,27 +243,69 @@ namespace BomberBird.Arena.Tests
 		{
 			ArenaLayout layout = loadCampaign().GetStage(i_StageNumber).Layout;
 			ArenaGrid grid = layout.CreateGrid();
-			IList<Vector2Int> spawns = layout.MynaSpawnCells;
-			HashSet<Vector2Int> everReachable = reachable(grid, true);
 
-			Assert.IsNotEmpty(spawns, "Stage " + i_StageNumber + " has no mynas, so it cannot end.");
+			// The boss stage starts with nobody but the boss, which is still something to
+			// defeat. What makes a stage unfinishable is having neither.
+			List<Vector2Int> spawns = new List<Vector2Int>(layout.MynaSpawnCells);
+			spawns.AddRange(layout.BossSpawnCells);
+
+			Assert.IsNotEmpty(spawns,
+				"Stage " + i_StageNumber + " has neither mynas nor a boss, so it cannot end.");
 			Assert.AreEqual(spawns.Count, new HashSet<Vector2Int>(spawns).Count,
-				"Stage " + i_StageNumber + " stacks two mynas on one cell.");
+				"Stage " + i_StageNumber + " stacks two enemies on one cell.");
+
+			HashSet<Vector2Int> everReachable = reachable(grid, true);
+			Vector2Int start = startCell(grid);
 
 			foreach (Vector2Int spawn in spawns)
 			{
 				Assert.IsTrue(grid.IsWalkable(spawn),
-					"Stage " + i_StageNumber + " spawns a myna inside a block at " + spawn + ".");
+					"Stage " + i_StageNumber + " spawns an enemy inside a block at " + spawn + ".");
 				Assert.IsTrue(everReachable.Contains(spawn),
-					"Stage " + i_StageNumber + " walls a myna off at " + spawn + ", so the arena "
+					"Stage " + i_StageNumber + " walls an enemy off at " + spawn + ", so the arena "
 					+ "can never be cleared.");
 
-				int gap = Mathf.Abs(spawn.x - sr_Start.x) + Mathf.Abs(spawn.y - sr_Start.y);
+				int gap = Mathf.Abs(spawn.x - start.x) + Mathf.Abs(spawn.y - start.y);
 
 				Assert.GreaterOrEqual(gap, k_MinSpawnDistance,
-					"Stage " + i_StageNumber + " spawns a myna " + gap + " cells from the bird "
+					"Stage " + i_StageNumber + " spawns an enemy " + gap + " cells from the bird "
 					+ "at " + spawn + ", which kills the player as the stage loads.");
 			}
+		}
+
+		/// <summary>
+		/// The boss needs room to be summoned around. A boss walled into a one-cell pocket
+		/// would call its slaves into cells that do not exist and the fight would never
+		/// escalate.
+		/// </summary>
+		[Test]
+		public void TheBossHasRoomAroundIt([ValueSource("StageNumbers")] int i_StageNumber)
+		{
+			ArenaLayout layout = loadCampaign().GetStage(i_StageNumber).Layout;
+			IList<Vector2Int> bossCells = layout.BossSpawnCells;
+
+			if (bossCells.Count == 0)
+			{
+				Assert.Pass("Stage " + i_StageNumber + " has no boss.");
+			}
+
+			Assert.AreEqual(1, bossCells.Count,
+				"Stage " + i_StageNumber + " names more than one boss cell.");
+
+			ArenaGrid grid = layout.CreateGrid();
+			int open = 0;
+
+			foreach (Vector2Int step in sr_Steps)
+			{
+				if (grid.IsWalkable(bossCells[0] + step))
+				{
+					++open;
+				}
+			}
+
+			Assert.GreaterOrEqual(open, 2,
+				"Stage " + i_StageNumber + " boxes the boss in at " + bossCells[0] + " with only "
+				+ open + " open neighbour(s).");
 		}
 	}
 }

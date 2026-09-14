@@ -1703,7 +1703,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.BirdDeath
   m_Pods: {fileID: 1688113800}
   m_Mynas: {fileID: 1688113803}
-  m_LethalSeconds: 0.45
   m_DeathBeat: 1
   m_FlashRate: 10
 --- !u!114 &1600481140
@@ -1857,8 +1856,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Enemies::BomberBird.Enemies.ArenaMynas
   m_Pods: {fileID: 1688113800}
   m_Prefab: {fileID: 2916023543840682989, guid: baa97522c9bd3405b950ea94b136bd34, type: 3}
+  m_BossPrefab: {fileID: 6073608404563358969, guid: 992e9ff37928141fabe8248dac13415a, type: 3}
   m_RandomSeed: 0
   m_LethalSeconds: 0.45
+  m_ScatterSeconds: 1.25
+  m_ScatterSpeed: 3
 --- !u!114 &1688113804
 MonoBehaviour:
   m_ObjectHideFlags: 0

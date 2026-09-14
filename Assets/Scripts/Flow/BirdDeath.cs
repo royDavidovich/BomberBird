@@ -13,12 +13,18 @@ namespace BomberBird.Flow
 	/// the player sees what hit them.
 	///
 	/// Both ways of dying live here rather than one here and one in the myna, so there is a
-	/// single answer to what killed the bird: a burst it is standing in, or a myna that has
-	/// reached it.
+	/// single answer to what killed the bird: a burst that went off on top of it, or a myna
+	/// that has reached it.
 	///
-	/// A burst stays lethal for as long as it is on screen, not only for the instant it goes
-	/// off. Walking through a drawn burst unharmed would make failures unreadable, which is
-	/// the one thing the design asks the player never to feel.
+	/// A burst kills only the bird it actually catches when it goes off. Flames that are
+	/// still fading are scenery: dying to a burst the player had already watched end reads as
+	/// the game cheating, and it was the most common complaint about the feel.
+	///
+	/// That is why the burst is answered as an event rather than asked about every frame.
+	/// PodExploded fires once per explosion, so a chain costs the bird exactly as many
+	/// chances to die as there were pods, and the lingering fire costs it none. Ordinary
+	/// mynas keep the older rule and still die to what is left burning - see
+	/// <see cref="BomberBird.Enemies.ArenaMynas"/>.
 	/// </summary>
 	[RequireComponent(typeof(BirdMovement))]
 	public class BirdDeath : MonoBehaviour
@@ -28,18 +34,12 @@ namespace BomberBird.Flow
 		[Tooltip("Optional. Assign it and touching a myna kills the bird.")]
 		[SerializeField] private ArenaMynas m_Mynas;
 
-		[Header("Danger")]
-		[Tooltip("Seconds a burst keeps killing. Keep this in step with the burst's time on screen.")]
-		[SerializeField] private float m_LethalSeconds = 0.45f;
-
 		[Header("Dying")]
 		[Tooltip("Seconds the arena holds after a death before the stage reloads.")]
 		[SerializeField] private float m_DeathBeat = 1f;
 
 		[Tooltip("Flashes per second while the bird is dying.")]
 		[SerializeField] private float m_FlashRate = 10f;
-
-		private readonly BurstDanger r_Danger = new BurstDanger();
 
 		private BirdMovement m_Movement;
 		private BirdPodPlacer m_Placer;
@@ -98,9 +98,9 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			Vector2Int cell = m_Movement.Cell;
-
-			if (r_Danger.IsBurning(cell, Time.time) || (m_Mynas != null && m_Mynas.IsMynaAt(cell)))
+			// Only the myna is asked about per frame: it moves, so the moment it reaches the
+			// bird is a moment no event announces. A burst arrives as an event instead.
+			if (m_Mynas != null && m_Mynas.IsMynaAt(m_Movement.Cell))
 			{
 				StartCoroutine(die());
 			}
@@ -108,7 +108,21 @@ namespace BomberBird.Flow
 
 		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
 		{
-			r_Danger.Mark(i_Covered, Time.time, m_LethalSeconds);
+			if (m_IsDying || i_Covered == null)
+			{
+				return;
+			}
+
+			Vector2Int cell = m_Movement.Cell;
+
+			for (int i = 0; i < i_Covered.Count; ++i)
+			{
+				if (i_Covered[i] == cell)
+				{
+					StartCoroutine(die());
+					return;
+				}
+			}
 		}
 
 		private IEnumerator die()

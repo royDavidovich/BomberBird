@@ -12,31 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f69d0d978404b455eb2a099d13d98b6e, type: 3}
   m_Name: stage-06
   m_EditorClassIdentifier: BomberBird.Arena::BomberBird.Arena.ArenaLayout
-  m_MynaSpawnCells:
-  - {x: 11, y: 9}
-  - {x: 1, y: 1}
-  - {x: 11, y: 1}
-  - {x: 3, y: 5}
-  - {x: 6, y: 5}
-  - {x: 9, y: 5}
-  m_Rows: '#############
+  m_MynaSpawnCells: []
+  m_BossSpawnCells:
+  - {x: 7, y: 5}
+  m_Rows: '###############
 
-    #..s.....s..#
+    #..s.......s..#
 
-    #.H.......H.#
+    #.H.H.....H.H.#
 
-    #...s.s.s...#
+    #...s.s.s.s...#
 
-    #.H..H.H..H.#
+    #.H..H...H..H.#
 
-    #.s..s.s..s.#
+    #.s..s...s..s.#
 
-    #.H..H.H..H.#
+    #.H..H...H..H.#
 
-    #..s..s..s..#
+    #..s.s.s.s.s..#
 
-    #.H.......H.#
+    #.H.H.....H.H.#
 
-    #..s.....s..#
+    #..s.......s..#
 
-    #############'
+    ###############'
