@@ -36,6 +36,11 @@ namespace BomberBird.Arena
 			new Vector2Int(7, 5),
 		};
 
+		[Tooltip("Cells the boss starts on. Leave empty on a stage with no boss, which is "
+			+ "every stage but the last. Only the first cell is used.")]
+		[SerializeField]
+		private Vector2Int[] m_BossSpawnCells = new Vector2Int[0];
+
 		[Header("Arena map")]
 		[Tooltip("Row 0 is the TOP row.  '#' border, 'H' hard block, 's' soft block, "
 			+ "'c' the feather's cage, '.' floor.  A stage that awards a bird needs exactly one 'c'.")]
@@ -57,16 +62,34 @@ namespace BomberBird.Arena
 			get { return m_MynaSpawnCells; }
 		}
 
+		/// <summary>
+		/// Where this stage's boss starts, or empty on a stage that has none. An array rather
+		/// than a flag plus a cell, so "no boss" is the natural default and five of the six
+		/// stages say nothing at all.
+		/// </summary>
+		public IList<Vector2Int> BossSpawnCells
+		{
+			get { return m_BossSpawnCells; }
+		}
+
 		/// <summary>Builds the runtime grid for this stage.</summary>
 		public ArenaGrid CreateGrid()
 		{
 			ArenaGrid grid = new ArenaGrid(m_Rows);
 
-			if (grid.Width != k_Width || grid.Height != k_Height)
+			// Deliberately not a check against k_Width and k_Height. A stage is allowed its
+			// own size - the boss stage is wider to give the fight room - and a mistyped map
+			// is already caught harder than a warning: ArenaGrid throws on a ragged row.
+			//
+			// What a stage may not have is an even dimension. The hard-block lattice is laid
+			// out as ".H.H.H.", so an even width or height puts blocks against the border and
+			// closes the lanes the arena is built from.
+			if (grid.Width % 2 == 0 || grid.Height % 2 == 0)
 			{
 				Debug.LogWarningFormat(this,
-					"{0}: arena is {1}x{2}, but stages are expected to be {3}x{4}.",
-					name, grid.Width, grid.Height, k_Width, k_Height);
+					"{0}: arena is {1}x{2}. Both sides should be odd, or the hard-block lattice "
+					+ "does not meet the border cleanly.",
+					name, grid.Width, grid.Height);
 			}
 
 			return grid;

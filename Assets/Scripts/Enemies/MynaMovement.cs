@@ -21,6 +21,16 @@ namespace BomberBird.Enemies
 		[Tooltip("Cells per second.")]
 		[SerializeField] private float m_Speed = 2f;
 
+		// A full turn, counted down as the spin runs out: the myna passes through every
+		// facing exactly once.
+		private static readonly eFacing[] k_SpinOrder =
+		{
+			eFacing.Down,
+			eFacing.Left,
+			eFacing.Up,
+			eFacing.Right,
+		};
+
 		private ArenaGrid m_Grid;
 		private Predicate<Vector2Int> m_AlsoBlocked;
 		private System.Random m_Random;
@@ -29,6 +39,8 @@ namespace BomberBird.Enemies
 		private Vector2Int m_Direction;
 		private eFacing m_Facing = eFacing.Down;
 		private bool m_IsMoving;
+		private float m_SpinRemaining;
+		private float m_SpinQuarter;
 
 		public eFacing Facing
 		{
@@ -38,6 +50,16 @@ namespace BomberBird.Enemies
 		public bool IsMoving
 		{
 			get { return m_IsMoving; }
+		}
+
+		/// <summary>
+		/// How fast this myna walks. Settable because the boss speeds up as it is hit, the
+		/// same way <see cref="BomberBird.Player.BirdMovement.Speed"/> is set per bird.
+		/// </summary>
+		public float Speed
+		{
+			get { return m_Speed; }
+			set { m_Speed = value; }
 		}
 
 		/// <summary>
@@ -97,10 +119,38 @@ namespace BomberBird.Enemies
 			chooseNextCell();
 		}
 
+		/// <summary>
+		/// Holds position and turns a full circle, then walks on. The boss does this when a
+		/// burst costs it a life, so the hit is legible without stopping the fight.
+		///
+		/// There is no animation here: <see cref="BomberBird.Player.BirdAnimator"/> draws
+		/// whatever <see cref="Facing"/> says, so stepping the facing through its four
+		/// values while the walk is held is the spin.
+		///
+		/// It starts wherever the myna is, mid-step included. Waiting to reach a cell centre
+		/// would delay the only feedback the player gets by up to a whole step.
+		/// </summary>
+		public void Spin(float i_Seconds)
+		{
+			if (i_Seconds <= 0f)
+			{
+				return;
+			}
+
+			m_SpinRemaining = i_Seconds;
+			m_SpinQuarter = i_Seconds / 4f;
+		}
+
 		private void Update()
 		{
 			if (m_Grid == null)
 			{
+				return;
+			}
+
+			if (m_SpinRemaining > 0f)
+			{
+				advanceSpin();
 				return;
 			}
 
@@ -116,6 +166,33 @@ namespace BomberBird.Enemies
 				m_Cell = m_TargetCell;
 				chooseNextCell();
 			}
+		}
+
+		/// <summary>
+		/// One frame of the turn. The quarter the myna is on comes from how much of the spin
+		/// is left, so the rotation is even however long the spin was set to.
+		/// </summary>
+		private void advanceSpin()
+		{
+			m_SpinRemaining -= Time.deltaTime;
+
+			// Standing still: the animator draws the idle frame for whichever way it faces,
+			// which is what makes the turn read as a turn rather than a slide.
+			m_IsMoving = false;
+
+			if (m_SpinRemaining > 0f)
+			{
+				int quarter = m_SpinQuarter <= 0f ? 0 : (int)(m_SpinRemaining / m_SpinQuarter);
+
+				m_Facing = k_SpinOrder[Mathf.Clamp(quarter, 0, k_SpinOrder.Length - 1)];
+
+				return;
+			}
+
+			m_SpinRemaining = 0f;
+
+			// Face the way it is about to walk, not wherever the rotation happened to stop.
+			m_Facing = Facings.FromStep(m_Direction, m_Facing);
 		}
 
 		private void chooseNextCell()

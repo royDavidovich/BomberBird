@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.10, 2026-09-13 |
+| Document version | v0.11, 2026-09-15 |
 
 ## 1. High Concept
 
@@ -61,7 +61,7 @@ flowchart TD
 - Solid objects stop the burst. Some obstacles can be destroyed.
 - A burst can trigger another pod and create a chain reaction.
 - Common mynas act as the enemy birds. Their exact movement behavior will be selected during prototyping.
-- The player loses a life when hit by a common myna, another hazard, or an active burst, then retries the stage immediately. The run ends when no lives remain.
+- The player loses a life when hit by a common myna, another hazard, or a burst that catches them as it goes off, then retries the stage immediately. Flames still fading after a burst are scenery and harm nobody but the mynas, so a player who has watched a burst end can cross it. Common mynas remain vulnerable to those flames for as long as they are drawn. The run ends when no lives remain.
 - The stage objective is to defeat every common myna in the arena.
 - On a regular stage, a new bird's feather sits locked inside a cage from the moment the stage begins, so the player can see the reward and the bars around it for the whole level. The cage is solid: it blocks movement and stops bursts, and no amount of firepower opens it.
 - Defeating the last myna opens the cage. The player then walks over the feather to collect it, and only then does the exit open.
@@ -177,11 +177,18 @@ The final placement and visual treatment will be decided after the first playabl
 | Sound and music | Original or clearly licensed audio | Record creator, source, and license |
 
 Birds should be recognizable at gameplay scale. The approved playable roster is the Eurasian hoopoe, great white pelican, chukar partridge, and white-throated kingfisher. Their approved retro pixel-art concept sheets are stored in `Docs/ArtReferences/Birds/`. The common myna is the designated enemy species because it is an invasive species whose growing presence in Israel supports the game's local habitat-defense theme. The approved myna concept sheet represents the regular enemy. A larger boss myna closes the campaign in level 6. It is the same species as the regular
-enemy and moves by the same rules, but it survives three bursts instead of one. Each
-non-fatal hit makes it faster and calls two ordinary mynas into the arena, so the fight
-escalates as it is won. It has no attack of its own beyond touching the player, which
-every myna already does. This keeps the campaign's climax inside systems that already
-exist rather than adding a behaviour system in the final weeks. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
+enemy and moves by the same rules, but it survives five bursts instead of one, and the
+stage begins with the boss alone so the player reads it before the arena fills. Each
+non-fatal hit turns it a full circle on the spot, makes it slightly faster, and calls in
+one more ordinary myna than the hit before - one, then two, three, and four, so ten
+across the fight. The speed gain is capped, because the growing escort is the escalation
+and a boss that accelerates unchecked stops being catchable. The fifth hit kills it and
+calls nobody, and every slave still standing scatters and dies with it, harmless to the
+player as it flees, so the arena empties on the blow that ends the fight rather than
+peaking there. The boss arena is two cells wider than the others to give all of this room.
+It has no attack of its own beyond touching the player, which every myna already does.
+This keeps the campaign's climax inside systems that already exist rather than adding a
+behaviour system in the final weeks. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
 
 All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission. Art format, animation counts, and audio style will be chosen after a small visual prototype proves what is practical.
 
@@ -271,3 +278,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.8 | 2026-09-13 | Made the four playable birds differ by tuned movement speed, burst range, and active pod limit rather than by sprite alone; settled the level 6 boss as a three-hit myna that accelerates and calls escorts; added the habitat card, closing screen, and closing note to the screen list; and committed the object pool to the burst effects |
 | v0.9 | 2026-09-13 | Gave the objective a physical form: the feather is caged in plain sight from the start of the stage and the cage is indestructible, and the exit became a gate fixed in the middle of the right-hand wall that opens with a flashing arrow |
 | v0.10 | 2026-09-13 | Settled which levels award a feather. Three birds across six levels leaves three levels without one, so the orchard joins the intro and the boss as a cage-less stage, and every feather is now found in its own bird's habitat |
+| v0.11 | 2026-09-15 | Rebuilt the level 6 boss fight: five hits instead of three, the stage starts with the boss alone, each surviving hit spins it in place and calls one more myna than the last for ten across the fight, the speed gain is capped, and killing it scatters every remaining myna harmlessly instead of leaving them to be hunted down. Widened the boss arena to 15 x 11 to hold it. Narrowed the burst rule so a fading burst no longer kills the player, only the detonation itself does; mynas are still vulnerable to the flames |
