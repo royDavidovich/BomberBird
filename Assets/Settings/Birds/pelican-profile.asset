@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: pelican-profile
   m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdProfile
   m_DisplayName: Great white pelican
-  m_Sprites: {fileID: 0}
+  m_Sprites: {fileID: 11400000, guid: 21ae8e6c0e3b4a919c20d29bac8c47a6, type: 2}
   m_Speed: 3
   m_BurstRange: 3
   m_MaxActivePods: 1
