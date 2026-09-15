@@ -73,7 +73,11 @@ namespace BomberBird.UI
 			}
 
 			m_StageLabel.text = "Stage " + flow.StageNumber;
-			m_LivesLabel.text = "Lives " + flow.Lives;
+
+			// Pods and lives are labelled by the icon beside them, so the number stands alone.
+			// The stage keeps its word: there is no stage icon, and a bare number would not
+			// say what it counted.
+			m_LivesLabel.text = flow.Lives.ToString();
 		}
 
 		private void podField_PodPlaced(Vector2Int i_Cell)
@@ -90,7 +94,7 @@ namespace BomberBird.UI
 		{
 			int available = m_Pods.MaxActivePods - m_Field.ActivePodCount;
 
-			m_PodsLabel.text = "Pods " + Mathf.Max(0, available);
+			m_PodsLabel.text = Mathf.Max(0, available).ToString();
 		}
 
 		private bool hasRequiredReferences()
