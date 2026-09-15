@@ -85,6 +85,19 @@ namespace BomberBird.UI
 			GameFlow.Instance.RestartStage();
 		}
 
+		/// <summary>Wired to the overlay's Main Menu button. Abandons the run.</summary>
+		public void GoToMainMenu()
+		{
+			if (GameFlow.Instance == null)
+			{
+				Debug.LogError(name + ": no GameFlow in the scene, so the menu cannot be reached.", this);
+				return;
+			}
+
+			// GameFlow restores the clock, so the menu never loads into a frozen game.
+			GameFlow.Instance.GoToMainMenu();
+		}
+
 		private void setPaused(bool i_IsPaused)
 		{
 			m_IsPaused = i_IsPaused;
