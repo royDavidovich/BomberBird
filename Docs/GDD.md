@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.11, 2026-09-15 |
+| Document version | v0.12, 2026-09-15 |
 
 ## 1. High Concept
 
@@ -149,7 +149,7 @@ Gameplay input is disabled while paused and during stage transitions. Losing foc
 5. **Pause overlay:** Resume, Restart, and Main Menu.
 6. **Results:** completion, optional rewards, Retry, and Next Stage.
 7. **Closing screen:** shown when the boss falls, listing the birds the player rescued across the campaign.
-8. **Closing note:** a short factual card on the common myna as a real invasive species in Israel, with its source credited.
+8. **Closing note:** a factual card on the common myna as a real invasive species in Israel - not a footnote but the reason the game exists. It states what the species has actually cost local wildlife: native cavity-nesting birds evicted from their nests, eggs and chicks destroyed, and species pushed out of habitats they held before the myna arrived. The consequences are real and ongoing, and the card says so plainly, with its source credited.
 
 Screens 1, 3, 7, and 8 exist to make six arenas read as one journey through Israeli
 habitats. They carry no gameplay rules: removing all of them would leave the campaign
@@ -279,3 +279,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.9 | 2026-09-13 | Gave the objective a physical form: the feather is caged in plain sight from the start of the stage and the cage is indestructible, and the exit became a gate fixed in the middle of the right-hand wall that opens with a flashing arrow |
 | v0.10 | 2026-09-13 | Settled which levels award a feather. Three birds across six levels leaves three levels without one, so the orchard joins the intro and the boss as a cage-less stage, and every feather is now found in its own bird's habitat |
 | v0.11 | 2026-09-15 | Rebuilt the level 6 boss fight: five hits instead of three, the stage starts with the boss alone, each surviving hit spins it in place and calls one more myna than the last for ten across the fight, the speed gain is capped, and killing it scatters every remaining myna harmlessly instead of leaving them to be hunted down. Widened the boss arena to 15 x 11 to hold it. Narrowed the burst rule so a fading burst no longer kills the player, only the detonation itself does; mynas are still vulnerable to the flames |
+| v0.12 | 2026-09-15 | Gave the campaign a shape the player moves through: a main menu that starts the run, and a bird selection screen before every stage after the intro, showing all four birds with the unearned ones as silhouettes so the roster reads as a goal from the second stage on. The intro still hands the player the hoopoe rather than asking them to choose before they know what a bird does. Sharpened the closing note so it carries what the myna has actually cost Israeli wildlife rather than stating the fact and moving on |
