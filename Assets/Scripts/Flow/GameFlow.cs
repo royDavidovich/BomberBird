@@ -22,6 +22,12 @@ namespace BomberBird.Flow
 		[Tooltip("The campaign this run plays: the stages in order and the birds they award.")]
 		[SerializeField] private Campaign m_Campaign;
 
+		// Scenes are loaded by name, never by build index: adding a scene renumbers every
+		// index, and an index load would silently start sending the player somewhere else.
+		public const string k_MainMenuScene = "MainMenu";
+		public const string k_BirdSelectScene = "BirdSelect";
+		public const string k_GameplayScene = "Gameplay";
+
 		private static GameFlow s_Instance;
 
 		private RunState m_Run;
@@ -126,7 +132,8 @@ namespace BomberBird.Flow
 				m_Run.Restart();
 			}
 
-			reloadStage();
+			// A death replays the stage with the same bird - never back to selection.
+			StartStage();
 		}
 
 		/// <summary>The stage was cleared. Carries the run forward and plays the next one.</summary>
@@ -134,7 +141,8 @@ namespace BomberBird.Flow
 		{
 			m_Run.AdvanceStage();
 
-			reloadStage();
+			// Not straight into the next stage: every stage after the intro is chosen into.
+			GoToBirdSelect();
 		}
 
 		/// <summary>
@@ -152,18 +160,49 @@ namespace BomberBird.Flow
 			return m_Run != null && m_Run.SelectBird(i_Bird);
 		}
 
+		/// <summary>
+		/// Abandons the run and returns to the menu. The roster belongs to the run, so
+		/// leaving mid-campaign starts the next one clean rather than half-finished.
+		/// </summary>
+		public void GoToMainMenu()
+		{
+			Time.timeScale = 1f;
+
+			if (m_Run != null)
+			{
+				m_Run.Restart();
+			}
+
+			SceneManager.LoadScene(k_MainMenuScene);
+		}
+
+		/// <summary>The screen between stages, where the player picks the bird to fly.</summary>
+		public void GoToBirdSelect()
+		{
+			Time.timeScale = 1f;
+
+			SceneManager.LoadScene(k_BirdSelectScene);
+		}
+
+		/// <summary>
+		/// Plays the stage the run is on. What Play calls, and what Continue calls.
+		///
+		/// The intro is reached only from Play and every later stage only from
+		/// <see cref="CompleteStage"/>, which is what keeps the selection screen out of the
+		/// intro without a rule saying so.
+		/// </summary>
+		public void StartStage()
+		{
+			Time.timeScale = 1f;
+
+			SceneManager.LoadScene(k_GameplayScene);
+		}
+
 		/// <summary>Replays the stage without spending a life, for the pause overlay.</summary>
 		public void RestartStage()
 		{
-			reloadStage();
-		}
-
-		private void reloadStage()
-		{
-			// A restart from the pause overlay would otherwise load into a stopped clock.
-			Time.timeScale = 1f;
-
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			// Same load as starting it: a retry is the stage over again, not a different one.
+			StartStage();
 		}
 	}
 }
