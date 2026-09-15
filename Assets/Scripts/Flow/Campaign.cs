@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BomberBird.Arena;
 using BomberBird.Player;
 using UnityEngine;
@@ -81,6 +82,74 @@ namespace BomberBird.Flow
 			int index = i_StageNumber - 1;
 
 			return index < 0 || index >= StageCount ? null : m_Stages[index];
+		}
+
+		/// <summary>One bird the campaign can hand out, and where it comes from.</summary>
+		public class RosterEntry
+		{
+			private readonly BirdProfile r_Bird;
+			private readonly string r_Habitat;
+
+			public BirdProfile Bird
+			{
+				get { return r_Bird; }
+			}
+
+			/// <summary>The habitat whose feather awards it, or null for the starter.</summary>
+			public string Habitat
+			{
+				get { return r_Habitat; }
+			}
+
+			public RosterEntry(BirdProfile i_Bird, string i_Habitat)
+			{
+				r_Bird = i_Bird;
+				r_Habitat = i_Habitat;
+			}
+		}
+
+		/// <summary>
+		/// Every bird the campaign can hand out, in the order it hands them out.
+		///
+		/// Deliberately not <see cref="RunState.Roster"/>, which holds only what has been
+		/// earned. The selection screen shows the birds still locked as well, because seeing
+		/// what is coming is what makes a feather worth chasing.
+		/// </summary>
+		public IList<RosterEntry> EveryBird()
+		{
+			List<RosterEntry> birds = new List<RosterEntry>();
+
+			if (m_StartingBird != null)
+			{
+				birds.Add(new RosterEntry(m_StartingBird, null));
+			}
+
+			for (int i = 0; i < StageCount; ++i)
+			{
+				Stage stage = m_Stages[i];
+
+				// Two stages awarding one bird would otherwise show two cards for it.
+				if (stage == null || stage.AwardedBird == null || holds(birds, stage.AwardedBird))
+				{
+					continue;
+				}
+
+				birds.Add(new RosterEntry(stage.AwardedBird, stage.HabitatName));
+			}
+
+			return birds;
+		}
+
+		private static bool holds(IList<RosterEntry> i_Birds, BirdProfile i_Bird)
+		{
+			bool found = false;
+
+			for (int i = 0; i < i_Birds.Count && !found; ++i)
+			{
+				found = i_Birds[i].Bird == i_Bird;
+			}
+
+			return found;
 		}
 
 		/// <summary>Reports every misconfigured stage at once, or null when all are usable.</summary>
