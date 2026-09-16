@@ -140,7 +140,7 @@ namespace BomberBird.UI
 			play(m_MynaDefeated);
 		}
 
-		private void objective_FeatherCollected()
+		private void objective_FeatherCollected(Vector2Int i_Cell)
 		{
 			play(m_FeatherCollect);
 		}
