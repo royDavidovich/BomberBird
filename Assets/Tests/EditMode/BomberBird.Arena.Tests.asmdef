@@ -7,6 +7,7 @@
         "BomberBird.Pods",
         "BomberBird.Enemies",
         "BomberBird.Flow",
+        "BomberBird.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
