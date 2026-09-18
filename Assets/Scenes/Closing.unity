@@ -1667,7 +1667,7 @@ MonoBehaviour:
   m_NotePanel: {fileID: 1566415704}
   m_ContinueHint: {fileID: 1847894324}
   m_RescuedHold: 5
-  m_NoteHold: 0.75
+  m_NoteHold: 8
 --- !u!4 &793659181
 Transform:
   m_ObjectHideFlags: 0

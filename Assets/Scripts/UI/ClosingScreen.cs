@@ -33,9 +33,10 @@ namespace BomberBird.UI
 			+ "the screen that rewards them for it.")]
 		[SerializeField] private float m_RescuedHold = 5f;
 
-		[Tooltip("Seconds the note holds before a press is accepted. Shorter: by now the player "
-			+ "has already chosen to read on.")]
-		[SerializeField] private float m_NoteHold = 0.75f;
+		[Tooltip("Seconds the note holds before a press is accepted. The longest hold in the "
+			+ "game: this card is the reason it exists, and a press meant for the screen before "
+			+ "it would throw it away unread.")]
+		[SerializeField] private float m_NoteHold = 8f;
 
 		private float m_ShownAt;
 		private float m_Hold;
