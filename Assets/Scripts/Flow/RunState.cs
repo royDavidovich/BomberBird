@@ -50,6 +50,15 @@ namespace BomberBird.Flow
 			get { return r_Roster; }
 		}
 
+		/// <summary>
+		/// Whether the roster holds a choice worth stopping for. One bird is not a choice, so
+		/// the selection screen would only be showing the player a decision already made.
+		/// </summary>
+		public bool HasBirdChoice
+		{
+			get { return r_Roster.Count > 1; }
+		}
+
 		/// <summary>The bird being played.</summary>
 		public BirdProfile SelectedBird
 		{

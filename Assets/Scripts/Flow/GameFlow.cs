@@ -141,8 +141,16 @@ namespace BomberBird.Flow
 		{
 			m_Run.AdvanceStage();
 
-			// Not straight into the next stage: every stage after the intro is chosen into.
-			GoToBirdSelect();
+			// Every stage after the intro is chosen into, but only once there is something to
+			// choose. A roster of one would show the player a decision already made.
+			if (m_Run.HasBirdChoice)
+			{
+				GoToBirdSelect();
+			}
+			else
+			{
+				StartStage();
+			}
 		}
 
 		/// <summary>

@@ -188,5 +188,38 @@ namespace BomberBird.Tests
 			Assert.AreSame(starter, run.Roster[0]);
 			Assert.AreSame(starter, run.SelectedBird, "and the player is back on the starter");
 		}
+
+		/// <summary>
+		/// The selection screen is worth a stop only when the roster holds a real decision.
+		/// Until a feather has been collected it holds the starter alone.
+		/// </summary>
+		[Test]
+		public void TheStarterAloneIsNotAChoice()
+		{
+			RunState run = makeRun();
+
+			Assert.IsFalse(run.HasBirdChoice, "only the starter has been earned");
+		}
+
+		[Test]
+		public void AnUnlockedBirdMakesItAChoice()
+		{
+			RunState run = new RunState(k_StartingLives, makeBird("hoopoe"));
+
+			run.UnlockBird(makeBird("kingfisher"));
+
+			Assert.IsTrue(run.HasBirdChoice, "two birds is a decision");
+		}
+
+		[Test]
+		public void RestartingTheRunTakesTheChoiceBackToo()
+		{
+			RunState run = new RunState(k_StartingLives, makeBird("hoopoe"));
+			run.UnlockBird(makeBird("kingfisher"));
+
+			run.Restart();
+
+			Assert.IsFalse(run.HasBirdChoice, "the earned bird went back with the roster");
+		}
 	}
 }
