@@ -27,6 +27,7 @@ namespace BomberBird.Flow
 		public const string k_MainMenuScene = "MainMenu";
 		public const string k_BirdSelectScene = "BirdSelect";
 		public const string k_GameplayScene = "Gameplay";
+		public const string k_ClosingScene = "Closing";
 
 		private static GameFlow s_Instance;
 
@@ -141,6 +142,15 @@ namespace BomberBird.Flow
 		{
 			m_Run.AdvanceStage();
 
+			// Past the last stage the campaign is over. Until now this fell through to
+			// StartStage, which loaded a Gameplay scene the campaign had no stage for, and
+			// StageSetup quietly used the scene's own default arena instead.
+			if (m_Campaign != null && m_Run.StageNumber > m_Campaign.StageCount)
+			{
+				GoToClosing();
+				return;
+			}
+
 			// Every stage after the intro is chosen into, but only once there is something to
 			// choose. A roster of one would show the player a decision already made.
 			if (m_Run.HasBirdChoice)
@@ -182,6 +192,19 @@ namespace BomberBird.Flow
 			}
 
 			SceneManager.LoadScene(k_MainMenuScene);
+		}
+
+		/// <summary>
+		/// The end of the campaign: the birds rescued, and the note about the real myna.
+		///
+		/// The run is deliberately left standing rather than restarted here. The closing
+		/// screens read from it, and the menu restarts it on the way out.
+		/// </summary>
+		public void GoToClosing()
+		{
+			Time.timeScale = 1f;
+
+			SceneManager.LoadScene(k_ClosingScene);
 		}
 
 		/// <summary>The screen between stages, where the player picks the bird to fly.</summary>
