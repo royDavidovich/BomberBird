@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdProfile
   m_DisplayName: Eurasian hoopoe
   m_Sprites: {fileID: 11400000, guid: ef61208fe01b04e539921048e46a0ec3, type: 2}
+  m_CardPortrait: {fileID: 21300000, guid: 6f206d3cc8db94c268d04f7c0dd2b7f9, type: 3}
   m_Speed: 4
   m_BurstRange: 2
   m_MaxActivePods: 1

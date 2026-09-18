@@ -373,6 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 569e7f052fa5846248a598654dea9d0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.MainMenuScreen
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
   m_FirstSelected: {fileID: 1192743229}
 --- !u!4 &659733008
 Transform:

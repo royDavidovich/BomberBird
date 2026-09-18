@@ -4,13 +4,16 @@ using BomberBird.Player;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace BomberBird.UI
 {
 	/// <summary>
 	/// The screen between stages: every bird the campaign can hand out, the earned ones
-	/// playable and the rest as silhouettes, and a Continue that commits the choice.
+	/// playable and the rest as silhouettes.
+	///
+	/// Choosing is the whole interaction. There is no Continue to press afterwards - the player
+	/// moves onto a card and presses it, and the stage starts. A locked card can be moved onto
+	/// and read, but pressing it refuses.
 	///
 	/// It shows the locked birds on purpose. At stage 2 the roster is still one bird, and the
 	/// three silhouettes beside it are the screen saying there is more game here than the
@@ -26,13 +29,20 @@ namespace BomberBird.UI
 
 		[Header("Parts")]
 		[SerializeField] private BirdCard m_CardPrefab;
-		[SerializeField] private Transform m_CardRow;
-		[SerializeField] private Button m_ContinueButton;
+		[SerializeField] private RectTransform m_CardRow;
 		[SerializeField] private TMP_Text m_StageLabel;
 
-		private readonly List<BirdCard> r_Cards = new List<BirdCard>();
+		[Tooltip("Gap between cards. The row is laid out here rather than by a layout group, "
+			+ "because a layout group rewrites every child's position on each rebuild and would "
+			+ "undo the lift a focused card gives itself.")]
+		[SerializeField] private float m_CardSpacing = 36f;
 
-		private BirdCard m_Selected;
+		[Header("Sound")]
+		[Tooltip("The bird is chosen and the stage begins.")]
+		[SerializeField] private AudioClip m_Confirm;
+
+		[Tooltip("A bird that has not been earned yet is pressed.")]
+		[SerializeField] private AudioClip m_Denied;
 
 		private void Start()
 		{
@@ -48,28 +58,42 @@ namespace BomberBird.UI
 			}
 
 			buildCards();
-
-			if (m_ContinueButton != null)
-			{
-				m_ContinueButton.onClick.AddListener(Continue);
-			}
 		}
 
-		/// <summary>Wired to Continue. Commits the bird, then plays the stage.</summary>
-		public void Continue()
+		/// <summary>
+		/// Commits the bird and plays the stage. Public because it is the screen's whole job,
+		/// and because the play-test drives it without a mouse.
+		/// </summary>
+		public void Choose(BirdCard i_Card)
 		{
+			if (i_Card == null)
+			{
+				return;
+			}
+
 			if (GameFlow.Instance == null)
 			{
 				Debug.LogError(name + ": no GameFlow, so there is no run to choose a bird for.", this);
 				return;
 			}
 
-			// SelectBird refuses a bird the run has not earned. A locked card cannot be
-			// clicked, so this is the second lock rather than the only one.
-			if (m_Selected != null && !GameFlow.Instance.SelectBird(m_Selected.Bird))
+			if (!i_Card.IsUnlocked)
+			{
+				// Not an error. Pressing a bird you have not earned is a thing players do on
+				// purpose, to find out what it would take - and a press that answers with
+				// nothing at all reads as a broken button rather than a locked bird.
+				UiSound.Play(m_Denied);
+				return;
+			}
+
+			UiSound.Play(m_Confirm);
+
+			// SelectBird refuses a bird the run has not earned. The card's own lock is the
+			// mechanism, so this is the second lock rather than the only one.
+			if (!GameFlow.Instance.SelectBird(i_Card.Bird))
 			{
 				Debug.LogError(
-					name + ": the run refused " + m_Selected.Bird.name + ", so the stage keeps the "
+					name + ": the run refused " + i_Card.Bird.name + ", so the stage keeps the "
 					+ "bird it already had.", this);
 			}
 
@@ -81,6 +105,12 @@ namespace BomberBird.UI
 			IList<Campaign.RosterEntry> roster = m_Campaign.EveryBird();
 			IList<BirdProfile> earned = GameFlow.Instance == null ? null : GameFlow.Instance.Roster;
 			BirdProfile playing = GameFlow.Instance == null ? null : GameFlow.Instance.SelectedBird;
+			BirdCard opensOn = null;
+
+			RectTransform prefabRect = m_CardPrefab.transform as RectTransform;
+			float cardWidth = prefabRect == null ? 0f : prefabRect.rect.width;
+			float step = cardWidth + m_CardSpacing;
+			float firstX = -step * (roster.Count - 1) * 0.5f;
 
 			for (int i = 0; i < roster.Count; ++i)
 			{
@@ -89,40 +119,44 @@ namespace BomberBird.UI
 
 				BirdCard card = Instantiate(m_CardPrefab, m_CardRow);
 				card.name = "Card " + entry.Bird.name;
-				card.Chosen += onCardChosen;
+				place(card, firstX + step * i);
+				card.Pressed += Choose;
 				card.Show(entry, unlocked);
 
-				r_Cards.Add(card);
-
-				// Open on the bird already being flown, falling back to the first playable one
-				// so Continue is never pressed with nothing chosen.
-				if (unlocked && (entry.Bird == playing || m_Selected == null))
+				// Open on the bird already being flown, falling back to the first playable one,
+				// so the first press is never on a bird the player cannot fly.
+				if (unlocked && (entry.Bird == playing || opensOn == null))
 				{
-					select(card);
+					opensOn = card;
 				}
 			}
 
 			// Keyboard and gamepad need something focused, or the screen cannot be driven
-			// without a mouse - and Docs/GDD.md commits to a D-pad.
-			if (m_Selected != null && EventSystem.current != null)
+			// without a mouse - and Docs/GDD.md commits to a D-pad. With no Continue to fall
+			// back on, an unfocused screen would not merely look odd, it would be a dead end.
+			if (opensOn != null && EventSystem.current != null)
 			{
-				EventSystem.current.SetSelectedGameObject(m_Selected.gameObject);
+				EventSystem.current.SetSelectedGameObject(opensOn.gameObject);
 			}
 		}
 
-		private void onCardChosen(BirdCard i_Card)
+		/// <summary>
+		/// Centres the card on the row at the given offset. Called before Show, so the resting
+		/// position the card caches is the one it will return to when it loses focus.
+		/// </summary>
+		private void place(BirdCard i_Card, float i_X)
 		{
-			select(i_Card);
-		}
+			RectTransform rect = i_Card.transform as RectTransform;
 
-		private void select(BirdCard i_Card)
-		{
-			for (int i = 0; i < r_Cards.Count; ++i)
+			if (rect == null)
 			{
-				r_Cards[i].SetSelected(r_Cards[i] == i_Card);
+				return;
 			}
 
-			m_Selected = i_Card;
+			rect.anchorMin = new Vector2(0.5f, 0.5f);
+			rect.anchorMax = new Vector2(0.5f, 0.5f);
+			rect.pivot = new Vector2(0.5f, 0.5f);
+			rect.anchoredPosition = new Vector2(i_X, 0f);
 		}
 
 		private bool hasRequiredReferences()
