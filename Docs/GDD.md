@@ -7,12 +7,12 @@
 | Status | Approved by the lecturer through the designated course GDD Google Sheet |
 | Team | Roy Davidovich, game design and development |
 | Genre | Single-player top-down grid action-puzzle |
-| Target platform | Windows PC |
+| Target platform | Desktop: Windows PC and macOS |
 | Engine | Unity 6.3 LTS, 6000.3.21f1, 2D |
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.12, 2026-09-15 |
+| Document version | v0.13, 2026-09-18 |
 
 ## 1. High Concept
 
@@ -198,7 +198,7 @@ All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission.
 
 **Systems:** Unity 2D, the built-in Input Manager, grid-based level data, and inspector-editable tuning values.
 
-**Target device:** the Windows computer used for the class demonstration.
+**Target device:** desktop computers running Windows or macOS. The game is developed and played on a Mac, so macOS is the primary test platform and the machine used for the class demonstration. A Windows build is produced and smoke-tested before submission so that both declared platforms actually run. Nothing in the design depends on a platform-specific API, so the two targets differ only by build settings.
 
 ```mermaid
 flowchart TD
@@ -242,7 +242,7 @@ Only features that improve the actual implementation will remain. The architectu
 - [ ] A clear completion condition and exit.
 - [ ] Six handmade levels, each in its own habitat, ending in the common myna boss level.
 - [ ] Four playable birds unlocked in order by collecting a feather at the end of a level.
-- [ ] Essential UI, feedback, and a working Windows build.
+- [ ] Essential UI, feedback, and working macOS and Windows builds, each smoke-tested on its own platform.
 
 ### 8.2 Polish
 
@@ -255,7 +255,7 @@ Only features that improve the actual implementation will remain. The architectu
 
 - Multiplayer or networking.
 - Procedural generation or a level editor.
-- Mobile builds and touch controls.
+- Mobile builds and touch controls. The project commits to desktop only, so no mobile control scheme, portrait layout, or phone-sized UI pass is promised.
 - 3D environments or an open world.
 - Large skill trees, complex narrative, or unique rule sets for every bird.
 - Online accounts, leaderboards, or cloud saves.
@@ -280,3 +280,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.10 | 2026-09-13 | Settled which levels award a feather. Three birds across six levels leaves three levels without one, so the orchard joins the intro and the boss as a cage-less stage, and every feather is now found in its own bird's habitat |
 | v0.11 | 2026-09-15 | Rebuilt the level 6 boss fight: five hits instead of three, the stage starts with the boss alone, each surviving hit spins it in place and calls one more myna than the last for ten across the fight, the speed gain is capped, and killing it scatters every remaining myna harmlessly instead of leaving them to be hunted down. Widened the boss arena to 15 x 11 to hold it. Narrowed the burst rule so a fading burst no longer kills the player, only the detonation itself does; mynas are still vulnerable to the flames |
 | v0.12 | 2026-09-15 | Gave the campaign a shape the player moves through: a main menu that starts the run, and a bird selection screen before every stage after the intro, showing all four birds with the unearned ones as silhouettes so the roster reads as a goal from the second stage on. The intro still hands the player the hoopoe rather than asking them to choose before they know what a bird does. Sharpened the closing note so it carries what the myna has actually cost Israeli wildlife rather than stating the fact and moving on |
+| v0.13 | 2026-09-18 | Stated the target platform as desktop Windows and macOS rather than Windows PC alone. The game is built and played on a Mac and had never run on the Windows target the document claimed, so macOS is now named as the primary test platform and a smoke-tested Windows build joined the MVP list. A lecturer email in September 2026 confirms that a PC/Mac desktop target is the expected baseline and that a mobile version is an additional commitment graded as a second full platform, including its own controls and screen-size adaptation, so mobile builds and touch controls stay out of scope by decision rather than by omission. |
