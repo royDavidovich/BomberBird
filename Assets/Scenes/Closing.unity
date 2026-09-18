@@ -1668,6 +1668,8 @@ MonoBehaviour:
   m_ContinueHint: {fileID: 1847894324}
   m_RescuedHold: 5
   m_NoteHold: 8
+  m_PulseSeconds: 1.4
+  m_PulseFloor: 0.3
 --- !u!4 &793659181
 Transform:
   m_ObjectHideFlags: 0

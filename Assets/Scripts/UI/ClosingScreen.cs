@@ -1,4 +1,5 @@
 using BomberBird.Flow;
+using TMPro;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -38,9 +39,19 @@ namespace BomberBird.UI
 			+ "it would throw it away unread.")]
 		[SerializeField] private float m_NoteHold = 8f;
 
+		[Tooltip("Seconds for one full fade of the prompt once it appears. It pulses rather "
+			+ "than blinks: after an eight second wait a hard on and off becomes irritating, "
+			+ "and the point is only to say the screen is listening now.")]
+		[SerializeField] private float m_PulseSeconds = 1.4f;
+
+		[Tooltip("How far down the pulse fades. 1 would not move at all.")]
+		[Range(0f, 1f)]
+		[SerializeField] private float m_PulseFloor = 0.3f;
+
 		private float m_ShownAt;
 		private float m_Hold;
 		private bool m_IsOnNote;
+		private TMP_Text m_HintText;
 
 		private void Start()
 		{
@@ -58,6 +69,8 @@ namespace BomberBird.UI
 			{
 				m_ContinueHint.SetActive(true);
 			}
+
+			pulseHint();
 
 			if (!wasPressed())
 			{
@@ -80,6 +93,39 @@ namespace BomberBird.UI
 			show(m_NotePanel, m_RescuedPanel, m_NoteHold);
 		}
 
+		/// <summary>
+		/// Breathes the prompt in and out. Unscaled, so it keeps moving whatever the game has
+		/// done to Time.timeScale on its way here.
+		/// </summary>
+		private void pulseHint()
+		{
+			if (m_ContinueHint == null)
+			{
+				return;
+			}
+
+			if (m_HintText == null)
+			{
+				m_HintText = m_ContinueHint.GetComponent<TMP_Text>();
+
+				if (m_HintText == null)
+				{
+					return;
+				}
+			}
+
+			if (m_PulseSeconds <= 0f)
+			{
+				m_HintText.alpha = 1f;
+				return;
+			}
+
+			float phase = (Time.unscaledTime - m_ShownAt - m_Hold) / m_PulseSeconds;
+			float wave = 0.5f + 0.5f * Mathf.Cos(phase * 2f * Mathf.PI);
+
+			m_HintText.alpha = Mathf.Lerp(m_PulseFloor, 1f, wave);
+		}
+
 		private void show(GameObject i_Shown, GameObject i_Hidden, float i_Hold)
 		{
 			if (i_Hidden != null)
@@ -95,6 +141,11 @@ namespace BomberBird.UI
 			if (m_ContinueHint != null)
 			{
 				m_ContinueHint.SetActive(false);
+
+				if (m_HintText != null)
+				{
+					m_HintText.alpha = 1f;
+				}
 			}
 
 			m_ShownAt = Time.unscaledTime;
