@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Player::BomberBird.Player.BirdProfile
   m_DisplayName: White-throated kingfisher
   m_Sprites: {fileID: 11400000, guid: 334db01d78ddf4cbaaef2ab96a7f4b05, type: 2}
+  m_CardPortrait: {fileID: 21300000, guid: fd63b7d71d55e498886a84fe32f3c53d, type: 3}
   m_Speed: 5.5
   m_BurstRange: 1
   m_MaxActivePods: 1

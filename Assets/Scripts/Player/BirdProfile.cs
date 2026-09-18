@@ -21,6 +21,11 @@ namespace BomberBird.Player
 
 		[SerializeField] private BirdSpriteSet m_Sprites;
 
+		[Tooltip("The illustrated portrait for the selection card. Drawn larger and in more "
+			+ "detail than the 32 px sprite the bird is played as, because the card is the one "
+			+ "place the player looks at a bird rather than flies it.")]
+		[SerializeField] private Sprite m_CardPortrait;
+
 		[Header("Handling")]
 		[Tooltip("Cells per second.")]
 		[SerializeField] private float m_Speed = 4f;
@@ -44,6 +49,15 @@ namespace BomberBird.Player
 		public BirdSpriteSet Sprites
 		{
 			get { return m_Sprites; }
+		}
+
+		/// <summary>
+		/// The selection card's portrait, or null on a profile that has not been given one.
+		/// The card falls back to the down-idle sprite rather than drawing nothing.
+		/// </summary>
+		public Sprite CardPortrait
+		{
+			get { return m_CardPortrait; }
 		}
 
 		public float Speed

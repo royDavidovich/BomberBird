@@ -8,6 +8,8 @@
         "BomberBird.Enemies",
         "BomberBird.Flow",
         "BomberBird.UI",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
