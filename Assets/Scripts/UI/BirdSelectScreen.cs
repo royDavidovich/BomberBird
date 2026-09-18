@@ -37,6 +37,13 @@ namespace BomberBird.UI
 			+ "undo the lift a focused card gives itself.")]
 		[SerializeField] private float m_CardSpacing = 36f;
 
+		[Header("Sound")]
+		[Tooltip("The bird is chosen and the stage begins.")]
+		[SerializeField] private AudioClip m_Confirm;
+
+		[Tooltip("A bird that has not been earned yet is pressed.")]
+		[SerializeField] private AudioClip m_Denied;
+
 		private void Start()
 		{
 			if (!hasRequiredReferences())
@@ -73,9 +80,13 @@ namespace BomberBird.UI
 			if (!i_Card.IsUnlocked)
 			{
 				// Not an error. Pressing a bird you have not earned is a thing players do on
-				// purpose, to find out what it would take.
+				// purpose, to find out what it would take - and a press that answers with
+				// nothing at all reads as a broken button rather than a locked bird.
+				UiSound.Play(m_Denied);
 				return;
 			}
+
+			UiSound.Play(m_Confirm);
 
 			// SelectBird refuses a bird the run has not earned. The card's own lock is the
 			// mechanism, so this is the second lock rather than the only one.

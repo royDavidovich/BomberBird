@@ -175,25 +175,12 @@ namespace BomberBird.UI
 		///
 		/// Reaching the gate loads the next stage at the end of the same frame, which
 		/// destroys this component and every sound it was playing. The flourish would be cut
-		/// off after a few milliseconds. A throwaway object carried across the load is the
-		/// smallest thing that lets it finish, and it deletes itself when the clip ends.
+		/// off after a few milliseconds. <see cref="UiSound"/> carries it across, and the
+		/// menus lean on the same trick for the same reason.
 		/// </summary>
 		private void playAcrossLoad(AudioClip i_Clip)
 		{
-			if (i_Clip == null)
-			{
-				return;
-			}
-
-			GameObject carrier = new GameObject(name + " (stage clear)");
-			DontDestroyOnLoad(carrier);
-
-			AudioSource source = carrier.AddComponent<AudioSource>();
-			source.clip = i_Clip;
-			source.volume = m_Source.volume;
-			source.Play();
-
-			Destroy(carrier, i_Clip.length);
+			UiSound.Play(i_Clip, m_Source.volume);
 		}
 
 		/// <summary>

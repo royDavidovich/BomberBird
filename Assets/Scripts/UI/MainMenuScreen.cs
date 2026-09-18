@@ -15,6 +15,11 @@ namespace BomberBird.UI
 	/// </summary>
 	public class MainMenuScreen : MonoBehaviour
 	{
+		[Header("Sound")]
+		[Tooltip("Play is pressed and the run begins. The same clip the selection screen "
+			+ "confirms a bird with, because it is the same act.")]
+		[SerializeField] private AudioClip m_Confirm;
+
 		[Header("Keyboard")]
 		[Tooltip("Takes focus on the first key pressed. Left unselected until then.")]
 		[SerializeField] private GameObject m_FirstSelected;
@@ -64,6 +69,7 @@ namespace BomberBird.UI
 				return;
 			}
 
+			UiSound.Play(m_Confirm);
 			GameFlow.Instance.StartStage();
 		}
 

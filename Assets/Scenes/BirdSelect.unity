@@ -153,6 +153,8 @@ MonoBehaviour:
   m_CardRow: {fileID: 1154140305}
   m_StageLabel: {fileID: 1424049569}
   m_CardSpacing: 36
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
+  m_Denied: {fileID: 8300000, guid: 6d4c8649c53e64b5ead0498a6c623ca5, type: 3}
 --- !u!4 &216666091
 Transform:
   m_ObjectHideFlags: 0
