@@ -28,21 +28,27 @@ namespace BomberBird.UI
 		[Tooltip("Hint that a press moves on. Hidden until the player has had a moment to read.")]
 		[SerializeField] private GameObject m_ContinueHint;
 
-		[Tooltip("Seconds before a press is accepted, so the last keystroke of the boss fight "
-			+ "does not skip the ending that keystroke just earned.")]
-		[SerializeField] private float m_HoldBeforeInput = 0.75f;
+		[Tooltip("Seconds the rescued birds hold before a press is accepted. Long, because the "
+			+ "player arrives here still pressing the key that finished the boss, and this is "
+			+ "the screen that rewards them for it.")]
+		[SerializeField] private float m_RescuedHold = 5f;
+
+		[Tooltip("Seconds the note holds before a press is accepted. Shorter: by now the player "
+			+ "has already chosen to read on.")]
+		[SerializeField] private float m_NoteHold = 0.75f;
 
 		private float m_ShownAt;
+		private float m_Hold;
 		private bool m_IsOnNote;
 
 		private void Start()
 		{
-			show(m_RescuedPanel, m_NotePanel);
+			show(m_RescuedPanel, m_NotePanel, m_RescuedHold);
 		}
 
 		private void Update()
 		{
-			if (Time.unscaledTime - m_ShownAt < m_HoldBeforeInput)
+			if (Time.unscaledTime - m_ShownAt < m_Hold)
 			{
 				return;
 			}
@@ -70,10 +76,10 @@ namespace BomberBird.UI
 			}
 
 			m_IsOnNote = true;
-			show(m_NotePanel, m_RescuedPanel);
+			show(m_NotePanel, m_RescuedPanel, m_NoteHold);
 		}
 
-		private void show(GameObject i_Shown, GameObject i_Hidden)
+		private void show(GameObject i_Shown, GameObject i_Hidden, float i_Hold)
 		{
 			if (i_Hidden != null)
 			{
@@ -91,6 +97,7 @@ namespace BomberBird.UI
 			}
 
 			m_ShownAt = Time.unscaledTime;
+			m_Hold = i_Hold;
 		}
 
 		/// <summary>
