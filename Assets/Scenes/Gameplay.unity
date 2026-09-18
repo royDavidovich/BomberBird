@@ -2087,6 +2087,7 @@ GameObject:
   - component: {fileID: 1688113804}
   - component: {fileID: 1688113806}
   - component: {fileID: 1688113805}
+  - component: {fileID: 1688113807}
   m_Layer: 0
   m_Name: Arena
   m_TagString: Untagged
@@ -2346,6 +2347,42 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1688113807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688113796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65a9b1bdbd85f480fa984d4f7ffb85e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.StageEffects
+  m_Pods: {fileID: 1688113800}
+  m_Mynas: {fileID: 1688113803}
+  m_Objective: {fileID: 1688113804}
+  m_MynaPuff:
+    Frames:
+    - {fileID: 21300000, guid: fad471ac2ddc5478283439490fae1112, type: 3}
+    - {fileID: 21300000, guid: fb63cbdb4624048089b47654dbedb5ca, type: 3}
+    - {fileID: 21300000, guid: 23e92ad91fe4c452e8efb1d61ba0bf4f, type: 3}
+    Seconds: 0.3
+    SortingOrder: 21
+  m_FeatherSparkle:
+    Frames:
+    - {fileID: 21300000, guid: f834c927bd9c44112aa0a0647f3eb3a2, type: 3}
+    - {fileID: 21300000, guid: 5757b2d18351c46d1bba9e80cbdfb828, type: 3}
+    - {fileID: 21300000, guid: 854b3b5fb6dc045a18e18658dac98273, type: 3}
+    Seconds: 0.45
+    SortingOrder: 21
+  m_PodDust:
+    Frames:
+    - {fileID: 21300000, guid: e46ee094ef09c40d08496cd27933112e, type: 3}
+    - {fileID: 21300000, guid: d1bd6e54e1c26464bb1cb19ab18753e0, type: 3}
+    - {fileID: 21300000, guid: 69be497c45930414f9eabfaf711c020a, type: 3}
+    Seconds: 0.2
+    SortingOrder: 4
 --- !u!1 &1764931107
 GameObject:
   m_ObjectHideFlags: 0

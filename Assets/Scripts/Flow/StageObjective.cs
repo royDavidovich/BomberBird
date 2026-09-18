@@ -48,8 +48,10 @@ namespace BomberBird.Flow
 		private bool m_IsCageOpen;
 		private bool m_IsFeatherCollected;
 
-		/// <summary>Raised the moment the bird walks onto the freed feather.</summary>
-		public event Action FeatherCollected;
+		/// <summary>
+		/// Raised the moment the bird walks onto the freed feather, with the cell it lay on.
+		/// </summary>
+		public event Action<Vector2Int> FeatherCollected;
 
 		/// <summary>Whether the bird may leave through the gate.</summary>
 		public bool IsExitOpen
@@ -165,6 +167,10 @@ namespace BomberBird.Flow
 		{
 			m_IsFeatherCollected = true;
 
+			// Read before the destroy, because the feather is gone by the time anyone
+			// listening gets to ask it where it was.
+			Vector2Int cell = m_Feather.Cell;
+
 			Destroy(m_Feather.gameObject);
 			m_Feather = null;
 
@@ -175,12 +181,12 @@ namespace BomberBird.Flow
 				GameFlow.Instance.UnlockBird(m_AwardedBird);
 			}
 
-			OnFeatherCollected();
+			OnFeatherCollected(cell);
 		}
 
-		private void OnFeatherCollected()
+		private void OnFeatherCollected(Vector2Int i_Cell)
 		{
-			FeatherCollected?.Invoke();
+			FeatherCollected?.Invoke(i_Cell);
 		}
 
 		/// <summary>
