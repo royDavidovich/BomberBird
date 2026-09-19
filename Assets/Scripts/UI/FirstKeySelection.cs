@@ -12,6 +12,12 @@ namespace BomberBird.UI
 	/// that does not exist yet, though, so something has to create the first one: this waits
 	/// for a key and does it then.
 	///
+	/// It waits for the keyboard to be empty first. These screens arrive on top of a player
+	/// whose hands are already on the keys - the arrow that walked into the gate, the Escape
+	/// that opened the pause overlay - and a press that was meant for the arena must not be
+	/// read as a choice on the card that interrupted it. So the count starts once nothing is
+	/// held, and the first press after that is the player's answer to this screen.
+	///
 	/// It started inside <see cref="MainMenuScreen"/> and was pulled out when the results
 	/// cards and the pause overlay wanted the same opening.
 	/// </summary>
@@ -22,7 +28,7 @@ namespace BomberBird.UI
 			+ "whose first button changes arms this at runtime instead.")]
 		[SerializeField] private GameObject m_FirstSelected;
 
-		private bool m_IsFirstFrame;
+		private bool m_HasSeenIdle;
 
 		/// <summary>
 		/// Points this at the button to open on, and clears whatever was selected before, so
@@ -39,20 +45,17 @@ namespace BomberBird.UI
 			}
 		}
 
-		/// <summary>
-		/// The key that opened the screen must not also select on it. Escape opens the pause
-		/// overlay, and its own press is still down on the frame the overlay wakes up.
-		/// </summary>
 		private void OnEnable()
 		{
-			m_IsFirstFrame = true;
+			m_HasSeenIdle = false;
 		}
 
 		private void Update()
 		{
-			if (m_IsFirstFrame)
+			if (!m_HasSeenIdle)
 			{
-				m_IsFirstFrame = false;
+				// Whatever was being held when this screen opened has to be let go of first.
+				m_HasSeenIdle = !Input.anyKey;
 				return;
 			}
 
