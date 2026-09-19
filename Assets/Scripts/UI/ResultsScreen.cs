@@ -54,6 +54,9 @@ namespace BomberBird.UI
 		[SerializeField] private GameObject m_ClearedFirstSelected;
 
 		[Header("Game over")]
+		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
+			+ "stage keeps the arena it just won showing through the scrim.")]
+		[SerializeField] private GameObject m_GameOverBackdrop;
 		[SerializeField] private TMP_Text m_GameOverStage;
 		[SerializeField] private GameObject m_GameOverFirstSelected;
 
@@ -196,6 +199,11 @@ namespace BomberBird.UI
 			if (m_Placer != null)
 			{
 				m_Placer.enabled = false;
+			}
+
+			if (m_GameOverBackdrop != null)
+			{
+				m_GameOverBackdrop.SetActive(i_Panel == m_GameOverPanel);
 			}
 
 			if (m_ClearedPanel != null)
