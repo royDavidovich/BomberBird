@@ -55,6 +55,10 @@ namespace BomberBird.UI
 			+ "\"Feather earned\" and never named what was earned.")]
 		[SerializeField] private TMP_Text m_FeatherText;
 
+		[Tooltip("Set to the earned bird's own feather, the one that was lying in the arena, "
+			+ "rather than a stand-in that is the same for all of them.")]
+		[SerializeField] private Image m_FeatherIcon;
+
 		[Tooltip("Shown only on the campaign's last stage.")]
 		[SerializeField] private GameObject m_TotalsRow;
 
@@ -269,6 +273,14 @@ namespace BomberBird.UI
 			if (collected != null)
 			{
 				setText(m_FeatherText, "Feather earned\n" + collected.DisplayName);
+
+				// The pickup's first frame: the same feather the player walked over, so the
+				// card shows what was taken rather than a generic one.
+				if (m_FeatherIcon != null && collected.FeatherFrames != null
+					&& collected.FeatherFrames.Length > 0 && collected.FeatherFrames[0] != null)
+				{
+					m_FeatherIcon.sprite = collected.FeatherFrames[0];
+				}
 			}
 
 			if (m_TotalsRow != null)
