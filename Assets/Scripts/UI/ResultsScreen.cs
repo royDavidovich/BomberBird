@@ -19,6 +19,10 @@ namespace BomberBird.UI
 	{
 		[Header("Panels")]
 		[SerializeField] private GameObject m_Overlay;
+
+		[Tooltip("Holds the card's buttons unselected until the player presses a key, the way "
+			+ "the main menu opens. Armed with whichever button the shown card starts on.")]
+		[SerializeField] private FirstKeySelection m_FirstKey;
 		[SerializeField] private GameObject m_ClearedPanel;
 		[SerializeField] private GameObject m_GameOverPanel;
 
@@ -171,7 +175,7 @@ namespace BomberBird.UI
 			}
 
 			show(i_Outcome == eStageOutcome.Cleared ? m_ClearedPanel : m_GameOverPanel);
-			select(i_Outcome == eStageOutcome.Cleared
+			arm(i_Outcome == eStageOutcome.Cleared
 				? m_ClearedFirstSelected
 				: m_GameOverFirstSelected);
 		}
@@ -325,9 +329,18 @@ namespace BomberBird.UI
 			}
 		}
 
-		private static void select(GameObject i_First)
+		/// <summary>
+		/// The card opens with nothing selected and no arrow showing. It is a screen the
+		/// player is thrown onto rather than one they asked for, and one they may still be
+		/// holding a key into, so the choice waits for them.
+		/// </summary>
+		private void arm(GameObject i_First)
 		{
-			if (i_First != null && EventSystem.current != null)
+			if (m_FirstKey != null)
+			{
+				m_FirstKey.Arm(i_First);
+			}
+			else if (i_First != null && EventSystem.current != null)
 			{
 				EventSystem.current.SetSelectedGameObject(i_First);
 			}
