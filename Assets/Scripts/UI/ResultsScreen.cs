@@ -280,7 +280,7 @@ namespace BomberBird.UI
 
 			if (collected != null)
 			{
-				setText(m_FeatherText, "Feather earned\n" + collected.DisplayName);
+				setText(m_FeatherText, "Feather earned:\n" + collected.DisplayName);
 
 				// The pickup's first frame: the same feather the player walked over, so the
 				// card shows what was taken rather than a generic one.
