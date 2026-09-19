@@ -59,6 +59,14 @@ namespace BomberBird.UI
 			+ "rather than a stand-in that is the same for all of them.")]
 		[SerializeField] private Image m_FeatherIcon;
 
+		[Tooltip("The bird band and the three tiles, moved as one. An ordinary clear has no "
+			+ "whole-game row under them, so the block drops to sit evenly between the habitat "
+			+ "and the buttons instead of hugging the habitat.")]
+		[SerializeField] private RectTransform m_Breakdown;
+
+		[Tooltip("How far that block drops when there is no whole-game row beneath it.")]
+		[SerializeField] private float m_BreakdownDrop = 52f;
+
 		[Tooltip("Shown only on the campaign's last stage.")]
 		[SerializeField] private GameObject m_TotalsRow;
 
@@ -281,6 +289,12 @@ namespace BomberBird.UI
 				{
 					m_FeatherIcon.sprite = collected.FeatherFrames[0];
 				}
+			}
+
+			if (m_Breakdown != null)
+			{
+				m_Breakdown.anchoredPosition = new Vector2(
+					m_Breakdown.anchoredPosition.x, isFinale ? 0f : -m_BreakdownDrop);
 			}
 
 			if (m_TotalsRow != null)
