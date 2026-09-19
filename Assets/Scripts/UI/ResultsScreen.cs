@@ -241,8 +241,10 @@ namespace BomberBird.UI
 
 			bool isFinale = flow.IsFinalStage;
 
+			// "The valley is yours again" belongs to the closing screens, where it can stand
+			// on its own; the card that reports the last stage is still a report.
 			setText(m_ClearedTitle, isFinale
-				? "The valley is yours again"
+				? "Game cleared"
 				: "Stage " + flow.StageNumber + " cleared");
 
 			Campaign.Stage stage = flow.CurrentStage;
