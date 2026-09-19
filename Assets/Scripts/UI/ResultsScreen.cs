@@ -57,6 +57,10 @@ namespace BomberBird.UI
 
 		[Tooltip("Shown only on the campaign's last stage.")]
 		[SerializeField] private GameObject m_TotalsRow;
+
+		[Tooltip("Feathers flanking the headline. The last card of a finished run is the one "
+			+ "place on this screen that celebrates rather than reports.")]
+		[SerializeField] private GameObject m_FinaleFlourish;
 		[SerializeField] private TMP_Text m_TotalsText;
 		[SerializeField] private TMP_Text m_NextLabel;
 		[SerializeField] private GameObject m_ClearedFirstSelected;
@@ -270,6 +274,11 @@ namespace BomberBird.UI
 			if (m_TotalsRow != null)
 			{
 				m_TotalsRow.SetActive(isFinale);
+			}
+
+			if (m_FinaleFlourish != null)
+			{
+				m_FinaleFlourish.SetActive(isFinale);
 			}
 
 			if (isFinale && m_TotalsText != null)
