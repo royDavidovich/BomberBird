@@ -59,6 +59,13 @@ namespace BomberBird.UI
 			+ "rather than a stand-in that is the same for all of them.")]
 		[SerializeField] private Image m_FeatherIcon;
 
+		[Tooltip("The portrait and the two lines beside it. It sits left of the feather row, so "
+			+ "on a stage that awarded nothing it would leave the right half of the card empty.")]
+		[SerializeField] private RectTransform m_BirdBand;
+
+		[Tooltip("How far that band slides right to sit centred when there is no feather row.")]
+		[SerializeField] private float m_BandCentring = 160f;
+
 		[Tooltip("The bird band and the three tiles, moved as one. An ordinary clear has no "
 			+ "whole-game row under them, so the block drops to sit evenly between the habitat "
 			+ "and the buttons instead of hugging the habitat.")]
@@ -276,6 +283,12 @@ namespace BomberBird.UI
 			if (m_FeatherRow != null)
 			{
 				m_FeatherRow.SetActive(collected != null);
+			}
+
+			if (m_BirdBand != null)
+			{
+				m_BirdBand.anchoredPosition = new Vector2(
+					collected != null ? 0f : m_BandCentring, m_BirdBand.anchoredPosition.y);
 			}
 
 			if (collected != null)
