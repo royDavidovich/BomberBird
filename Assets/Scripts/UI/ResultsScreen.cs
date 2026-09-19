@@ -58,13 +58,11 @@ namespace BomberBird.UI
 		[SerializeField] private GameObject m_GameOverFirstSelected;
 
 		private bool m_IsShowing;
+		private bool m_IsSubscribed;
 
 		private void OnEnable()
 		{
-			if (GameFlow.Instance != null)
-			{
-				GameFlow.Instance.StageEnded += gameFlow_StageEnded;
-			}
+			subscribe();
 		}
 
 		/// <summary>
@@ -74,18 +72,37 @@ namespace BomberBird.UI
 		/// </summary>
 		private void OnDisable()
 		{
-			if (GameFlow.Instance != null)
+			if (m_IsSubscribed && GameFlow.Instance != null)
 			{
 				GameFlow.Instance.StageEnded -= gameFlow_StageEnded;
 			}
+
+			m_IsSubscribed = false;
 		}
 
 		private void Start()
 		{
+			// Again, because OnEnable may have been too early. Unity runs Awake and OnEnable
+			// per object rather than in two passes, so this component's OnEnable can run
+			// before GameFlow's Awake has set the instance, and the subscription would be
+			// silently skipped - leaving the flow to fall through to its no-screen path.
+			subscribe();
+
 			if (m_Overlay != null)
 			{
 				m_Overlay.SetActive(false);
 			}
+		}
+
+		private void subscribe()
+		{
+			if (m_IsSubscribed || GameFlow.Instance == null)
+			{
+				return;
+			}
+
+			GameFlow.Instance.StageEnded += gameFlow_StageEnded;
+			m_IsSubscribed = true;
 		}
 
 		/// <summary>Wired to Next stage. Leaves this stage and plays whatever follows it.</summary>

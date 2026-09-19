@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.14, 2026-09-18 |
+| Document version | v0.15, 2026-09-19 |
 
 ## 1. High Concept
 
@@ -61,7 +61,7 @@ flowchart TD
 - Solid objects stop the burst. Some obstacles can be destroyed.
 - A burst can trigger another pod and create a chain reaction.
 - Common mynas act as the enemy birds. Their exact movement behavior will be selected during prototyping.
-- The player loses a life when hit by a common myna, another hazard, or a burst that catches them as it goes off, then retries the stage immediately. Flames still fading after a burst are scenery and harm nobody but the mynas, so a player who has watched a burst end can cross it. Common mynas remain vulnerable to those flames for as long as they are drawn. The run ends when no lives remain.
+- The player loses a life when hit by a common myna, another hazard, or a burst that catches them as it goes off, then retries the stage immediately. Flames still fading after a burst are scenery and harm nobody but the mynas, so a player who has watched a burst end can cross it. Common mynas remain vulnerable to those flames for as long as they are drawn. Spending the last life ends the attempt rather than the run: a GAME OVER card says so, and the player chooses between another try at the same stage, with the stage reached and the birds earned intact, and returning to the menu. Six stages have to be completable in one sitting.
 - The stage objective is to defeat every common myna in the arena.
 - On a regular stage, a new bird's feather sits locked inside a cage from the moment the stage begins, so the player can see the reward and the bars around it for the whole level. The cage is solid: it blocks movement and stops bursts, and no amount of firepower opens it.
 - Defeating the last myna opens the cage. The player then walks over the feather to collect it, and only then does the exit open.
@@ -147,7 +147,7 @@ Gameplay input is disabled while paused and during stage transitions. Losing foc
 3. **Habitat card:** a brief card before each stage naming the habitat and the bird it belongs to.
 4. **Gameplay:** the arena and a compact HUD carrying the pods available to place, the current stage, and the lives remaining. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
 5. **Pause overlay:** Resume, Restart, and Main Menu.
-6. **Results:** completion, optional rewards, Retry, and Next Stage.
+6. **Results:** shown when a stage ends. On a clear it names the stage and habitat, the bird flown, the feather if one was earned, and what the stage cost: mynas defeated, pods placed and time taken. It offers Next Stage and Retry, and on the final stage it carries the campaign totals before handing over to the closing screens. On the last life it becomes GAME OVER, offering Retry and Main Menu.
 7. **Closing screen:** shown when the boss falls, listing the birds the player rescued across the campaign.
 8. **Closing note:** a factual card on the common myna as a real invasive species in Israel - not a footnote but the reason the game exists. It states what the species has actually cost local wildlife: native cavity-nesting birds evicted from their nests, eggs and chicks destroyed, and species pushed out of habitats they held before the myna arrived. The consequences are real and ongoing, and the card says so plainly, with its source credited.
 
@@ -282,3 +282,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.12 | 2026-09-15 | Gave the campaign a shape the player moves through: a main menu that starts the run, and a bird selection screen before every stage after the intro, showing all four birds with the unearned ones as silhouettes so the roster reads as a goal from the second stage on. The intro still hands the player the hoopoe rather than asking them to choose before they know what a bird does. Sharpened the closing note so it carries what the myna has actually cost Israeli wildlife rather than stating the fact and moving on |
 | v0.13 | 2026-09-17 | Stopped showing the bird selection screen while the roster holds one bird. v0.12 put it before every stage after the intro so the unearned birds would read as a goal, but in play the second stage opens on one hoopoe and three silhouettes with nothing to decide, which reads as a step to click through rather than as something to aim at. The screen now appears from the first feather collected, where there is a decision in it. Dressed the main menu in its title art: the hero fills the screen, the wordmark sits in the stone sign, and the Play and Quit labels are drawn rather than set in a UI font |
 | v0.14 | 2026-09-18 | Stated the target platform as desktop Windows and macOS rather than Windows PC alone. The game is built and played on a Mac and had never run on the Windows target the document claimed, so macOS is now named as the primary test platform and a smoke-tested Windows build joined the MVP list. A lecturer email in September 2026 confirms that a PC/Mac desktop target is the expected baseline and that a mobile version is an additional commitment graded as a second full platform, including its own controls and screen-size adaptation, so mobile builds and touch controls stay out of scope by decision rather than by omission. |
+| v0.15 | 2026-09-19 | Gave the player a beat instead of throwing them back in. Losing the last life used to reset the whole campaign in silence - stage one, starter bird, every feather gone - so it now ends the attempt rather than the run: a GAME OVER card reports it and the player chooses between retrying the same stage with the roster intact and returning to the menu. Six stages have to be completable in one sitting, and a single bad stage five should not cost the five before it. Every stage also now ends on a results card naming what the stage cost, with campaign totals on the last one. And every stage, including a retry, starts frozen until the player presses something, so a death does not roll straight into the next attempt before their hands are back. |
