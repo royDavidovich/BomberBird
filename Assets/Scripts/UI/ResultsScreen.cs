@@ -277,7 +277,7 @@ namespace BomberBird.UI
 				// Named, because three more numbers under three numbers otherwise read as a
 				// second opinion on the stage rather than the tally of the whole run. The
 				// stage just played has not been folded in yet, so add it here.
-				m_TotalsText.text = "Whole game:   "
+				m_TotalsText.text = "Whole game\n"
 					+ (flow.TotalMynasDefeated + countMynas()) + " mynas   "
 					+ (flow.TotalPodsPlaced + countPods()) + " pods   "
 					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds());
