@@ -274,14 +274,16 @@ namespace BomberBird.UI
 
 			if (isFinale && m_TotalsText != null)
 			{
-				// The stage just played has not been folded in yet, so add it here.
-				m_TotalsText.text =
-					(flow.TotalMynasDefeated + countMynas()) + " mynas   "
+				// Named, because three more numbers under three numbers otherwise read as a
+				// second opinion on the stage rather than the tally of the whole run. The
+				// stage just played has not been folded in yet, so add it here.
+				m_TotalsText.text = "Whole game:   "
+					+ (flow.TotalMynasDefeated + countMynas()) + " mynas   "
 					+ (flow.TotalPodsPlaced + countPods()) + " pods   "
 					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds());
 			}
 
-			setText(m_NextLabel, isFinale ? "See what you saved" : "Next stage");
+			setText(m_NextLabel, isFinale ? "Continue" : "Next stage");
 		}
 
 		private void fillGameOver()
