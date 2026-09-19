@@ -4085,8 +4085,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 110, y: -26}
-  m_SizeDelta: {x: 460, y: 54}
+  m_AnchoredPosition: {x: 110, y: -44}
+  m_SizeDelta: {x: 460, y: 84}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1248135204
 GameObject:
@@ -5984,6 +5984,7 @@ MonoBehaviour:
   m_ClearedPortrait: {fileID: 1090868681}
   m_ClearedBirdName: {fileID: 277221929}
   m_FeatherRow: {fileID: 1239945235}
+  m_FeatherText: {fileID: 1944709929}
   m_TotalsRow: {fileID: 1008526188}
   m_TotalsText: {fileID: 1072569282}
   m_NextLabel: {fileID: 1641405951}
@@ -6506,7 +6507,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 25, y: 0}
-  m_SizeDelta: {x: 380, y: 44}
+  m_SizeDelta: {x: 380, y: 76}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1944709929
 MonoBehaviour:
@@ -6528,7 +6529,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Feather earned
+  m_text: 'Feather earned
+
+    White-throated kingfisher'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6572,7 +6575,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

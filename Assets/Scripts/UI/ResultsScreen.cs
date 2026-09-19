@@ -51,6 +51,10 @@ namespace BomberBird.UI
 		[Tooltip("Hidden unless this stage's feather was actually picked up.")]
 		[SerializeField] private GameObject m_FeatherRow;
 
+		[Tooltip("Two lines: the award, then the bird it unlocked. The row used to say only "
+			+ "\"Feather earned\" and never named what was earned.")]
+		[SerializeField] private TMP_Text m_FeatherText;
+
 		[Tooltip("Shown only on the campaign's last stage.")]
 		[SerializeField] private GameObject m_TotalsRow;
 		[SerializeField] private TMP_Text m_TotalsText;
@@ -249,9 +253,16 @@ namespace BomberBird.UI
 
 			// The feather is sourced from what was picked up, not from what the stage owes:
 			// by now the bird is already in the roster and GameFlow.AwardedBird reads null.
+			BirdProfile collected = m_Objective == null ? null : m_Objective.CollectedBird;
+
 			if (m_FeatherRow != null)
 			{
-				m_FeatherRow.SetActive(m_Objective != null && m_Objective.CollectedBird != null);
+				m_FeatherRow.SetActive(collected != null);
+			}
+
+			if (collected != null)
+			{
+				setText(m_FeatherText, "Feather earned\n" + collected.DisplayName);
 			}
 
 			if (m_TotalsRow != null)
