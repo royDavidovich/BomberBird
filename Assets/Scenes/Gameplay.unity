@@ -541,7 +541,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -420}
+  m_AnchoredPosition: {x: 0, y: -452}
   m_SizeDelta: {x: 1200, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &159897216
@@ -564,7 +564,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: press any key to begin
+  m_text: press space to begin
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -573,8 +573,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4290111221
-  m_fontColor: {r: 0.9607843, g: 0.9019608, b: 0.70980394, a: 1}
+    rgba: 4280099886
+  m_fontColor: {r: 0.18039216, g: 0.14117648, b: 0.11372549, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -5954,7 +5954,7 @@ MonoBehaviour:
   m_Movement: {fileID: 1600481133}
   m_Placer: {fileID: 1600481138}
   m_PulseSeconds: 1.4
-  m_PulseFloor: 0.3
+  m_PulseFloor: 0.6
 --- !u!114 &1834911888
 MonoBehaviour:
   m_ObjectHideFlags: 0

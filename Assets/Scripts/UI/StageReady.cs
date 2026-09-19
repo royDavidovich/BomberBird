@@ -13,7 +13,10 @@ namespace BomberBird.UI
 	/// player has looked at the board. This gives them the beat to look.
 	///
 	/// It is not part of <see cref="PauseController"/>, which uses the same freeze, because
-	/// that component's job is the pause overlay and this must not show one.
+	/// that component's job is the pause overlay and this must not show one. The two do run
+	/// side by side, though: pausing a stage that has not begun is reasonable - the player
+	/// wants the menu, not the arena - so the hold survives a pause and the resume that ends
+	/// it, and only Space lets the stage go.
 	/// </summary>
 	public class StageReady : MonoBehaviour
 	{
@@ -22,8 +25,8 @@ namespace BomberBird.UI
 		[SerializeField] private GameObject m_Prompt;
 
 		[Header("What it suspends")]
-		[Tooltip("Switched off while waiting, so Escape cannot pause a stage that has not "
-			+ "started.")]
+		[Tooltip("Left running, so Escape still opens the menu on a stage that has not begun. "
+			+ "Read here to know when the hold is the pause's rather than this one's.")]
 		[SerializeField] private PauseController m_Pause;
 
 		[Tooltip("Stopped by hand: a frozen clock halts movement, but pod placing reads input "
@@ -63,9 +66,24 @@ namespace BomberBird.UI
 				return;
 			}
 
+			if (m_Pause != null && m_Pause.IsPaused)
+			{
+				// The pause overlay is up over the held stage. It owns the screen until it
+				// closes, and Resume hands the clock back to this hold rather than to play.
+				// The prompt steps aside rather than pulsing over the menu: it is the last
+				// child of the canvas, so it draws on top of everything including that.
+				showPrompt(false);
+				return;
+			}
+
+			showPrompt(true);
+			holdClock();
 			pulsePrompt();
 
-			if (Input.anyKeyDown)
+			// Space alone, and never as part of a system shortcut. This used to take any key,
+			// which meant Escape started the stage on its way to opening the pause overlay,
+			// and a Cmd+Shift+4 screenshot started it by accident.
+			if (Input.GetKeyDown(KeyCode.Space) && !UiInput.IsModifierHeld())
 			{
 				m_IsReleasing = true;
 			}
@@ -75,11 +93,26 @@ namespace BomberBird.UI
 		{
 			m_IsWaiting = true;
 
-			if (m_Pause != null)
-			{
-				m_Pause.enabled = false;
-			}
+			holdClock();
+			showPrompt(true);
+		}
 
+		private void showPrompt(bool i_IsShown)
+		{
+			if (m_Prompt != null && m_Prompt.activeSelf != i_IsShown)
+			{
+				m_Prompt.SetActive(i_IsShown);
+			}
+		}
+
+		/// <summary>
+		/// Re-asserted every waiting frame rather than set once, because the pause overlay
+		/// can open over a held stage and its Resume restores the clock and the bird's input
+		/// on the way out. Without this the stage would be live behind a prompt still asking
+		/// the player to start it.
+		/// </summary>
+		private void holdClock()
+		{
 			Time.timeScale = 0f;
 
 			if (m_Movement != null)
@@ -90,11 +123,6 @@ namespace BomberBird.UI
 			if (m_Placer != null)
 			{
 				m_Placer.enabled = false;
-			}
-
-			if (m_Prompt != null)
-			{
-				m_Prompt.SetActive(true);
 			}
 		}
 
@@ -115,15 +143,7 @@ namespace BomberBird.UI
 				m_Placer.enabled = true;
 			}
 
-			if (m_Pause != null)
-			{
-				m_Pause.enabled = true;
-			}
-
-			if (m_Prompt != null)
-			{
-				m_Prompt.SetActive(false);
-			}
+			showPrompt(false);
 
 			// Nothing left to do for the rest of the stage.
 			enabled = false;

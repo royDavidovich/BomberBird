@@ -64,33 +64,10 @@ namespace BomberBird.UI
 				return;
 			}
 
-			if (m_FirstSelected != null && wasKeyboardPressed())
+			if (m_FirstSelected != null && UiInput.WasKeyPressed())
 			{
 				EventSystem.current.SetSelectedGameObject(m_FirstSelected);
 			}
-		}
-
-		/// <summary>
-		/// A key rather than a click. <see cref="Input.anyKeyDown"/> counts mouse buttons as
-		/// keys, and a click already selects whatever it landed on, so the mouse must not be
-		/// allowed to hand focus to the first button as well.
-		/// </summary>
-		private static bool wasKeyboardPressed()
-		{
-			if (!Input.anyKeyDown)
-			{
-				return false;
-			}
-
-			for (int button = 0; button < 3; ++button)
-			{
-				if (Input.GetMouseButtonDown(button))
-				{
-					return false;
-				}
-			}
-
-			return true;
 		}
 	}
 }
