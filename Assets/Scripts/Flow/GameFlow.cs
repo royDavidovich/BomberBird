@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BomberBird.Player;
 using UnityEngine;
@@ -33,6 +34,17 @@ namespace BomberBird.Flow
 
 		private RunState m_Run;
 
+		/// <summary>
+		/// Raised when a stage ends, before anything is loaded, so a results screen can show
+		/// what just happened while the arena it happened in is still standing.
+		///
+		/// An event rather than a reference because the screen lives in BomberBird.UI, which
+		/// depends on this assembly and not the other way round. Nothing here knows or cares
+		/// whether anyone is listening: with no subscriber both paths fall through to what
+		/// they did before, so a Gameplay scene opened on its own is still playable.
+		/// </summary>
+		public event Action<eStageOutcome> StageEnded;
+
 		/// <summary>The live run, or null when no GameFlow is in the scene.</summary>
 		public static GameFlow Instance
 		{
@@ -59,6 +71,30 @@ namespace BomberBird.Flow
 		public BirdProfile SelectedBird
 		{
 			get { return m_Run == null ? null : m_Run.SelectedBird; }
+		}
+
+		/// <summary>Whether the stage being played is the campaign's last.</summary>
+		public bool IsFinalStage
+		{
+			get { return m_Campaign != null && StageNumber >= m_Campaign.StageCount; }
+		}
+
+		/// <summary>Mynas defeated across every stage advanced past this run.</summary>
+		public int TotalMynasDefeated
+		{
+			get { return m_Run == null ? 0 : m_Run.TotalMynasDefeated; }
+		}
+
+		/// <summary>Pods placed across every stage advanced past this run.</summary>
+		public int TotalPodsPlaced
+		{
+			get { return m_Run == null ? 0 : m_Run.TotalPodsPlaced; }
+		}
+
+		/// <summary>Seconds played across every stage advanced past this run.</summary>
+		public float TotalSeconds
+		{
+			get { return m_Run == null ? 0f : m_Run.TotalSeconds; }
 		}
 
 		/// <summary>The stage being played, or null once the campaign has been finished.</summary>
@@ -123,23 +159,64 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
-		/// Spends a life and replays the stage. Spending the last one starts the run over,
-		/// which is the whole failure path until a results screen exists.
+		/// Spends a life. An ordinary death replays the stage; the last one ends the run and
+		/// hands the decision to the player.
+		///
+		/// Losing the last life used to call <see cref="RunState.Restart"/>, which wiped the
+		/// stage reached and every bird earned and dropped the player into stage one with no
+		/// screen and no explanation. It now stops here: the results screen reports it, and
+		/// the player chooses between another attempt at this same stage, with the roster
+		/// intact, and the menu. Six stages have to be completable in one sitting.
 		/// </summary>
 		public void ReportDeath()
 		{
-			if (m_Run.LoseLife())
+			if (!m_Run.LoseLife())
 			{
-				m_Run.Restart();
+				// A death replays the stage with the same bird - never back to selection.
+				StartStage();
+				return;
 			}
 
-			// A death replays the stage with the same bird - never back to selection.
+			if (raiseStageEnded(eStageOutcome.Failed))
+			{
+				// The screen owns what happens next, and the arena stays standing behind it.
+				return;
+			}
+
+			// No screen in the scene. Fall back to the old behaviour rather than stranding
+			// the player on a dead arena.
+			m_Run.Restart();
 			StartStage();
 		}
 
-		/// <summary>The stage was cleared. Carries the run forward and plays the next one.</summary>
+		/// <summary>
+		/// The stage was cleared. Reports it, and carries the run forward once the player has
+		/// seen the result.
+		///
+		/// The event is raised before the run advances, so the screen still reads the stage
+		/// that was just played rather than the one coming next.
+		/// </summary>
 		public void CompleteStage()
 		{
+			if (raiseStageEnded(eStageOutcome.Cleared))
+			{
+				// The screen calls AdvanceToNextStage when the player is done reading.
+				return;
+			}
+
+			AdvanceToNextStage(0, 0, 0f);
+		}
+
+		/// <summary>
+		/// Leaves the stage just cleared and plays whatever comes after it, folding that
+		/// stage's tally into the campaign totals on the way.
+		///
+		/// Split out of <see cref="CompleteStage"/> so the results screen has somewhere to go
+		/// that does not raise the event it is already answering.
+		/// </summary>
+		public void AdvanceToNextStage(int i_MynasDefeated, int i_PodsPlaced, float i_Seconds)
+		{
+			m_Run.AddStageTotals(i_MynasDefeated, i_PodsPlaced, i_Seconds);
 			m_Run.AdvanceStage();
 
 			// Past the last stage the campaign is over. Until now this fell through to
@@ -161,6 +238,32 @@ namespace BomberBird.Flow
 			{
 				StartStage();
 			}
+		}
+
+		/// <summary>
+		/// Another attempt at this stage after the last life was spent. The lives come back;
+		/// the stage reached, the birds earned and the campaign totals do not move.
+		/// </summary>
+		public void RetryAfterGameOver()
+		{
+			m_Run.RestoreLives();
+
+			StartStage();
+		}
+
+		/// <summary>Reports the outcome, and says whether anyone was listening.</summary>
+		private bool raiseStageEnded(eStageOutcome i_Outcome)
+		{
+			Action<eStageOutcome> ended = StageEnded;
+
+			if (ended == null)
+			{
+				return false;
+			}
+
+			ended(i_Outcome);
+
+			return true;
 		}
 
 		/// <summary>
