@@ -312,10 +312,13 @@ namespace BomberBird.UI
 				// Named, because three more numbers under three numbers otherwise read as a
 				// second opinion on the stage rather than the tally of the whole run. The
 				// stage just played has not been folded in yet, so add it here.
-				m_TotalsText.text = "Whole game\n"
-					+ (flow.TotalMynasDefeated + countMynas()) + " mynas   "
-					+ (flow.TotalPodsPlaced + countPods()) + " pods   "
-					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds());
+				// One line under a rule: the label quiet, the three figures bold, the way the
+				// tiles option had it. Rich text rather than three labels, because the run
+				// tally is one sentence and splitting it would need its own layout group.
+				m_TotalsText.text = "<color=#5C4A33>Whole game</color>    <b>"
+					+ (flow.TotalMynasDefeated + countMynas()) + " mynas</b>    <b>"
+					+ (flow.TotalPodsPlaced + countPods()) + " pods</b>    <b>"
+					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds()) + "</b>";
 			}
 
 			setText(m_NextLabel, isFinale ? "Continue" : "Next stage");
