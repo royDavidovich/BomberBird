@@ -17,6 +17,11 @@ namespace BomberBird.UI
 	/// side by side, though: pausing a stage that has not begun is reasonable - the player
 	/// wants the menu, not the arena - so the hold survives a pause and the resume that ends
 	/// it, and only Space lets the stage go.
+	///
+	/// The prompt sits under both overlays in the canvas, so a pause draws over it rather
+	/// than the other way round. Where it sits today that makes no visible difference - the
+	/// pause panel covers the prompt's whole line - but it is the order that lets the prompt
+	/// move anywhere outside the panel without reaching over the menu.
 	/// </summary>
 	public class StageReady : MonoBehaviour
 	{
@@ -70,9 +75,12 @@ namespace BomberBird.UI
 			{
 				// The pause overlay is up over the held stage. It owns the screen until it
 				// closes, and Resume hands the clock back to this hold rather than to play.
-				// The prompt steps aside rather than pulsing over the menu: it is the last
-				// child of the canvas, so it draws on top of everything including that.
-				showPrompt(false);
+				//
+				// The prompt is left on screen and simply falls behind the menu, because it
+				// now sits under the overlay in the canvas rather than over it. Nothing else
+				// in this method runs while the menu is up: the pulse stops, so the prompt
+				// holds whatever alpha it had, and the Space check below is skipped, or the
+				// keystroke that presses Resume would also start the stage behind it.
 				return;
 			}
 
