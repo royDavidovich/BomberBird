@@ -33,7 +33,7 @@ namespace BomberBird.Enemies
 		[Tooltip("What the mynas' authored speed is multiplied by in the easy mode. Applied "
 			+ "to the stage's mynas, the boss and its slaves alike.")]
 		[Range(0.2f, 1f)]
-		[SerializeField] private float m_EasySpeedScale = 0.7f;
+		[SerializeField] private float m_EasySpeedScale = 0.5f;
 
 		[Range(0f, 1f)]
 		[Tooltip("How often an easy myna walks straight through a junction instead of picking "
