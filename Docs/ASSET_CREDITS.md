@@ -39,6 +39,7 @@ AI-generated assets are recorded here as well. They are not third-party work, bu
 | `ui-confirm.wav` | Kenney, [Interface Sounds](https://kenney.nl/assets/interface-sounds) | CC0 1.0 | Play on the main menu, and committing a bird on the selection screen | `Assets/ThirdParty/Audio/`. Converted to mono 44.1 kHz, 16-bit WAV from `confirmation_001.ogg`, 0.29 s. Deliberately not `confirmation_002.ogg`, which is already `stage-clear.wav` - confirming a choice and clearing a stage should not sound identical |
 | `ui-denied.wav` | Kenney, [Interface Sounds](https://kenney.nl/assets/interface-sounds) | CC0 1.0 | Pressing a bird that has not been earned yet | `Assets/ThirdParty/Audio/`. Converted to mono 44.1 kHz, 16-bit WAV from `error_002.ogg`, 0.17 s. Short on purpose: it answers a press the player will make repeatedly while working out what a locked bird costs |
 | `music-loop.ogg` | MintoDog, [Cozy Puzzle In-Game 3 on OpenGameArt](https://opengameart.org/content/cozy-puzzle-in-game-3) | CC0 1.0 | Gameplay background music | `Assets/ThirdParty/Audio/`. Original loopable OGG, 2:04 long, with acoustic guitar, mallet, wind, and bass |
+| `music-bird-select.ogg` | MintoDog, [Cozy Puzzle In-Game 1 on OpenGameArt](https://opengameart.org/content/cozy-puzzle-in-game-1) | CC0 1.0 | Bird selection screen background music | `Assets/ThirdParty/Audio/`. Original loopable OGG, 2:10 long, 118 BPM. Same composer and set as `music-loop.ogg`, so the selection screen sounds like the same game at a brisker step |
 
 ## How to add an entry
 

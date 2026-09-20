@@ -6573,6 +6573,7 @@ GameObject:
   - component: {fileID: 1834911882}
   - component: {fileID: 1834911888}
   - component: {fileID: 1834911887}
+  - component: {fileID: 1834911889}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -6743,6 +6744,19 @@ MonoBehaviour:
   m_GameOverBackdrop: {fileID: 3022872}
   m_GameOverStage: {fileID: 421220164}
   m_GameOverFirstSelected: {fileID: 2112226096}
+--- !u!114 &1834911889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834911881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a645e5efcfc294ede99db81b37ac674e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.SceneMusic
+  m_Track: {fileID: 8300000, guid: 6a08deae92c6e4bdfb8f8a4fc193c140, type: 3}
 --- !u!1 &1852013829
 GameObject:
   m_ObjectHideFlags: 0
