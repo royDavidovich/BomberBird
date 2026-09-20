@@ -24,7 +24,7 @@ MonoBehaviour:
   - m_HabitatName: Orchard Grove
     m_Layout: {fileID: 11400000, guid: 8d4d97ed16304302aea9e8fab15d9976, type: 2}
     m_TileSet: {fileID: 11400000, guid: 21c11f90f54c4473a5b4dbe21560c915, type: 2}
-    m_HabitatHero: {fileID: 0}
+    m_HabitatHero: {fileID: 21300000, guid: a6c47ebbbc0094baaba3ff5708ba8785, type: 3}
     m_HabitatBlurb: Rows of old fruit trees, heavy and close. Good cover for a ground-feeding
       bird, and better cover for the ones hunting it.
     m_BirdLine: home of the Eurasian hoopoe
@@ -40,7 +40,7 @@ MonoBehaviour:
   - m_HabitatName: Lagoon Shore
     m_Layout: {fileID: 11400000, guid: 924e4331b8ca49968c00ab6c11d79019, type: 2}
     m_TileSet: {fileID: 11400000, guid: 2dfd643542e54515adb3f185a85d2042, type: 2}
-    m_HabitatHero: {fileID: 0}
+    m_HabitatHero: {fileID: 21300000, guid: f758c130510264a5982565068c825ca1, type: 3}
     m_HabitatBlurb: Brackish and wide open, the water shallow enough to wade. Pelicans
       rest here on the way south, in numbers, and leave again.
     m_BirdLine: home of the great white pelican
