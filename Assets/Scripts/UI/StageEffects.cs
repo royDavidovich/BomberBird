@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using BomberBird.Arena;
 using BomberBird.Enemies;
 using BomberBird.Flow;
@@ -56,6 +57,20 @@ namespace BomberBird.UI
 		[Tooltip("Sorted under the pod on purpose: it must never hide the thing it announces.")]
 		[SerializeField] private Effect m_PodDust = new Effect();
 
+		[Header("Pooling")]
+		[Tooltip("Effect visuals built before the stage runs. These three never overlap by more than a handful.")]
+		[Min(0)]
+		[SerializeField] private int m_PoolCapacity = 8;
+
+		[Tooltip("Most visuals the pool will hold. One returned past this is destroyed instead of kept.")]
+		[Min(1)]
+		[SerializeField] private int m_PoolMaxSize = 32;
+
+		// Every visual currently on loan. Membership is also the guard that makes a release
+		// idempotent, so an effect cut short by OnDisable cannot be returned twice.
+		private readonly HashSet<SpriteRenderer> r_LiveVisuals = new HashSet<SpriteRenderer>();
+
+		private SpriteVisualPool m_Pool;
 		private ArenaGrid m_Grid;
 		private PodField m_Field;
 		private Transform m_Container;
@@ -80,6 +95,8 @@ namespace BomberBird.UI
 			// arena's tiles or the pods.
 			m_Container = new GameObject("StageEffects").transform;
 			m_Container.SetParent(transform, false);
+
+			m_Pool = new SpriteVisualPool(m_Container, "EffectVisuals", m_PoolCapacity, m_PoolMaxSize);
 
 			reportUnassigned();
 		}
@@ -155,22 +172,22 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// Draws the frames in order and removes the effect.
+		/// Draws the frames in order and gives the visual back.
 		///
-		/// Built and thrown away each time, exactly as a burst is. The dust plays many times
-		/// a minute, so if profiling ever shows these allocations matter, this is the second
-		/// place to pool after the burst pieces.
+		/// Borrowed from <see cref="SpriteVisualPool"/> rather than built, the same way a
+		/// burst piece is. The dust alone plays every time a pod is placed, which is often
+		/// enough for the allocation to be worth not making.
 		/// </summary>
 		private IEnumerator fade(Effect i_Effect, Vector2Int i_Cell)
 		{
-			GameObject visual = new GameObject(i_Effect.Frames[0].name);
-			visual.transform.SetParent(m_Container, false);
-			visual.transform.localPosition = m_Grid.CellToWorld(i_Cell);
-
-			SpriteRenderer renderer = visual.AddComponent<SpriteRenderer>();
-			renderer.sortingOrder = i_Effect.SortingOrder;
-
 			float secondsPerFrame = i_Effect.Seconds / i_Effect.Frames.Length;
+
+			// Borrowed last, once nothing left in this method can fault: a visual taken and
+			// then abandoned by a throw would sit out on loan until the next teardown.
+			SpriteRenderer renderer = m_Pool.Get(
+				m_Grid.CellToWorld(i_Cell), 0f, i_Effect.SortingOrder);
+
+			r_LiveVisuals.Add(renderer);
 
 			for (int frame = 0; frame < i_Effect.Frames.Length; ++frame)
 			{
@@ -179,19 +196,40 @@ namespace BomberBird.UI
 				yield return new WaitForSeconds(secondsPerFrame);
 			}
 
-			Destroy(visual);
+			release(renderer);
 		}
 
-		private void clearVisuals()
+		/// <summary>Returns one visual, once. A visual already given back is not in the set.</summary>
+		private void release(SpriteRenderer i_Visual)
 		{
-			if (m_Container == null)
+			if (!r_LiveVisuals.Remove(i_Visual))
 			{
 				return;
 			}
 
-			for (int i = m_Container.childCount - 1; i >= 0; --i)
+			m_Pool.Release(i_Visual);
+		}
+
+		/// <summary>
+		/// Returns whatever is still on screen to the pool, so a disable inside a stage leaves
+		/// the pool whole and an effect cut short mid-flight is swept up. It does not carry
+		/// across stages: every stage and every retry is a fresh <c>LoadScene</c>, so the pool
+		/// dies with the scene and the next one prewarms from nothing.
+		/// </summary>
+		private void clearVisuals()
+		{
+			if (m_Pool == null)
 			{
-				Destroy(m_Container.GetChild(i).gameObject);
+				return;
+			}
+
+			// Copied, because releasing walks the set it is iterating.
+			SpriteRenderer[] stranded = new SpriteRenderer[r_LiveVisuals.Count];
+			r_LiveVisuals.CopyTo(stranded);
+
+			for (int i = 0; i < stranded.Length; ++i)
+			{
+				release(stranded[i]);
 			}
 		}
 

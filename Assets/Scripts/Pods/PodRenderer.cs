@@ -41,8 +41,23 @@ namespace BomberBird.Pods
 		[Tooltip("How long a burst stays on screen.")]
 		[SerializeField] private float m_BurstSeconds = 0.45f;
 
+		[Header("Pooling")]
+		[Tooltip("Burst pieces built before the stage runs. A range 3 burst covers thirteen cells, so this holds several overlapping bursts without allocating.")]
+		[Min(0)]
+		[SerializeField] private int m_BurstPoolCapacity = 32;
+
+		[Tooltip("Most pieces the pool will hold. A piece returned past this is destroyed instead of kept.")]
+		[Min(1)]
+		[SerializeField] private int m_BurstPoolMaxSize = 128;
+
 		private readonly Dictionary<Vector2Int, GameObject> r_PodVisuals = new Dictionary<Vector2Int, GameObject>();
 
+		// Every piece currently on loan from the pool. Membership is also the guard that makes
+		// a release idempotent: a piece returned by the coroutine has already left the set, so
+		// the teardown below cannot return it a second time.
+		private readonly HashSet<SpriteRenderer> r_LivePieces = new HashSet<SpriteRenderer>();
+
+		private SpriteVisualPool m_BurstPool;
 		private ArenaPods m_Pods;
 		private ArenaGrid m_Grid;
 		private PodField m_Field;
@@ -65,6 +80,9 @@ namespace BomberBird.Pods
 			// when these are cleared.
 			m_Container = new GameObject("PodVisuals").transform;
 			m_Container.SetParent(transform, false);
+
+			m_BurstPool = new SpriteVisualPool(
+				m_Container, "BurstPieces", m_BurstPoolCapacity, m_BurstPoolMaxSize);
 		}
 
 		private void OnEnable()
@@ -136,10 +154,12 @@ namespace BomberBird.Pods
 		}
 
 		/// <summary>
-		/// Draws one burst, fading it out over <see cref="m_BurstSeconds"/> and removing it.
+		/// Draws one burst, fading it out over <see cref="m_BurstSeconds"/> and giving its
+		/// pieces back.
 		///
-		/// A burst is built and thrown away each time. If profiling ever shows that this
-		/// allocation matters, these pieces are the obvious thing to pool.
+		/// The pieces are borrowed from <see cref="SpriteVisualPool"/> rather than built:
+		/// a burst lasts a fraction of a second and a chain sets off several at once, which
+		/// is exactly the repeated create-and-retire the pool exists for.
 		/// </summary>
 		private IEnumerator showBurst(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
 		{
@@ -150,10 +170,7 @@ namespace BomberBird.Pods
 				yield break;
 			}
 
-			GameObject root = new GameObject(string.Format("Burst_{0}_{1}", i_Origin.x, i_Origin.y));
-			root.transform.SetParent(m_Container, false);
-
-			List<BurstPiece> pieces = buildBurstPieces(root.transform, i_Origin, i_Covered);
+			List<BurstPiece> pieces = buildBurstPieces(i_Origin, i_Covered);
 			float secondsPerFrame = m_BurstSeconds / frameCount;
 
 			for (int frame = 0; frame < frameCount; ++frame)
@@ -166,10 +183,13 @@ namespace BomberBird.Pods
 				yield return new WaitForSeconds(secondsPerFrame);
 			}
 
-			Destroy(root);
+			foreach (BurstPiece piece in pieces)
+			{
+				releasePiece(piece.Renderer);
+			}
 		}
 
-		private List<BurstPiece> buildBurstPieces(Transform i_Root, Vector2Int i_Origin, IList<Vector2Int> i_Covered)
+		private List<BurstPiece> buildBurstPieces(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
 		{
 			List<BurstPiece> pieces = new List<BurstPiece>(i_Covered.Count);
 
@@ -178,13 +198,28 @@ namespace BomberBird.Pods
 				float angle;
 				eBurstPiece piece = classifyPiece(cell, i_Origin, i_Covered, out angle);
 
-				GameObject visual = createVisual(
-					string.Format("Piece_{0}_{1}", cell.x, cell.y), cell, angle, m_BurstSortingOrder, i_Root);
+				SpriteRenderer renderer = m_BurstPool.Get(
+					m_Grid.CellToWorld(cell), angle, m_BurstSortingOrder);
 
-				pieces.Add(new BurstPiece { Renderer = visual.GetComponent<SpriteRenderer>(), Piece = piece });
+				r_LivePieces.Add(renderer);
+				pieces.Add(new BurstPiece { Renderer = renderer, Piece = piece });
 			}
 
 			return pieces;
+		}
+
+		/// <summary>
+		/// Returns one piece, once. A piece already given back is not in the set, so a burst
+		/// cut short by <see cref="OnDisable"/> and then swept up cannot release it twice.
+		/// </summary>
+		private void releasePiece(SpriteRenderer i_Piece)
+		{
+			if (!r_LivePieces.Remove(i_Piece))
+			{
+				return;
+			}
+
+			m_BurstPool.Release(i_Piece);
 		}
 
 		/// <summary>
@@ -249,19 +284,36 @@ namespace BomberBird.Pods
 			Destroy(pod);
 		}
 
+		/// <summary>
+		/// Clears what is on screen. The burst pieces go back to the pool rather than to the
+		/// garbage collector, so a disable inside a stage leaves the pool whole and a burst
+		/// cut short mid-flight is swept up; only the pods, which are not pooled, are
+		/// destroyed.
+		///
+		/// It does not carry across stages. Every stage and every retry is a fresh
+		/// <c>LoadScene</c> (<see cref="BomberBird.Flow.GameFlow.StartStage"/>), so the pool
+		/// dies with the scene and the next one prewarms from nothing.
+		/// </summary>
 		private void clearVisuals()
 		{
+			if (m_BurstPool != null)
+			{
+				// Copied, because releasing walks the set it is iterating.
+				SpriteRenderer[] stranded = new SpriteRenderer[r_LivePieces.Count];
+				r_LivePieces.CopyTo(stranded);
+
+				for (int i = 0; i < stranded.Length; ++i)
+				{
+					releasePiece(stranded[i]);
+				}
+			}
+
+			foreach (GameObject pod in r_PodVisuals.Values)
+			{
+				Destroy(pod);
+			}
+
 			r_PodVisuals.Clear();
-
-			if (m_Container == null)
-			{
-				return;
-			}
-
-			for (int i = m_Container.childCount - 1; i >= 0; --i)
-			{
-				Destroy(m_Container.GetChild(i).gameObject);
-			}
 		}
 
 		private bool hasRequiredReferences()

@@ -223,9 +223,10 @@ The exact class names and boundaries will be chosen while building the first ver
 ### Course Features
 
 1. **Coroutine:** handle pod fuse timing and short transitions because both are time-based sequences.
-2. **Object pool:** reuse the burst effect objects. Every detonation currently builds and
-   destroys a set of GameObjects, and chain reactions make that repeat in bursts, which is
-   the repeated-spawning case this was reserved for.
+2. **Object pool:** reuse the burst effect objects. Every detonation previously built and
+   destroyed a set of GameObjects, and chain reactions made that repeat in bursts, which is
+   the repeated-spawning case this was reserved for. Built: the burst pieces and the one-shot
+   stage effects are now drawn from a pool.
 3. **Events:** notify UI and audio about gameplay changes without coupling them directly to the player.
 4. **ScriptableObject or serialized configuration:** expose values that need playtesting without recompiling code.
 
