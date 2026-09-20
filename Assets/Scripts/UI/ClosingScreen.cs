@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using BomberBird.Flow;
+using BomberBird.Player;
 using TMPro;
 using UnityEngine;
 
@@ -18,12 +20,35 @@ namespace BomberBird.UI
 	/// </summary>
 	public class ClosingScreen : MonoBehaviour
 	{
+		/// <summary>
+		/// One card on the rescued panel and the bird it stands for. Paired rather than left as
+		/// two parallel arrays, because the pairing is the whole point and a list that slipped
+		/// by one would credit the player with the wrong bird.
+		/// </summary>
+		[System.Serializable]
+		private class RescuedCard
+		{
+			[Tooltip("The bird the card names. The run's roster is searched for it.")]
+			public BirdProfile Bird;
+
+			[Tooltip("The card itself, hidden when the bird was never rescued.")]
+			public RectTransform Card;
+		}
+
 		[Header("Panels, in the order they are shown")]
 		[Tooltip("The birds rescued across the campaign.")]
 		[SerializeField] private GameObject m_RescuedPanel;
 
 		[Tooltip("The factual card about the myna.")]
 		[SerializeField] private GameObject m_NotePanel;
+
+		[Header("The birds rescued")]
+		[Tooltip("Every card the panel can show. A bird the run never earned is hidden and "
+			+ "the cards left standing close the gap.")]
+		[SerializeField] private RescuedCard[] m_RescuedCards;
+
+		[Tooltip("Gap between the cards left standing. Matches the bird selection row.")]
+		[SerializeField] private float m_CardSpacing = 36f;
 
 		[Header("Prompt")]
 		[Tooltip("Hint that a press moves on. Hidden until the player has had a moment to read.")]
@@ -55,7 +80,65 @@ namespace BomberBird.UI
 
 		private void Start()
 		{
+			ShowRescued(GameFlow.Instance == null ? null : GameFlow.Instance.Roster);
 			show(m_RescuedPanel, m_NotePanel, m_RescuedHold);
+		}
+
+		/// <summary>
+		/// Leaves standing only the birds the run actually rescued, and closes the row up around
+		/// the gaps. Docs/GDD.md section 5.7 lists the birds the player saved, and the feathers
+		/// are optional - a card for a bird that was never freed is the screen claiming something
+		/// that did not happen.
+		///
+		/// A null roster shows every card. That is the scene opened on its own in the editor,
+		/// where the whole panel is what you want to see, and it is also why this takes the
+		/// roster rather than reading the singleton itself: the test can hand it one.
+		/// </summary>
+		public void ShowRescued(IList<BirdProfile> i_Rescued)
+		{
+			if (m_RescuedCards == null)
+			{
+				return;
+			}
+
+			List<RectTransform> standing = new List<RectTransform>();
+
+			for (int i = 0; i < m_RescuedCards.Length; ++i)
+			{
+				RescuedCard card = m_RescuedCards[i];
+
+				if (card == null || card.Card == null)
+				{
+					continue;
+				}
+
+				bool wasRescued = i_Rescued == null
+					|| (card.Bird != null && i_Rescued.Contains(card.Bird));
+
+				card.Card.gameObject.SetActive(wasRescued);
+
+				if (wasRescued)
+				{
+					standing.Add(card.Card);
+				}
+			}
+
+			if (standing.Count == 0)
+			{
+				return;
+			}
+
+			// The cards are the same width, so one step serves all of them. Their authored
+			// height is left alone: only the row needs recentring.
+			float step = standing[0].rect.width + m_CardSpacing;
+			float firstX = -step * (standing.Count - 1) * 0.5f;
+
+			for (int i = 0; i < standing.Count; ++i)
+			{
+				RectTransform card = standing[i];
+
+				card.anchoredPosition = new Vector2(firstX + step * i, card.anchoredPosition.y);
+			}
 		}
 
 		private void Update()

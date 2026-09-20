@@ -1679,6 +1679,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.ClosingScreen
   m_RescuedPanel: {fileID: 1484763132}
   m_NotePanel: {fileID: 1566415704}
+  m_RescuedCards:
+  - Bird: {fileID: 11400000, guid: c8039b8a2bc4c4fd4bb325bd11fb32c4, type: 2}
+    Card: {fileID: 480452760}
+  - Bird: {fileID: 11400000, guid: 19a4810925a0b461e88f4aa6b90ae12e, type: 2}
+    Card: {fileID: 294076992}
+  - Bird: {fileID: 11400000, guid: 855760986c2b84e54bfa7256d7f25806, type: 2}
+    Card: {fileID: 879139079}
+  - Bird: {fileID: 11400000, guid: b2b399ae04ee545fa85f0a12006dfc3e, type: 2}
+    Card: {fileID: 290721975}
+  m_CardSpacing: 36
   m_ContinueHint: {fileID: 1847894324}
   m_RescuedHold: 5
   m_NoteHold: 8
