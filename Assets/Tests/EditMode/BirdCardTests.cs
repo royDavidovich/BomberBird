@@ -64,8 +64,11 @@ namespace BomberBird.Tests
 			BirdCard card = makeCard(false, out Parts parts);
 
 			Assert.AreEqual("?", parts.Name.text);
-			Assert.AreEqual(string.Empty, parts.Stats.text,
-				"An empty stats line keeps the habitat on the same row as the neighbouring cards.");
+			Assert.AreEqual("-", parts.Speed.text,
+				"A locked card keeps its three rows and dashes the values, so the habitat "
+				+ "below lands on the same line as the neighbouring cards'.");
+			Assert.AreEqual("-", parts.Burst.text);
+			Assert.AreEqual("-", parts.Pods.text);
 			Assert.AreEqual("Lagoon Shore", parts.Habitat.text);
 			Assert.IsTrue(parts.Scrim.activeSelf);
 		}
@@ -76,7 +79,9 @@ namespace BomberBird.Tests
 			BirdCard card = makeCard(true, out Parts parts);
 
 			Assert.AreEqual("Test bird", parts.Name.text);
-			StringAssert.Contains("Speed", parts.Stats.text);
+			Assert.AreEqual(card.Bird.Speed.ToString(), parts.Speed.text);
+			Assert.AreEqual(card.Bird.BurstRange.ToString(), parts.Burst.text);
+			Assert.AreEqual(card.Bird.MaxActivePods.ToString(), parts.Pods.text);
 			Assert.IsFalse(parts.Scrim.activeSelf);
 		}
 
@@ -134,7 +139,9 @@ namespace BomberBird.Tests
 			public Button Button;
 			public Image Portrait;
 			public TMP_Text Name;
-			public TMP_Text Stats;
+			public TMP_Text Speed;
+			public TMP_Text Burst;
+			public TMP_Text Pods;
 			public TMP_Text Habitat;
 			public GameObject Bracket;
 			public GameObject Scrim;
@@ -154,7 +161,9 @@ namespace BomberBird.Tests
 				Button = host.AddComponent<Button>(),
 				Portrait = child<Image>(host, "Portrait"),
 				Name = child<TextMeshProUGUI>(host, "Name"),
-				Stats = child<TextMeshProUGUI>(host, "Stats"),
+				Speed = child<TextMeshProUGUI>(host, "SpeedValue"),
+				Burst = child<TextMeshProUGUI>(host, "BurstValue"),
+				Pods = child<TextMeshProUGUI>(host, "PodsValue"),
 				Habitat = child<TextMeshProUGUI>(host, "Habitat"),
 				Bracket = childObject(host, "Bracket"),
 				Scrim = childObject(host, "Scrim"),
@@ -165,7 +174,9 @@ namespace BomberBird.Tests
 			assign(card, "m_Button", o_Parts.Button);
 			assign(card, "m_Portrait", o_Parts.Portrait);
 			assign(card, "m_NameLabel", o_Parts.Name);
-			assign(card, "m_StatsLabel", o_Parts.Stats);
+			assign(card, "m_SpeedValue", o_Parts.Speed);
+			assign(card, "m_BurstValue", o_Parts.Burst);
+			assign(card, "m_PodsValue", o_Parts.Pods);
 			assign(card, "m_HabitatLabel", o_Parts.Habitat);
 			assign(card, "m_FocusBracket", o_Parts.Bracket);
 			assign(card, "m_LockedScrim", o_Parts.Scrim);

@@ -28,7 +28,12 @@ namespace BomberBird.UI
 		[Header("Parts")]
 		[SerializeField] private Image m_Portrait;
 		[SerializeField] private TMP_Text m_NameLabel;
-		[SerializeField] private TMP_Text m_StatsLabel;
+		[Tooltip("The three values, one per row, with the number on the right. Stacked rather "
+			+ "than run together on one line so two birds can be compared by reading straight "
+			+ "across the row.")]
+		[SerializeField] private TMP_Text m_SpeedValue;
+		[SerializeField] private TMP_Text m_BurstValue;
+		[SerializeField] private TMP_Text m_PodsValue;
 		[SerializeField] private TMP_Text m_HabitatLabel;
 		[SerializeField] private Button m_Button;
 
@@ -60,6 +65,13 @@ namespace BomberBird.UI
 		/// </summary>
 		public event Action<BirdCard> Pressed;
 
+		/// <summary>
+		/// Raised when this card takes the focus, so the screen can sound the move. The card
+		/// does not play it itself: the screen is the one that knows the difference between
+		/// the player walking onto a card and the screen opening on one.
+		/// </summary>
+		public event Action<BirdCard> Focused;
+
 		public BirdProfile Bird
 		{
 			get { return m_Bird; }
@@ -87,12 +99,12 @@ namespace BomberBird.UI
 				m_NameLabel.text = i_IsUnlocked ? m_Bird.DisplayName : "?";
 			}
 
-			if (m_StatsLabel != null)
-			{
-				// A locked card keeps an empty stats line rather than dropping it, so the
-				// habitat below lands on the same row as its neighbours'.
-				m_StatsLabel.text = i_IsUnlocked ? describeValues() : string.Empty;
-			}
+			// A locked card keeps its three rows and shows a dash in each, so the habitat below
+			// lands on the same line as its neighbours' and the card still reads as a bird with
+			// values waiting rather than a card with a hole in it.
+			setValue(m_SpeedValue, i_IsUnlocked ? m_Bird.Speed.ToString() : "-");
+			setValue(m_BurstValue, i_IsUnlocked ? m_Bird.BurstRange.ToString() : "-");
+			setValue(m_PodsValue, i_IsUnlocked ? m_Bird.MaxActivePods.ToString() : "-");
 
 			if (m_HabitatLabel != null)
 			{
@@ -122,6 +134,11 @@ namespace BomberBird.UI
 		{
 			m_IsSelected = true;
 			refreshFocus();
+
+			if (Focused != null)
+			{
+				Focused(this);
+			}
 		}
 
 		public void OnDeselect(BaseEventData i_EventData)
@@ -195,12 +212,12 @@ namespace BomberBird.UI
 			return i_Bird.Sprites == null ? null : i_Bird.Sprites.GetIdle(eFacing.Down);
 		}
 
-		/// <summary>The three values Docs/GDD.md says set the birds apart.</summary>
-		private string describeValues()
+		private static void setValue(TMP_Text i_Label, string i_Value)
 		{
-			return "Speed " + m_Bird.Speed
-				+ "   Burst " + m_Bird.BurstRange
-				+ "   Pods " + m_Bird.MaxActivePods;
+			if (i_Label != null)
+			{
+				i_Label.text = i_Value;
+			}
 		}
 
 		private void onPressed()

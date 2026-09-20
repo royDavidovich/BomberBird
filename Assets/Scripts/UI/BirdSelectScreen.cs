@@ -38,11 +38,18 @@ namespace BomberBird.UI
 		[SerializeField] private float m_CardSpacing = 36f;
 
 		[Header("Sound")]
-		[Tooltip("The bird is chosen and the stage begins.")]
+		[Tooltip("The focus moves onto another bird. Short: it is heard on every step along "
+			+ "the row, so anything with a tail on it turns a quick walk into a smear.")]
+		[SerializeField] private AudioClip m_Move;
+
+		[Tooltip("The bird is chosen and the stage begins. Deliberately not the menu's Play "
+			+ "sound: choosing a bird is a different act from starting the game.")]
 		[SerializeField] private AudioClip m_Confirm;
 
 		[Tooltip("A bird that has not been earned yet is pressed.")]
 		[SerializeField] private AudioClip m_Denied;
+
+		private bool m_IsOpening;
 
 		private void Start()
 		{
@@ -54,7 +61,15 @@ namespace BomberBird.UI
 
 			if (m_StageLabel != null && GameFlow.Instance != null)
 			{
-				m_StageLabel.text = "Stage " + GameFlow.Instance.StageNumber;
+				// The habitat as well as the number: the cards name the habitats that award
+				// the locked birds, so the player is reading habitat names here anyway, and
+				// the one they are about to fly into should be the plainest of them.
+				Campaign.Stage stage = GameFlow.Instance.CurrentStage;
+				string habitat = stage == null ? null : stage.HabitatName;
+
+				m_StageLabel.text = string.IsNullOrEmpty(habitat)
+					? "Stage " + GameFlow.Instance.StageNumber
+					: "Stage " + GameFlow.Instance.StageNumber + " - " + habitat;
 			}
 
 			buildCards();
@@ -121,6 +136,7 @@ namespace BomberBird.UI
 				card.name = "Card " + entry.Bird.name;
 				place(card, firstX + step * i);
 				card.Pressed += Choose;
+				card.Focused += cardFocused;
 				card.Show(entry, unlocked);
 
 				// Open on the bird already being flown, falling back to the first playable one,
@@ -136,8 +152,23 @@ namespace BomberBird.UI
 			// back on, an unfocused screen would not merely look odd, it would be a dead end.
 			if (opensOn != null && EventSystem.current != null)
 			{
+				// Silent: the screen arriving on a card is not the player moving onto one, and
+				// a sound here would play over the load rather than answer a keypress. The
+				// event is raised inside this call, which is why the flag wraps it.
+				m_IsOpening = true;
 				EventSystem.current.SetSelectedGameObject(opensOn.gameObject);
+				m_IsOpening = false;
 			}
+		}
+
+		private void cardFocused(BirdCard i_Card)
+		{
+			if (m_IsOpening)
+			{
+				return;
+			}
+
+			UiSound.Play(m_Move);
 		}
 
 		/// <summary>
