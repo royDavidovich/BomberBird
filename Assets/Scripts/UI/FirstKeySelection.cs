@@ -28,6 +28,11 @@ namespace BomberBird.UI
 			+ "whose first button changes arms this at runtime instead.")]
 		[SerializeField] private GameObject m_FirstSelected;
 
+		[Tooltip("A panel that owns the keyboard while it is up. Optional - only the main menu "
+			+ "has one. The same standing-down PauseController and StageReady already do for "
+			+ "the rules panel.")]
+		[SerializeField] private DifficultyPanel m_Difficulty;
+
 		private bool m_HasSeenIdle;
 
 		/// <summary>
@@ -56,6 +61,14 @@ namespace BomberBird.UI
 			{
 				// Whatever was being held when this screen opened has to be let go of first.
 				m_HasSeenIdle = !Input.anyKey;
+				return;
+			}
+
+			if (m_Difficulty != null && m_Difficulty.IsShown)
+			{
+				// The panel is up and reading the keyboard itself. Without this, the keystroke
+				// that closes it would land here as "the first key" and hand focus to Play,
+				// which is the same one-frame trap the rules panel already guards against.
 				return;
 			}
 

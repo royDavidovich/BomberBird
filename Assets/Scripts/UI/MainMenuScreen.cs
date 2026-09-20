@@ -1,5 +1,4 @@
 using BomberBird.Flow;
-using TMPro;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -14,10 +13,10 @@ namespace BomberBird.UI
 	/// </summary>
 	public class MainMenuScreen : MonoBehaviour
 	{
-		[Header("Mynas")]
-		[Tooltip("Reads the difficulty back to the player, so the button says what the game "
-			+ "will do rather than what pressing it does.")]
-		[SerializeField] private TMP_Text m_MynasLabel;
+		[Header("Difficulty")]
+		[Tooltip("The panel the Difficulty button opens. The setting is read and changed there, "
+			+ "so the button only has to name what it opens.")]
+		[SerializeField] private DifficultyPanel m_Difficulty;
 
 		[Header("Sound")]
 		[Tooltip("Play is pressed and the run begins. The same clip the selection screen "
@@ -38,24 +37,19 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// Wired to the mynas button. Flips the difficulty for every stage from here on and
-		/// says so on the button.
-		///
-		/// It is offered on the menu rather than mid-stage because it changes how a myna is
-		/// spawned, and a stage already under way keeps the mynas it was given.
+		/// Wired to the Difficulty button. Opens the choice rather than making it: the button
+		/// used to flip the setting and report it, which meant a player had to press it to find
+		/// out what else was on offer.
 		/// </summary>
-		public void ToggleMynas()
+		public void ShowDifficulty()
 		{
-			if (GameFlow.Instance == null)
+			if (m_Difficulty == null)
 			{
-				Debug.LogError(name + ": no GameFlow, so there is no run to set the mynas for.", this);
+				Debug.LogError(name + ": no difficulty panel wired, so the button opens nothing.", this);
 				return;
 			}
 
-			UiSound.Play(m_Confirm);
-			GameFlow.Instance.EasyMynas = !GameFlow.Instance.EasyMynas;
-
-			showMynas();
+			m_Difficulty.Show();
 		}
 
 		/// <summary>
@@ -65,25 +59,6 @@ namespace BomberBird.UI
 		public void Quit()
 		{
 			Application.Quit();
-		}
-
-		private void Start()
-		{
-			// The setting is remembered between sittings, so the menu opens showing whichever
-			// way the player left it rather than the authored default.
-			showMynas();
-		}
-
-		private void showMynas()
-		{
-			if (m_MynasLabel == null)
-			{
-				return;
-			}
-
-			bool isEasy = GameFlow.Instance != null && GameFlow.Instance.EasyMynas;
-
-			m_MynasLabel.text = isEasy ? "Mynas: easy" : "Mynas: normal";
 		}
 	}
 }
