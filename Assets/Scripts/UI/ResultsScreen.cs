@@ -94,10 +94,23 @@ namespace BomberBird.UI
 			+ "stage keeps the arena it just won showing through the scrim.")]
 		[SerializeField] private GameObject m_GameOverBackdrop;
 		[SerializeField] private TMP_Text m_GameOverStage;
+
+		[Tooltip("The taunt under the stage line. One of the lines below, drawn at random.")]
+		[SerializeField] private TMP_Text m_GameOverTaunt;
+
+		[Tooltip("The bank the taunt is drawn from. Written here rather than in code so a line "
+			+ "can be added, cut or reworded without a recompile. Empty hides the label.")]
+		[SerializeField] private string[] m_GameOverTaunts;
 		[SerializeField] private GameObject m_GameOverFirstSelected;
 
 		private bool m_IsShowing;
 		private bool m_IsSubscribed;
+
+		/// <summary>
+		/// The taunt the previous game over showed, so the next one can avoid repeating it. A
+		/// short bank repeats often enough for the card to look broken rather than random.
+		/// </summary>
+		private int m_LastTauntIndex = -1;
 
 		private void OnEnable()
 		{
@@ -350,6 +363,39 @@ namespace BomberBird.UI
 			setText(m_GameOverStage, flow == null
 				? string.Empty
 				: "Stage " + flow.StageNumber + " beat you");
+
+			showTaunt();
+		}
+
+		/// <summary>
+		/// Picks a line from the bank, never the one the last game over showed. With two lines
+		/// that is strict alternation, which is the most a bank that size can offer.
+		/// </summary>
+		private void showTaunt()
+		{
+			if (m_GameOverTaunt == null)
+			{
+				return;
+			}
+
+			bool hasTaunts = m_GameOverTaunts != null && m_GameOverTaunts.Length > 0;
+			m_GameOverTaunt.gameObject.SetActive(hasTaunts);
+
+			if (!hasTaunts)
+			{
+				return;
+			}
+
+			int index = Random.Range(0, m_GameOverTaunts.Length);
+
+			// One step on, rather than a reroll loop: with a bank of one it would never end.
+			if (index == m_LastTauntIndex && m_GameOverTaunts.Length > 1)
+			{
+				index = (index + 1) % m_GameOverTaunts.Length;
+			}
+
+			m_LastTauntIndex = index;
+			m_GameOverTaunt.text = m_GameOverTaunts[index];
 		}
 
 		private void setBird(BirdProfile i_Bird)
