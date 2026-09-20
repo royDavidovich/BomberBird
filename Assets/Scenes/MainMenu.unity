@@ -607,6 +607,8 @@ MonoBehaviour:
   m_OtherName: {r: 0.16862746, g: 0.11764706, b: 0.078431375, a: 1}
   m_CloseKeys: 1b0000000d0000000f01000020000000
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
+  m_Move: {fileID: 8300000, guid: 0250ac97dc9f94fd08b3ceeeb1d54f62, type: 3}
+  m_MoveVolume: 0.6
 --- !u!114 &659733011
 MonoBehaviour:
   m_ObjectHideFlags: 0
