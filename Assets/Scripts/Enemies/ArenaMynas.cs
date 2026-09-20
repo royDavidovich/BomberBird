@@ -351,8 +351,13 @@ namespace BomberBird.Enemies
 			// cells its neighbours have already claimed this frame. A myna is never its own
 			// neighbour, so it cannot block itself. Held as a field because the boss summons
 			// more mynas long after this runs.
+			// HasPodAt, not IsBlocking. IsBlocking exists for the bird: a pod it just placed
+			// stays passable until it has stepped off, or it would wall itself in. A myna
+			// placed nothing and gets no such grace, so a pod stops it from the moment it
+			// lands. A myna already walking into that cell still finishes the step - the
+			// choice is only made on arrival - and then cannot come back.
 			m_AlsoBlocked =
-				cell => (m_Field != null && m_Field.IsBlocking(cell)) || isClaimedByAMyna(cell);
+				cell => (m_Field != null && m_Field.HasPodAt(cell)) || isClaimedByAMyna(cell);
 
 			IList<Vector2Int> cells = m_Arena.Layout.MynaSpawnCells;
 
