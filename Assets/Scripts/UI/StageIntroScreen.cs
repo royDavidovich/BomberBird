@@ -37,6 +37,11 @@ namespace BomberBird.UI
 
 		[Header("Text")]
 		[SerializeField] private TMP_Text m_StageLabel;
+
+		[Tooltip("The word over the habitat's name on the first stage only, so the player "
+			+ "knows the gentlest arena in the campaign is meant as one.")]
+		[SerializeField] private GameObject m_IntroTag;
+
 		[SerializeField] private TMP_Text m_HabitatName;
 		[SerializeField] private TMP_Text m_BirdLine;
 		[SerializeField] private TMP_Text m_Blurb;
@@ -113,9 +118,16 @@ namespace BomberBird.UI
 				return;
 			}
 
-			setText(m_StageLabel, "STAGE " + (GameFlow.Instance == null
+			int stageNumber = GameFlow.Instance == null
 				? RunState.k_FirstStage
-				: GameFlow.Instance.StageNumber));
+				: GameFlow.Instance.StageNumber;
+
+			setText(m_StageLabel, "STAGE " + stageNumber);
+
+			if (m_IntroTag != null)
+			{
+				m_IntroTag.SetActive(stageNumber == RunState.k_FirstStage);
+			}
 
 			setText(m_HabitatName, i_Stage.HabitatName);
 			setText(m_BirdLine, i_Stage.BirdLine);
