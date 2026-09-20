@@ -16,9 +16,9 @@ MonoBehaviour:
   - m_HabitatName: First Steps Garden
     m_Layout: {fileID: 11400000, guid: ad78887da97f941a4a5617a1d8b023cd, type: 2}
     m_TileSet: {fileID: 11400000, guid: d2b69b68d229c44ddbb6c383f04b4b30, type: 2}
-    m_HabitatHero: {fileID: 0}
+    m_HabitatHero: {fileID: 21300000, guid: 51f51ce3182bc4ff9835b62dc302fed9, type: 3}
     m_HabitatBlurb: A walled garden let go soft at the edges. The hoopoe works the
-      path for grubs at dusk, and the mynas have found the fig tree.
+      path for grubs at dusk, and the mynas have found the pomegranate.
     m_BirdLine: home of the Eurasian hoopoe
     m_AwardedBird: {fileID: 0}
   - m_HabitatName: Orchard Grove
