@@ -221,5 +221,70 @@ namespace BomberBird.Tests
 
 			Assert.IsFalse(run.HasBirdChoice, "the earned bird went back with the roster");
 		}
+
+		/// <summary>
+		/// The reason RestoreLives exists. Running out on stage five must cost the lives and
+		/// nothing else - not the stage reached, and not the birds earned getting there.
+		/// </summary>
+		[Test]
+		public void RestoringLivesKeepsTheStageAndTheRoster()
+		{
+			RunState run = makeRun();
+			BirdProfile earned = makeBird("earned");
+
+			run.AdvanceStage();
+			run.AdvanceStage();
+			run.UnlockBird(earned);
+			run.SelectBird(earned);
+			run.AddStageTotals(7, 9, 42f);
+
+			while (!run.LoseLife())
+			{
+			}
+
+			run.RestoreLives();
+
+			Assert.AreEqual(k_StartingLives, run.Lives, "the lives should come back");
+			Assert.IsFalse(run.IsOver);
+			Assert.AreEqual(3, run.StageNumber, "the stage reached must survive");
+			Assert.AreEqual(2, run.Roster.Count, "the earned bird must survive");
+			Assert.AreSame(earned, run.SelectedBird, "the chosen bird must survive");
+			Assert.AreEqual(7, run.TotalMynasDefeated, "campaign totals must survive");
+		}
+
+		/// <summary>
+		/// The other half of that: Restart still wipes everything, so the two never get
+		/// quietly conflated.
+		/// </summary>
+		[Test]
+		public void RestartStillWipesTheRun()
+		{
+			RunState run = makeRun();
+
+			run.AdvanceStage();
+			run.UnlockBird(makeBird("earned"));
+			run.AddStageTotals(7, 9, 42f);
+
+			run.Restart();
+
+			Assert.AreEqual(RunState.k_FirstStage, run.StageNumber);
+			Assert.AreEqual(1, run.Roster.Count, "only the starter should be left");
+			Assert.AreEqual(0, run.TotalMynasDefeated);
+			Assert.AreEqual(0, run.TotalPodsPlaced);
+			Assert.AreEqual(0f, run.TotalSeconds);
+		}
+
+		[Test]
+		public void CampaignTotalsAccumulateAcrossStages()
+		{
+			RunState run = makeRun();
+
+			run.AddStageTotals(4, 6, 30.5f);
+			run.AddStageTotals(3, 2, 19.5f);
+
+			Assert.AreEqual(7, run.TotalMynasDefeated);
+			Assert.AreEqual(8, run.TotalPodsPlaced);
+			Assert.AreEqual(50f, run.TotalSeconds, 0.001f);
+		}
 	}
 }

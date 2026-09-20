@@ -354,6 +354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 659733008}
   - component: {fileID: 659733007}
+  - component: {fileID: 659733009}
   m_Layer: 0
   m_Name: MainMenuScreen
   m_TagString: Untagged
@@ -374,7 +375,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.MainMenuScreen
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
-  m_FirstSelected: {fileID: 1192743229}
 --- !u!4 &659733008
 Transform:
   m_ObjectHideFlags: 0
@@ -390,6 +390,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &659733009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659733006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dac2bf37183d42cb9b40988425e4f56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.FirstKeySelection
+  m_FirstSelected: {fileID: 1192743229}
 --- !u!1 &738608080
 GameObject:
   m_ObjectHideFlags: 0

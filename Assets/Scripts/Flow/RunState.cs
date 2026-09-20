@@ -26,6 +26,9 @@ namespace BomberBird.Flow
 		private int m_Lives;
 		private int m_StageNumber;
 		private BirdProfile m_SelectedBird;
+		private int m_TotalMynasDefeated;
+		private int m_TotalPodsPlaced;
+		private float m_TotalSeconds;
 
 		/// <summary>Lives still in hand. Zero means the run is over.</summary>
 		public int Lives
@@ -37,6 +40,24 @@ namespace BomberBird.Flow
 		public int StageNumber
 		{
 			get { return m_StageNumber; }
+		}
+
+		/// <summary>Mynas defeated across every stage advanced past this run.</summary>
+		public int TotalMynasDefeated
+		{
+			get { return m_TotalMynasDefeated; }
+		}
+
+		/// <summary>Pods placed across every stage advanced past this run.</summary>
+		public int TotalPodsPlaced
+		{
+			get { return m_TotalPodsPlaced; }
+		}
+
+		/// <summary>Seconds played across every stage advanced past this run.</summary>
+		public float TotalSeconds
+		{
+			get { return m_TotalSeconds; }
 		}
 
 		public bool IsOver
@@ -83,6 +104,9 @@ namespace BomberBird.Flow
 		{
 			m_Lives = r_StartingLives;
 			m_StageNumber = k_FirstStage;
+			m_TotalMynasDefeated = 0;
+			m_TotalPodsPlaced = 0;
+			m_TotalSeconds = 0f;
 
 			r_Roster.Clear();
 
@@ -144,6 +168,33 @@ namespace BomberBird.Flow
 		public void AdvanceStage()
 		{
 			++m_StageNumber;
+		}
+
+		/// <summary>
+		/// Refills the lives and changes nothing else.
+		///
+		/// Deliberately not <see cref="Restart"/>. Losing the last life costs the lives and
+		/// only the lives: the stage reached, the birds earned and the campaign totals all
+		/// survive, so a player who runs out on stage five is offered that stage again rather
+		/// than the whole campaign from the beginning. Six stages have to be completable in
+		/// one sitting.
+		/// </summary>
+		public void RestoreLives()
+		{
+			m_Lives = r_StartingLives;
+		}
+
+		/// <summary>
+		/// Folds one finished stage into the campaign totals the closing results show.
+		///
+		/// Called when a stage is advanced past, never when its results are merely shown, so
+		/// replaying a stage cannot count it twice.
+		/// </summary>
+		public void AddStageTotals(int i_MynasDefeated, int i_PodsPlaced, float i_Seconds)
+		{
+			m_TotalMynasDefeated += i_MynasDefeated;
+			m_TotalPodsPlaced += i_PodsPlaced;
+			m_TotalSeconds += i_Seconds;
 		}
 	}
 }

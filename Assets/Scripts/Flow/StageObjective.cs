@@ -53,6 +53,20 @@ namespace BomberBird.Flow
 		/// </summary>
 		public event Action<Vector2Int> FeatherCollected;
 
+		/// <summary>
+		/// The bird whose feather was actually picked up this stage, or null if none was.
+		///
+		/// The results screen cannot ask <see cref="GameFlow.AwardedBird"/> for this: the
+		/// feather joins the roster the moment it is collected, well before the gate is
+		/// reached, and that property reports null for a bird already held. Asking it would
+		/// hide the feather on the very stage that earned it. This reads what happened rather
+		/// than what is owed, and m_AwardedBird is cached in Start, so it survives the unlock.
+		/// </summary>
+		public BirdProfile CollectedBird
+		{
+			get { return m_IsFeatherCollected ? m_AwardedBird : null; }
+		}
+
 		/// <summary>Whether the bird may leave through the gate.</summary>
 		public bool IsExitOpen
 		{
