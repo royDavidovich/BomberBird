@@ -193,6 +193,31 @@ namespace BomberBird.Flow
 			m_Music.Play();
 		}
 
+		/// <summary>
+		/// Holds the music where it is, for the pause overlay.
+		///
+		/// The clock stopping does not quiet it: the source runs on its own time, so a paused
+		/// game used to sit under a loop that carried on as though nothing had happened. It
+		/// pauses rather than stops, so resuming picks the bar back up instead of restarting
+		/// the track.
+		/// </summary>
+		public void SetMusicPaused(bool i_IsPaused)
+		{
+			if (m_Music == null)
+			{
+				return;
+			}
+
+			if (i_IsPaused)
+			{
+				m_Music.Pause();
+			}
+			else
+			{
+				m_Music.UnPause();
+			}
+		}
+
 		private void OnDestroy()
 		{
 			if (s_Instance == this)
