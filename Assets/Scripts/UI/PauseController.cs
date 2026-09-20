@@ -16,6 +16,12 @@ namespace BomberBird.UI
 		[Header("Overlay")]
 		[SerializeField] private GameObject m_Overlay;
 
+		[Tooltip("The rules panel, opened by the overlay's Help button. It draws over this "
+			+ "overlay and owns the keyboard while it is up, so Escape is left alone until "
+			+ "it closes - otherwise the keystroke that dismisses the rules would also "
+			+ "unpause the game behind them.")]
+		[SerializeField] private InstructionsPanel m_Instructions;
+
 		[Header("Input to suspend")]
 		[SerializeField] private BirdMovement m_Movement;
 		[SerializeField] private BirdPodPlacer m_Placer;
@@ -55,6 +61,13 @@ namespace BomberBird.UI
 
 		private void Update()
 		{
+			// The rules panel draws over this overlay and takes any key to close. Reading
+			// Escape here as well would close the rules and unpause in the same frame.
+			if (m_Instructions != null && m_Instructions.IsShown)
+			{
+				return;
+			}
+
 			// Input belongs in Update, and Update still runs while the clock is stopped.
 			if (Input.GetKeyDown(KeyCode.Escape))
 			{
@@ -68,6 +81,19 @@ namespace BomberBird.UI
 			if (!i_HasFocus && !m_IsPaused)
 			{
 				setPaused(true);
+			}
+		}
+
+		/// <summary>
+		/// Wired to the overlay's Help button. The rules open over the paused overlay rather
+		/// than in place of it, so closing them leaves the player back in the menu they asked
+		/// from, with nothing to restore.
+		/// </summary>
+		public void ShowInstructions()
+		{
+			if (m_Instructions != null)
+			{
+				m_Instructions.Show();
 			}
 		}
 

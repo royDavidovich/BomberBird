@@ -30,6 +30,24 @@ namespace BomberBird.Flow
 			[Tooltip("The habitat this stage is drawn with. Two stages may share one set.")]
 			[SerializeField] private ArenaTileSet m_TileSet;
 
+			[Header("The habitat screen")]
+			[Tooltip("The full-bleed art behind the habitat screen. Leave empty until the "
+				+ "habitat's hero is drawn: the screen falls back to this stage's own floor "
+				+ "tile rather than showing nothing.")]
+			[SerializeField] private Sprite m_HabitatHero;
+
+			[Tooltip("Two lines on what this habitat is. Read once, before the stage, so it "
+				+ "says what the place is rather than how to play it.")]
+			[TextArea(2, 4)]
+			[SerializeField] private string m_HabitatBlurb;
+
+			[Tooltip("The whole sentence naming the bird this habitat belongs to, such as "
+				+ "\"home of the Eurasian hoopoe\". Authored rather than built from the "
+				+ "awarded bird, because two stages belong to the hoopoe while awarding "
+				+ "nothing, and the courtyard belongs to the myna, which has no profile at "
+				+ "all and is not a home but a taking.")]
+			[SerializeField] private string m_BirdLine;
+
 			[Tooltip("The bird this stage's feather unlocks. Leave empty for the intro and "
 				+ "the boss, which award none and open their exit as soon as the arena is clear.")]
 			[SerializeField] private BirdProfile m_AwardedBird;
@@ -53,6 +71,24 @@ namespace BomberBird.Flow
 			public BirdProfile AwardedBird
 			{
 				get { return m_AwardedBird; }
+			}
+
+			/// <summary>The habitat screen's art, or null while it is still to be drawn.</summary>
+			public Sprite HabitatHero
+			{
+				get { return m_HabitatHero; }
+			}
+
+			/// <summary>Two lines on what this habitat is.</summary>
+			public string HabitatBlurb
+			{
+				get { return m_HabitatBlurb; }
+			}
+
+			/// <summary>The sentence naming the bird this habitat belongs to.</summary>
+			public string BirdLine
+			{
+				get { return m_BirdLine; }
 			}
 		}
 
@@ -177,6 +213,19 @@ namespace BomberBird.Flow
 				{
 					problems += " stage " + (i + 1) + " has no tile set;";
 				}
+				else if (string.IsNullOrEmpty(m_Stages[i].HabitatBlurb))
+				{
+					problems += " stage " + (i + 1) + " has no habitat blurb;";
+				}
+				else if (string.IsNullOrEmpty(m_Stages[i].BirdLine))
+				{
+					problems += " stage " + (i + 1) + " has no bird line;";
+				}
+
+				// HabitatHero is deliberately not checked. The six habitat heroes are
+				// commissioned art that lands after this ships, and the habitat screen
+				// already falls back to the stage's floor tile, so a missing one is a
+				// stage that looks plainer rather than a stage that is broken.
 			}
 
 			return problems.Length == 0 ? null : problems.Trim();

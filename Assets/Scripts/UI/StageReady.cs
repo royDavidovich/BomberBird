@@ -34,6 +34,10 @@ namespace BomberBird.UI
 			+ "Read here to know when the hold is the pause's rather than this one's.")]
 		[SerializeField] private PauseController m_Pause;
 
+		[Tooltip("The rules panel, shown over the held stage on the way into the intro. It "
+			+ "takes any key to close, so the stage must not also take that key and start.")]
+		[SerializeField] private InstructionsPanel m_Instructions;
+
 		[Tooltip("Stopped by hand: a frozen clock halts movement, but pod placing reads input "
 			+ "in Update and would keep working.")]
 		[SerializeField] private BirdMovement m_Movement;
@@ -68,6 +72,16 @@ namespace BomberBird.UI
 
 			if (!m_IsWaiting)
 			{
+				return;
+			}
+
+			if (m_Instructions != null && m_Instructions.IsShown)
+			{
+				// The rules are up over the held arena. They close on any key, and Space is
+				// a key, so a player dismissing them would otherwise start the stage in the
+				// same keystroke - which is exactly the beat this hold exists to give them.
+				// The clock is still held below, so nothing moves behind the panel.
+				holdClock();
 				return;
 			}
 

@@ -27,6 +27,7 @@ namespace BomberBird.Flow
 		// index, and an index load would silently start sending the player somewhere else.
 		public const string k_MainMenuScene = "MainMenu";
 		public const string k_BirdSelectScene = "BirdSelect";
+		public const string k_StageIntroScene = "StageIntro";
 		public const string k_GameplayScene = "Gameplay";
 		public const string k_ClosingScene = "Closing";
 
@@ -242,8 +243,9 @@ namespace BomberBird.Flow
 		{
 			if (!m_Run.LoseLife())
 			{
-				// A death replays the stage with the same bird - never back to selection.
-				StartStage();
+				// A death replays the stage with the same bird - never back to selection,
+				// and never back through the habitat screen.
+				ReplayStage();
 				return;
 			}
 
@@ -254,7 +256,8 @@ namespace BomberBird.Flow
 			}
 
 			// No screen in the scene. Fall back to the old behaviour rather than stranding
-			// the player on a dead arena.
+			// the player on a dead arena. A restarted run is arriving at stage 1 rather
+			// than replaying it, so this one does go through the habitat screen.
 			m_Run.Restart();
 			StartStage();
 		}
@@ -318,7 +321,9 @@ namespace BomberBird.Flow
 		{
 			m_Run.RestoreLives();
 
-			StartStage();
+			// A replay, not an arrival: this is the stage they just lost on, and they have
+			// read its habitat card already.
+			ReplayStage();
 		}
 
 		/// <summary>Reports the outcome, and says whether anyone was listening.</summary>
@@ -343,6 +348,16 @@ namespace BomberBird.Flow
 		public bool UnlockBird(BirdProfile i_Bird)
 		{
 			return m_Run != null && m_Run.UnlockBird(i_Bird);
+		}
+
+		/// <summary>
+		/// Whether the instructions still owe the player a showing this run, claiming that
+		/// showing if so. Asked by the panel in the arena as the intro stage opens; a death
+		/// there gets false and plays straight on.
+		/// </summary>
+		public bool ClaimInstructionsShowing()
+		{
+			return m_Run != null && m_Run.MarkInstructionsSeen();
 		}
 
 		/// <summary>Chooses the bird to play, for the selection screen.</summary>
@@ -389,24 +404,56 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
-		/// Plays the stage the run is on. What Play calls, and what Continue calls.
+		/// Arrives at the stage the run is on, by way of its habitat screen. What Play
+		/// calls, what the selection screen calls, and what following one stage with the
+		/// next calls.
 		///
 		/// The intro is reached only from Play and every later stage only from
 		/// <see cref="CompleteStage"/>, which is what keeps the selection screen out of the
 		/// intro without a rule saying so.
+		///
+		/// Arriving and replaying are separate methods rather than one with a flag, because
+		/// the habitat card belongs to the first and not to the second and every caller
+		/// already knows which it means. A player on their fifth attempt at the upland does
+		/// not want to be told what an upland is: see <see cref="ReplayStage"/>.
 		/// </summary>
 		public void StartStage()
 		{
 			Time.timeScale = 1f;
 
-			SceneManager.LoadScene(k_GameplayScene);
+			SceneManager.LoadScene(k_StageIntroScene);
+		}
+
+		/// <summary>
+		/// Leaves the habitat screen and plays the stage it introduced. Called by nothing
+		/// else: every other route into the arena either arrives through
+		/// <see cref="StartStage"/> or is a replay.
+		/// </summary>
+		public void BeginStage()
+		{
+			loadArena();
+		}
+
+		/// <summary>
+		/// The same stage over again, with no habitat card in the way. A death, a Retry
+		/// after game over, and the pause overlay's Restart all mean this.
+		/// </summary>
+		public void ReplayStage()
+		{
+			loadArena();
 		}
 
 		/// <summary>Replays the stage without spending a life, for the pause overlay.</summary>
 		public void RestartStage()
 		{
-			// Same load as starting it: a retry is the stage over again, not a different one.
-			StartStage();
+			ReplayStage();
+		}
+
+		private void loadArena()
+		{
+			Time.timeScale = 1f;
+
+			SceneManager.LoadScene(k_GameplayScene);
 		}
 	}
 }
