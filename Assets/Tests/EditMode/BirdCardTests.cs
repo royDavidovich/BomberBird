@@ -6,6 +6,7 @@ using BomberBird.UI;
 using NUnit.Framework;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace BomberBird.Tests
@@ -96,19 +97,22 @@ namespace BomberBird.Tests
 			Assert.IsFalse(parts.Bracket.activeSelf);
 		}
 
+		/// <summary>
+		/// Selection is the only thing that lifts a card. Hover used to count as well, and the
+		/// screen could show two chosen birds at once: arrow onto one, leave the mouse resting
+		/// on another. Handling the pointer here is what caused that, so the card must not go
+		/// back to listening for it - clicking still works, through the selection a click makes.
+		/// </summary>
 		[Test]
-		public void PointerAndKeyboardHoldFocusIndependently()
+		public void DoesNotTakeFocusFromTheMouse()
 		{
-			// Hover the card, arrow-key onto it, then take the mouse away: one flag would drop
-			// the focus the keyboard is still holding.
 			BirdCard card = makeCard(true, out Parts parts);
 
-			card.OnPointerEnter(null);
-			card.OnSelect(null);
-			card.OnPointerExit(null);
+			Assert.IsFalse(card is IPointerEnterHandler, "a hovered card must not light up");
+			Assert.IsFalse(card is IPointerExitHandler, "a hovered card must not light up");
 
-			Assert.IsTrue(parts.Bracket.activeSelf,
-				"The keyboard still has this card, so it keeps its bracket.");
+			card.OnSelect(null);
+			Assert.IsTrue(parts.Bracket.activeSelf);
 
 			card.OnDeselect(null);
 			Assert.IsFalse(parts.Bracket.activeSelf);

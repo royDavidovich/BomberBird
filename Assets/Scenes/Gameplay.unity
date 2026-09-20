@@ -815,8 +815,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -70, y: 105}
-  m_SizeDelta: {x: 280, y: 56}
+  m_AnchoredPosition: {x: -97.5, y: 105}
+  m_SizeDelta: {x: 225, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &277221929
 MonoBehaviour:
@@ -1969,6 +1969,7 @@ RectTransform:
   - {fileID: 1090868680}
   - {fileID: 1748219140}
   - {fileID: 277221928}
+  - {fileID: 1239945236}
   m_Father: {fileID: 1945207488}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4382,7 +4383,7 @@ RectTransform:
   - {fileID: 1352041020}
   - {fileID: 102181643}
   - {fileID: 1944709928}
-  m_Father: {fileID: 1945207488}
+  m_Father: {fileID: 446891989}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -6060,8 +6061,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -70, y: 143}
-  m_SizeDelta: {x: 280, y: 30}
+  m_AnchoredPosition: {x: -97.5, y: 143}
+  m_SizeDelta: {x: 225, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1748219141
 MonoBehaviour:
@@ -6731,6 +6732,7 @@ MonoBehaviour:
   m_FeatherIcon: {fileID: 102181644}
   m_BirdBand: {fileID: 446891989}
   m_BandCentring: 160
+  m_BandLift: 20
   m_Breakdown: {fileID: 1945207488}
   m_BreakdownDrop: 52
   m_TotalsRow: {fileID: 1008526188}
@@ -7389,7 +7391,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 446891989}
-  - {fileID: 1239945236}
   - {fileID: 1466695412}
   - {fileID: 2091354252}
   - {fileID: 893082855}

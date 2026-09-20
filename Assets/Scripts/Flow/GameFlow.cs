@@ -36,6 +36,7 @@ namespace BomberBird.Flow
 
 		private RunState m_Run;
 		private bool m_EasyMynas;
+		private AudioSource m_Music;
 
 		/// <summary>
 		/// Raised when a stage ends, before anything is loaded, so a results screen can show
@@ -168,8 +169,28 @@ namespace BomberBird.Flow
 			}
 
 			m_EasyMynas = PlayerPrefs.GetInt(k_EasyMynasPref, 0) != 0;
+			m_Music = GetComponent<AudioSource>();
 
 			m_Run = new RunState(m_StartingLives, m_Campaign == null ? null : m_Campaign.StartingBird);
+		}
+
+		/// <summary>
+		/// Puts a track on the run's own music source, which outlives every scene load.
+		///
+		/// A scene asks for what it wants to hear through <see cref="BomberBird.UI.SceneMusic"/>
+		/// and this decides whether anything changes: asking for the track already playing is
+		/// ignored, so returning to the arena after a results card does not restart the loop
+		/// half way through.
+		/// </summary>
+		public void PlayMusic(AudioClip i_Clip)
+		{
+			if (m_Music == null || i_Clip == null || (m_Music.clip == i_Clip && m_Music.isPlaying))
+			{
+				return;
+			}
+
+			m_Music.clip = i_Clip;
+			m_Music.Play();
 		}
 
 		private void OnDestroy()

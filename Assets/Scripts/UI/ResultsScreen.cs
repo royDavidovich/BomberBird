@@ -66,6 +66,11 @@ namespace BomberBird.UI
 		[Tooltip("How far that band slides right to sit centred when there is no feather row.")]
 		[SerializeField] private float m_BandCentring = 160f;
 
+		[Tooltip("How far the band sits above its authored place on an ordinary clear. The "
+			+ "finale card gets none of it: that one keeps the whole breakdown high already, "
+			+ "so the portrait is a few pixels under the habitat line and has nowhere to go.")]
+		[SerializeField] private float m_BandLift = 20f;
+
 		[Tooltip("The bird band and the three tiles, moved as one. An ordinary clear has no "
 			+ "whole-game row under them, so the block drops to sit evenly between the habitat "
 			+ "and the buttons instead of hugging the habitat.")]
@@ -288,7 +293,7 @@ namespace BomberBird.UI
 			if (m_BirdBand != null)
 			{
 				m_BirdBand.anchoredPosition = new Vector2(
-					collected != null ? 0f : m_BandCentring, m_BirdBand.anchoredPosition.y);
+					collected != null ? 0f : m_BandCentring, isFinale ? 0f : m_BandLift);
 			}
 
 			if (collected != null)

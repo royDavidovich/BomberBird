@@ -103,7 +103,7 @@ The rule above holds regardless: a bird becomes playable by being discovered ins
 | Burst range | Area affected in each direction | Per bird | See the roster table below |
 | Active pod limit | Number of simultaneous placed pods | Per bird | See the roster table below |
 | Fuse duration | Time available to escape or prepare a chain | Shared | 2 seconds |
-| Starting lives | Attempts before the run ends | Shared | 3 |
+| Starting lives | Attempts before the run ends | Shared | 6 |
 | Enemy speed | Pressure inside the arena | Shared | To be tested |
 
 These values will be editable in the Unity Inspector or a configuration asset.

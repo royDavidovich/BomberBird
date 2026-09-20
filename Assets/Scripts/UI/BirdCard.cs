@@ -23,8 +23,7 @@ namespace BomberBird.UI
 	/// Presentation only. It reports that it was pressed and knows nothing about whether the
 	/// run will accept that.
 	/// </summary>
-	public class BirdCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
-		ISelectHandler, IDeselectHandler
+	public class BirdCard : MonoBehaviour, ISelectHandler, IDeselectHandler
 	{
 		[Header("Parts")]
 		[SerializeField] private Image m_Portrait;
@@ -53,7 +52,6 @@ namespace BomberBird.UI
 		private Vector2 m_RestingPosition;
 		private BirdProfile m_Bird;
 		private bool m_IsUnlocked;
-		private bool m_IsPointerInside;
 		private bool m_IsSelected;
 
 		/// <summary>
@@ -120,18 +118,6 @@ namespace BomberBird.UI
 			refreshFocus();
 		}
 
-		public void OnPointerEnter(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = true;
-			refreshFocus();
-		}
-
-		public void OnPointerExit(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = false;
-			refreshFocus();
-		}
-
 		public void OnSelect(BaseEventData i_EventData)
 		{
 			m_IsSelected = true;
@@ -146,16 +132,20 @@ namespace BomberBird.UI
 
 		private void OnDisable()
 		{
-			// A card hidden mid-hover never receives its exit, so it would come back lifted.
-			m_IsPointerInside = false;
+			// A card hidden while focused never receives its deselect, so it would come back
+			// lifted.
 			m_IsSelected = false;
 			refreshFocus();
 		}
 
 		/// <summary>
-		/// The pointer and the keyboard overlap rather than replace each other - hover one card,
-		/// arrow-key to another, then move the mouse away - so they are tracked apart and the
-		/// card answers to either. Same reasoning as <see cref="ButtonFocusArrow"/>.
+		/// Selection alone decides which card is lifted and bracketed, so exactly one card can
+		/// ever look chosen.
+		///
+		/// Hover used to count too, and two cards could be lit at once: arrow onto one, leave
+		/// the mouse resting on another, and the screen showed two answers to a question with
+		/// one answer. The mouse still works - clicking a card selects it, which lands here
+		/// through <see cref="OnSelect"/> - it simply no longer highlights on its own.
 		/// </summary>
 		private void refreshFocus()
 		{
@@ -172,7 +162,7 @@ namespace BomberBird.UI
 				}
 			}
 
-			bool hasFocus = m_IsPointerInside || m_IsSelected;
+			bool hasFocus = m_IsSelected;
 
 			if (m_FocusBracket != null)
 			{
