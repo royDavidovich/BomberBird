@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.16, 2026-09-20 |
+| Document version | v0.17, 2026-09-20 |
 
 ## 1. High Concept
 
@@ -104,7 +104,7 @@ The rule above holds regardless: a bird becomes playable by being discovered ins
 | Active pod limit | Number of simultaneous placed pods | Per bird | See the roster table below |
 | Fuse duration | Time available to escape or prepare a chain | Shared | 2 seconds |
 | Starting lives | Attempts before the run ends | Shared | 6 |
-| Enemy speed | Pressure inside the arena | Shared | To be tested |
+| Enemy speed | Pressure inside the arena | Shared | 2.0, halved by the menu's mynas toggle |
 
 These values will be editable in the Unity Inspector or a configuration asset.
 
@@ -194,7 +194,7 @@ All imported assets will be listed in `Docs/ASSET_CREDITS.md` before submission.
 
 ## 7. Technical Design
 
-**Scenes:** a menu scene and one reusable gameplay scene are the current starting point. This may be simplified if a single-scene structure proves clearer.
+**Scenes:** four. A menu scene, a bird selection scene, one reusable gameplay scene that every stage is loaded into, and a closing scene carrying both end cards. Selection is its own scene because the gameplay scene applies the chosen bird on load, so the choice has to be made before the arena exists.
 
 **Systems:** Unity 2D, the built-in Input Manager, grid-based level data, and inspector-editable tuning values.
 
@@ -236,14 +236,14 @@ Only features that improve the actual implementation will remain. The architectu
 
 ### 8.1 MVP
 
-- [ ] One complete loop from menu to playable stage, result, and retry.
-- [ ] Four-direction movement in a grid arena.
-- [ ] Timed pods, cross-shaped bursts, obstacles, and chain reactions.
-- [ ] At least one clear common myna enemy behavior.
-- [ ] A clear completion condition and exit.
-- [ ] Six handmade levels, each in its own habitat, ending in the common myna boss level.
-- [ ] Four playable birds unlocked in order by collecting a feather at the end of a level.
-- [ ] Essential UI, feedback, and working macOS and Windows builds, each smoke-tested on its own platform.
+- [x] One complete loop from menu to playable stage, result, and retry.
+- [x] Four-direction movement in a grid arena.
+- [x] Timed pods, cross-shaped bursts, obstacles, and chain reactions.
+- [x] At least one clear common myna enemy behavior.
+- [x] A clear completion condition and exit.
+- [x] Six handmade levels, each in its own habitat, ending in the common myna boss level.
+- [x] Four playable birds unlocked in order by collecting a feather at the end of a level.
+- [ ] Essential UI, feedback, and working macOS and Windows builds, each smoke-tested on its own platform. The UI and feedback are in; the last builds predate the results, game over and closing screens, so neither platform has been smoke-tested against the game as it stands.
 
 ### 8.2 Polish
 
@@ -285,3 +285,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.14 | 2026-09-18 | Stated the target platform as desktop Windows and macOS rather than Windows PC alone. The game is built and played on a Mac and had never run on the Windows target the document claimed, so macOS is now named as the primary test platform and a smoke-tested Windows build joined the MVP list. A lecturer email in September 2026 confirms that a PC/Mac desktop target is the expected baseline and that a mobile version is an additional commitment graded as a second full platform, including its own controls and screen-size adaptation, so mobile builds and touch controls stay out of scope by decision rather than by omission. |
 | v0.15 | 2026-09-19 | Gave the player a beat instead of throwing them back in. Losing the last life used to reset the whole campaign in silence - stage one, starter bird, every feather gone - so it now ends the attempt rather than the run: a GAME OVER card reports it and the player chooses between retrying the same stage with the roster intact and returning to the menu. Six stages have to be completable in one sitting, and a single bad stage five should not cost the five before it. Every stage also now ends on a results card naming what the stage cost, with campaign totals on the last one. And every stage, including a retry, starts frozen until the player presses something, so a death does not roll straight into the next attempt before their hands are back. |
 | v0.16 | 2026-09-20 | Gave the player a way to make the mynas readable. Play testing read the game as too hard, and the reason was not the speed alone: a myna picks a fresh direction at every junction, so one could turn into a corridor the player had already committed to and nothing about it could be planned for. The main menu now carries a mynas toggle: the easier flock walks at half the speed and carries straight on through most junctions, which makes a route around one something the player can read from across the arena. The ordinary game is untouched, and the choice is remembered between sittings. This answers the §8.2 polish line about a small choice of gameplay modifiers built from existing values - both halves are existing values, the myna speed and the walk's own junction choice. |
+| v0.17 | 2026-09-20 | No design change. Brought the document back in line with what is built, after an audit found it describing a project that no longer exists: the section 8.1 MVP list stood entirely unticked though seven of its eight lines had shipped, section 7 still named two scenes when there are four, and the enemy speed was still "to be tested" after the mynas toggle settled it. The one MVP line left unticked is the builds, which are real and out of date rather than absent. |
