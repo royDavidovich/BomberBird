@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using BomberBird.Player;
 using UnityEngine;
@@ -23,6 +24,24 @@ namespace BomberBird.Flow
 		[Tooltip("The campaign this run plays: the stages in order and the birds they award.")]
 		[SerializeField] private Campaign m_Campaign;
 
+		[Header("Screen transitions")]
+		[Tooltip("The black this fades through between screens. Left empty, every load is the "
+			+ "hard cut it used to be, which is what a Gameplay scene opened on its own gets.")]
+		[SerializeField] private ScreenFade m_Fade;
+
+		[Tooltip("Seconds to fade out, and again to fade in, on arriving somewhere new.")]
+		[SerializeField] private float m_FadeSeconds = 0.25f;
+
+		[Tooltip("The same, for replaying the stage just lost. Shorter on purpose: a fade the "
+			+ "player sees on every death is a tax on the attempt after it.")]
+		[SerializeField] private float m_ReplayFadeSeconds = 0.12f;
+
+		[Tooltip("How far the music is allowed to drop at full black. 0 is silence, which is "
+			+ "where the track is swapped and therefore where a swap is least audible. Lift it "
+			+ "if the dip on a replay - which changes no track - reads as a dropout.")]
+		[Range(0f, 1f)]
+		[SerializeField] private float m_MusicDuckFloor;
+
 		// Scenes are loaded by name, never by build index: adding a scene renumbers every
 		// index, and an index load would silently start sending the player somewhere else.
 		public const string k_MainMenuScene = "MainMenu";
@@ -38,6 +57,8 @@ namespace BomberBird.Flow
 		private RunState m_Run;
 		private bool m_EasyMynas;
 		private AudioSource m_Music;
+		private float m_MusicVolume = 1f;
+		private bool m_IsTransitioning;
 
 		/// <summary>
 		/// Raised when a stage ends, before anything is loaded, so a results screen can show
@@ -49,6 +70,16 @@ namespace BomberBird.Flow
 		/// they did before, so a Gameplay scene opened on its own is still playable.
 		/// </summary>
 		public event Action<eStageOutcome> StageEnded;
+
+		/// <summary>
+		/// Whether a screen transition is running, so nothing takes a keystroke behind the
+		/// black. Docs/GDD.md section 5 already promises input is disabled during a stage
+		/// transition; this is what that sentence is describing.
+		/// </summary>
+		public bool IsTransitioning
+		{
+			get { return m_IsTransitioning; }
+		}
 
 		/// <summary>The live run, or null when no GameFlow is in the scene.</summary>
 		public static GameFlow Instance
@@ -171,6 +202,13 @@ namespace BomberBird.Flow
 
 			m_EasyMynas = PlayerPrefs.GetInt(k_EasyMynasPref, 0) != 0;
 			m_Music = GetComponent<AudioSource>();
+
+			if (m_Music != null)
+			{
+				// Read once and kept, because the duck writes over the live value and would
+				// otherwise ratchet the track quieter with every scene change.
+				m_MusicVolume = m_Music.volume;
+			}
 
 			m_Run = new RunState(m_StartingLives, m_Campaign == null ? null : m_Campaign.StartingBird);
 		}
@@ -372,14 +410,10 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void GoToMainMenu()
 		{
-			Time.timeScale = 1f;
-
-			if (m_Run != null)
-			{
-				m_Run.Restart();
-			}
-
-			SceneManager.LoadScene(k_MainMenuScene);
+			// The reset waits for full black. Done before the fade it would be seen: the HUD
+			// reads the lives and the stage number every frame, and the card on screen is
+			// reporting totals this throws away.
+			loadScene(k_MainMenuScene, m_FadeSeconds, restartRun);
 		}
 
 		/// <summary>
@@ -390,17 +424,13 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void GoToClosing()
 		{
-			Time.timeScale = 1f;
-
-			SceneManager.LoadScene(k_ClosingScene);
+			loadScene(k_ClosingScene, m_FadeSeconds);
 		}
 
 		/// <summary>The screen between stages, where the player picks the bird to fly.</summary>
 		public void GoToBirdSelect()
 		{
-			Time.timeScale = 1f;
-
-			SceneManager.LoadScene(k_BirdSelectScene);
+			loadScene(k_BirdSelectScene, m_FadeSeconds);
 		}
 
 		/// <summary>
@@ -419,9 +449,7 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void StartStage()
 		{
-			Time.timeScale = 1f;
-
-			SceneManager.LoadScene(k_StageIntroScene);
+			loadScene(k_StageIntroScene, m_FadeSeconds);
 		}
 
 		/// <summary>
@@ -431,7 +459,7 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void BeginStage()
 		{
-			loadArena();
+			loadArena(m_FadeSeconds);
 		}
 
 		/// <summary>
@@ -440,7 +468,7 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void ReplayStage()
 		{
-			loadArena();
+			loadArena(m_ReplayFadeSeconds);
 		}
 
 		/// <summary>Replays the stage without spending a life, for the pause overlay.</summary>
@@ -449,11 +477,117 @@ namespace BomberBird.Flow
 			ReplayStage();
 		}
 
-		private void loadArena()
+		private void loadArena(float i_Seconds)
 		{
+			loadScene(k_GameplayScene, i_Seconds);
+		}
+
+		private void restartRun()
+		{
+			if (m_Run != null)
+			{
+				m_Run.Restart();
+			}
+		}
+
+		/// <summary>
+		/// Every change of screen in the game. Fades to black, loads, and fades back.
+		///
+		/// One method rather than a fade at each of the five load sites, because a transition
+		/// that is only mostly applied is worse than none: the one screen that still cut would
+		/// read as a bug in the four that do not.
+		///
+		/// <paramref name="i_AtBlack"/> is work that must not be seen - state the screen being
+		/// left is still displaying. It runs under full black, immediately before the load.
+		/// </summary>
+		private void loadScene(string i_Scene, float i_Seconds, Action i_AtBlack = null)
+		{
+			if (m_IsTransitioning)
+			{
+				// A second request while one is already running: Retry pressed twice, or a
+				// key that reached a button standing behind the black. The first is on its way.
+				return;
+			}
+
+			if (m_Fade == null)
+			{
+				// No cover on this object. The hard cut is what the game did before this
+				// existed, so a GameFlow without one is plain rather than broken.
+				Time.timeScale = 1f;
+
+				if (i_AtBlack != null)
+				{
+					i_AtBlack();
+				}
+
+				SceneManager.LoadScene(i_Scene);
+				return;
+			}
+
+			StartCoroutine(transition(i_Scene, i_Seconds, i_AtBlack));
+		}
+
+		private IEnumerator transition(string i_Scene, float i_Seconds, Action i_AtBlack)
+		{
+			m_IsTransitioning = true;
+
+			yield return fade(0f, 1f, i_Seconds);
+
+			// Only now. Held until full black, a Restart from the pause overlay does not run
+			// the arena for an eighth of a second behind the cover on its way out.
 			Time.timeScale = 1f;
 
-			SceneManager.LoadScene(k_GameplayScene);
+			if (i_AtBlack != null)
+			{
+				i_AtBlack();
+			}
+
+			SceneManager.LoadScene(i_Scene);
+
+			// One frame for the new scene's Awake and Start, so it is dressed before it is
+			// uncovered: SceneMusic asks for its track there, and it should arrive under
+			// black rather than a beat after the picture.
+			yield return null;
+
+			yield return fade(1f, 0f, i_Seconds);
+
+			m_IsTransitioning = false;
+		}
+
+		/// <summary>
+		/// Walks the cover from one opacity to another on unscaled time, because a transition
+		/// out of a paused game runs with the clock stopped.
+		/// </summary>
+		private IEnumerator fade(float i_From, float i_To, float i_Seconds)
+		{
+			float elapsed = 0f;
+
+			for (float t = ScreenFade.Ramp(elapsed, i_Seconds); t < 1f;
+				t = ScreenFade.Ramp(elapsed, i_Seconds))
+			{
+				setCover(Mathf.Lerp(i_From, i_To, t));
+
+				yield return null;
+
+				elapsed += Time.unscaledDeltaTime;
+			}
+
+			setCover(i_To);
+		}
+
+		/// <summary>
+		/// The cover and the music move together off one number. At full black the music is at
+		/// its floor, which is where <see cref="PlayMusic"/> swaps the track and therefore the
+		/// quietest place to do it.
+		/// </summary>
+		private void setCover(float i_Alpha)
+		{
+			m_Fade.Cover(i_Alpha);
+
+			if (m_Music != null)
+			{
+				m_Music.volume = m_MusicVolume * Mathf.Lerp(1f, m_MusicDuckFloor, i_Alpha);
+			}
 		}
 	}
 }

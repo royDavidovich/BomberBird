@@ -5,7 +5,8 @@
         "BomberBird.Arena",
         "BomberBird.Pods",
         "BomberBird.Player",
-        "BomberBird.Enemies"
+        "BomberBird.Enemies",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

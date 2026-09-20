@@ -104,8 +104,10 @@ namespace BomberBird.UI
 
 			// Space alone, and never as part of a system shortcut. This used to take any key,
 			// which meant Escape started the stage on its way to opening the pause overlay,
-			// and a Cmd+Shift+4 screenshot started it by accident.
-			if (Input.GetKeyDown(KeyCode.Space) && !UiInput.IsModifierHeld())
+			// and a Cmd+Shift+4 screenshot started it by accident. The listening check is the
+			// same one the any-key screens get: the arena arrives under the fade, and a Space
+			// still down from the screen before must not start a stage nobody has seen yet.
+			if (Input.GetKeyDown(KeyCode.Space) && !UiInput.IsModifierHeld() && UiInput.IsListening())
 			{
 				m_IsReleasing = true;
 			}
