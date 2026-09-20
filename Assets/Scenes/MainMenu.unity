@@ -530,6 +530,7 @@ GameObject:
   - component: {fileID: 659733007}
   - component: {fileID: 659733009}
   - component: {fileID: 659733010}
+  - component: {fileID: 659733011}
   m_Layer: 0
   m_Name: MainMenuScreen
   m_TagString: Untagged
@@ -606,6 +607,20 @@ MonoBehaviour:
   m_OtherName: {r: 0.16862746, g: 0.11764706, b: 0.078431375, a: 1}
   m_CloseKeys: 1b0000000d0000000f01000020000000
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
+--- !u!114 &659733011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659733006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4356c517ff9bb45819912076827c8e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.UiNavigationSound
+  m_Move: {fileID: 8300000, guid: 0250ac97dc9f94fd08b3ceeeb1d54f62, type: 3}
+  m_Volume: 0.6
 --- !u!1 &731861933
 GameObject:
   m_ObjectHideFlags: 0
