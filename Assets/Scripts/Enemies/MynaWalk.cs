@@ -32,13 +32,20 @@ namespace BomberBird.Enemies
 		///
 		/// <paramref name="i_AlsoBlocked"/> carries what the grid does not know about, such
 		/// as a placed pod. Passing null asks the arena's own contents only.
+		///
+		/// <paramref name="i_StraightChance"/> is how often a junction is ignored in favour of
+		/// carrying straight on: zero is the patrol described above, one never turns while the
+		/// way ahead is open. The easy mode raises it, because what made the game feel unfair
+		/// was not the mynas being fast but being unreadable - a myna holding its line can be
+		/// planned around, and one that might turn into the corridor you just entered cannot.
 		/// </summary>
 		public static Vector2Int ChooseDirection(
 			ArenaGrid i_Grid,
 			Vector2Int i_Cell,
 			Vector2Int i_Current,
 			Predicate<Vector2Int> i_AlsoBlocked,
-			System.Random i_Random)
+			System.Random i_Random,
+			float i_StraightChance = 0f)
 		{
 			if (i_Grid == null)
 			{
@@ -81,12 +88,45 @@ namespace BomberBird.Enemies
 				// A corridor. Carrying straight on is the only move that is not a reversal.
 				chosen = options[0];
 			}
+			else if (holdsItsLine(options, count, i_Current, i_StraightChance, i_Random))
+			{
+				chosen = i_Current;
+			}
 			else
 			{
 				chosen = options[i_Random.Next(count)];
 			}
 
 			return chosen;
+		}
+
+		/// <summary>
+		/// Whether this junction is passed through rather than turned at.
+		///
+		/// The draw only happens when a chance was asked for, so a myna walking the ordinary
+		/// game takes nothing from the shared <see cref="System.Random"/> and two runs of the
+		/// same seed still walk the same way.
+		/// </summary>
+		private static bool holdsItsLine(
+			Vector2Int[] i_Options, int i_Count, Vector2Int i_Current, float i_Chance, System.Random i_Random)
+		{
+			if (i_Chance <= 0f)
+			{
+				return false;
+			}
+
+			bool isStraightOpen = false;
+
+			for (int i = 0; i < i_Count; ++i)
+			{
+				if (i_Options[i] == i_Current)
+				{
+					isStraightOpen = true;
+					break;
+				}
+			}
+
+			return isStraightOpen && i_Random.NextDouble() < i_Chance;
 		}
 
 		private static bool canEnter(ArenaGrid i_Grid, Vector2Int i_Cell, Predicate<Vector2Int> i_AlsoBlocked)

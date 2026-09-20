@@ -88,6 +88,66 @@ namespace BomberBird.Tests
 			Assert.IsTrue(sawRight && sawDown, "a junction should not always resolve the same way");
 		}
 
+		/// <summary>
+		/// The easy mode's myna walks through a junction rather than deciding at it, which
+		/// is what makes it possible to plan a route around one.
+		/// </summary>
+		[Test]
+		public void HoldsItsLineWhenTheChanceIsCertain()
+		{
+			ArenaGrid grid = makeGrid();
+			Vector2Int junction = new Vector2Int(1, 9);
+
+			for (int seed = 0; seed < 20; ++seed)
+			{
+				Vector2Int chosen = MynaWalk.ChooseDirection(
+					grid, junction, sr_Right, null, new System.Random(seed), 1f);
+
+				Assert.AreEqual(sr_Right, chosen, "a certain chance should never turn at a junction");
+			}
+		}
+
+		/// <summary>
+		/// Holding its line is not walking into a wall: with the way ahead shut the myna
+		/// turns however certain the chance was.
+		/// </summary>
+		[Test]
+		public void StillTurnsWhenTheWayAheadIsShut()
+		{
+			ArenaGrid grid = makeGrid();
+			Vector2Int againstTheBorder = new Vector2Int(1, 9);
+
+			for (int seed = 0; seed < 20; ++seed)
+			{
+				// Walking left at x 1, so straight on is the border wall.
+				Vector2Int chosen = MynaWalk.ChooseDirection(
+					grid, againstTheBorder, sr_Left, null, new System.Random(seed), 1f);
+
+				Assert.AreNotEqual(sr_Left, chosen, "walked into the border");
+				Assert.AreNotEqual(Vector2Int.zero, chosen, "stood still with ways open");
+			}
+		}
+
+		/// <summary>
+		/// A chance of zero is the ordinary game, down to the random sequence: the draw is
+		/// skipped rather than made and ignored, so a seed walks the same way it always did.
+		/// </summary>
+		[Test]
+		public void LeavesTheOrdinaryWalkAlone()
+		{
+			ArenaGrid grid = makeGrid();
+			Vector2Int junction = new Vector2Int(1, 9);
+
+			for (int seed = 0; seed < 20; ++seed)
+			{
+				Vector2Int before = MynaWalk.ChooseDirection(grid, junction, sr_Right, null, new System.Random(seed));
+				Vector2Int after = MynaWalk.ChooseDirection(
+					grid, junction, sr_Right, null, new System.Random(seed), 0f);
+
+				Assert.AreEqual(before, after, "seed " + seed + " walks differently than it used to");
+			}
+		}
+
 		[Test]
 		public void TurnsBackOutOfADeadEnd()
 		{

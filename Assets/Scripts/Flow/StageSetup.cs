@@ -1,4 +1,5 @@
 using BomberBird.Arena;
+using BomberBird.Enemies;
 using BomberBird.Player;
 using BomberBird.Pods;
 using UnityEngine;
@@ -30,6 +31,11 @@ namespace BomberBird.Flow
 		[SerializeField] private BomberBird.Arena.Arena m_Arena;
 		[SerializeField] private ArenaRenderer m_Renderer;
 
+		[Tooltip("Told whether this run asked for the easy mynas. The enemies know nothing "
+			+ "about the run - the dependency runs the other way - so the handover happens "
+			+ "here, in the Awake that precedes their spawning.")]
+		[SerializeField] private ArenaMynas m_Mynas;
+
 		[Header("The bird")]
 		[SerializeField] private BirdMovement m_Bird;
 		[SerializeField] private BirdAnimator m_Animator;
@@ -37,6 +43,13 @@ namespace BomberBird.Flow
 
 		private void Awake()
 		{
+			if (m_Mynas != null && GameFlow.Instance != null)
+			{
+				// Read before the stage check below: the difficulty holds even on a run that
+				// has walked off the end of the campaign and kept the scene's own arena.
+				m_Mynas.UseEasyMynas = GameFlow.Instance.EasyMynas;
+			}
+
 			Campaign.Stage stage = GameFlow.Instance == null ? null : GameFlow.Instance.CurrentStage;
 
 			if (stage == null)

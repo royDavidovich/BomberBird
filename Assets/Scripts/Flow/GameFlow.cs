@@ -30,9 +30,12 @@ namespace BomberBird.Flow
 		public const string k_GameplayScene = "Gameplay";
 		public const string k_ClosingScene = "Closing";
 
+		private const string k_EasyMynasPref = "BomberBird.EasyMynas";
+
 		private static GameFlow s_Instance;
 
 		private RunState m_Run;
+		private bool m_EasyMynas;
 
 		/// <summary>
 		/// Raised when a stage ends, before anything is loaded, so a results screen can show
@@ -54,6 +57,25 @@ namespace BomberBird.Flow
 		public int Lives
 		{
 			get { return m_Run == null ? 0 : m_Run.Lives; }
+		}
+
+		/// <summary>
+		/// Whether the mynas walk the easy way: slower, and mostly holding their line rather
+		/// than choosing afresh at every junction.
+		///
+		/// Kept here because it outlives a scene the way the life count does, and remembered
+		/// between sittings: a player who needed the easier game last night should not have
+		/// to find the setting again. <see cref="StageSetup"/> hands it to the arena.
+		/// </summary>
+		public bool EasyMynas
+		{
+			get { return m_EasyMynas; }
+
+			set
+			{
+				m_EasyMynas = value;
+				PlayerPrefs.SetInt(k_EasyMynasPref, value ? 1 : 0);
+			}
 		}
 
 		public int StageNumber
@@ -144,6 +166,8 @@ namespace BomberBird.Flow
 					Debug.LogError(name + ": campaign '" + m_Campaign.name + "' is unusable:" + problems, this);
 				}
 			}
+
+			m_EasyMynas = PlayerPrefs.GetInt(k_EasyMynasPref, 0) != 0;
 
 			m_Run = new RunState(m_StartingLives, m_Campaign == null ? null : m_Campaign.StartingBird);
 		}

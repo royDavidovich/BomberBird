@@ -57,6 +57,28 @@ namespace BomberBird.Enemies
 			return outcome;
 		}
 
+		/// <summary>
+		/// Slows the whole fight by a scale, for the easy mode.
+		///
+		/// It rebuilds the ramp rather than only the walking speed, because the ramp is what
+		/// the boss climbs back up: a boss slowed at spawn but left with the hard ceiling
+		/// would be back at full pace a hit or two later, which is the opposite of what the
+		/// mode is for. <see cref="ArenaMynas"/> calls this at spawn, long before the first
+		/// burst can land, and <see cref="Awake"/> has already run by then - it is called
+		/// during Instantiate, which is why the scaling cannot simply happen before it.
+		/// </summary>
+		public void SlowTheFight(float i_Scale)
+		{
+			if (i_Scale <= 0f)
+			{
+				return;
+			}
+
+			m_SpeedStep *= i_Scale;
+			m_MaxSpeed *= i_Scale;
+			m_Health = new BossHealth(m_Lives, m_Movement.Speed, m_SpeedStep, m_MaxSpeed);
+		}
+
 		private void Awake()
 		{
 			m_Movement = GetComponent<MynaMovement>();
