@@ -25,8 +25,8 @@ MonoBehaviour:
     m_Layout: {fileID: 11400000, guid: 8d4d97ed16304302aea9e8fab15d9976, type: 2}
     m_TileSet: {fileID: 11400000, guid: 21c11f90f54c4473a5b4dbe21560c915, type: 2}
     m_HabitatHero: {fileID: 0}
-    m_HabitatBlurb: Rows of old fruit trees, heavy and close. Good cover for a bird
-      that feeds on the ground, and better cover for the ones hunting it.
+    m_HabitatBlurb: Rows of old fruit trees, heavy and close. Good cover for a ground-feeding
+      bird, and better cover for the ones hunting it.
     m_BirdLine: home of the Eurasian hoopoe
     m_AwardedBird: {fileID: 0}
   - m_HabitatName: Stream Bank
@@ -34,8 +34,7 @@ MonoBehaviour:
     m_TileSet: {fileID: 11400000, guid: ab40f6806b81454a99281f8948b67b40, type: 2}
     m_HabitatHero: {fileID: 0}
     m_HabitatBlurb: Shallow water over stones, with a kingfisher's bank cut into
-      the far side. It watches from the low branches and takes everything it eats
-      from here.
+      the far side. It hunts from the low branches over the shallows.
     m_BirdLine: home of the white-throated kingfisher
     m_AwardedBird: {fileID: 11400000, guid: 19a4810925a0b461e88f4aa6b90ae12e, type: 2}
   - m_HabitatName: Lagoon Shore
@@ -51,7 +50,7 @@ MonoBehaviour:
     m_TileSet: {fileID: 11400000, guid: cd801a67ca214e2cb23b14ac64bdc6f9, type: 2}
     m_HabitatHero: {fileID: 0}
     m_HabitatBlurb: Dry stone and low scrub on a hillside. The chukar covey walks
-      these slopes in the open, and runs rather than flies when something comes.
+      these slopes in the open, and runs rather than flies.
     m_BirdLine: home of the chukar partridge
     m_AwardedBird: {fileID: 11400000, guid: b2b399ae04ee545fa85f0a12006dfc3e, type: 2}
   - m_HabitatName: Overgrown Courtyard
