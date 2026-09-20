@@ -59,9 +59,11 @@ namespace BomberBird.UI
 
 		[Header("Pooling")]
 		[Tooltip("Effect visuals built before the stage runs. These three never overlap by more than a handful.")]
+		[Min(0)]
 		[SerializeField] private int m_PoolCapacity = 8;
 
 		[Tooltip("Most visuals the pool will hold. One returned past this is destroyed instead of kept.")]
+		[Min(1)]
 		[SerializeField] private int m_PoolMaxSize = 32;
 
 		// Every visual currently on loan. Membership is also the guard that makes a release
@@ -178,12 +180,14 @@ namespace BomberBird.UI
 		/// </summary>
 		private IEnumerator fade(Effect i_Effect, Vector2Int i_Cell)
 		{
+			float secondsPerFrame = i_Effect.Seconds / i_Effect.Frames.Length;
+
+			// Borrowed last, once nothing left in this method can fault: a visual taken and
+			// then abandoned by a throw would sit out on loan until the next teardown.
 			SpriteRenderer renderer = m_Pool.Get(
 				m_Grid.CellToWorld(i_Cell), 0f, i_Effect.SortingOrder);
 
 			r_LiveVisuals.Add(renderer);
-
-			float secondsPerFrame = i_Effect.Seconds / i_Effect.Frames.Length;
 
 			for (int frame = 0; frame < i_Effect.Frames.Length; ++frame)
 			{
@@ -207,8 +211,10 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// Returns whatever is still on screen to the pool, so the instances survive a disable
-		/// and the next stage starts warm.
+		/// Returns whatever is still on screen to the pool, so a disable inside a stage leaves
+		/// the pool whole and an effect cut short mid-flight is swept up. It does not carry
+		/// across stages: every stage and every retry is a fresh <c>LoadScene</c>, so the pool
+		/// dies with the scene and the next one prewarms from nothing.
 		/// </summary>
 		private void clearVisuals()
 		{

@@ -43,9 +43,11 @@ namespace BomberBird.Pods
 
 		[Header("Pooling")]
 		[Tooltip("Burst pieces built before the stage runs. A range 3 burst covers thirteen cells, so this holds several overlapping bursts without allocating.")]
+		[Min(0)]
 		[SerializeField] private int m_BurstPoolCapacity = 32;
 
 		[Tooltip("Most pieces the pool will hold. A piece returned past this is destroyed instead of kept.")]
+		[Min(1)]
 		[SerializeField] private int m_BurstPoolMaxSize = 128;
 
 		private readonly Dictionary<Vector2Int, GameObject> r_PodVisuals = new Dictionary<Vector2Int, GameObject>();
@@ -284,8 +286,13 @@ namespace BomberBird.Pods
 
 		/// <summary>
 		/// Clears what is on screen. The burst pieces go back to the pool rather than to the
-		/// garbage collector, so the instances survive a disable and the next stage starts
-		/// warm; only the pods, which are not pooled, are destroyed.
+		/// garbage collector, so a disable inside a stage leaves the pool whole and a burst
+		/// cut short mid-flight is swept up; only the pods, which are not pooled, are
+		/// destroyed.
+		///
+		/// It does not carry across stages. Every stage and every retry is a fresh
+		/// <c>LoadScene</c> (<see cref="BomberBird.Flow.GameFlow.StartStage"/>), so the pool
+		/// dies with the scene and the next one prewarms from nothing.
 		/// </summary>
 		private void clearVisuals()
 		{
