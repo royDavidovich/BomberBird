@@ -1907,7 +1907,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PRESS ANY KEY
+  m_text: TO EXIT - PRESS ANY KEY
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
   m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
