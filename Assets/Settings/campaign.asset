@@ -28,7 +28,9 @@ MonoBehaviour:
     m_HabitatHero: {fileID: 21300000, guid: a6c47ebbbc0094baaba3ff5708ba8785, type: 3}
     m_HabitatBlurb: 'Rows of old fruit trees, heavy and close.
 
-      Good cover for a ground-feeding bird, and better cover for the ones hunting it.'
+      Good cover for a ground-feeding bird, and better cover
+
+      for the ones hunting it.'
     m_BirdLine: home of the Eurasian hoopoe
     m_AwardedBird: {fileID: 0}
   - m_HabitatName: Stream Bank
@@ -55,16 +57,18 @@ MonoBehaviour:
     m_HabitatHero: {fileID: 0}
     m_HabitatBlurb: 'Dry stone and low scrub on a hillside.
 
-      The chukar covey walks these slopes in the open, and runs rather than flies.'
+      The chukar covey walks these slopes in the open,
+
+      and runs rather than flies.'
     m_BirdLine: home of the chukar partridge
     m_AwardedBird: {fileID: 11400000, guid: b2b399ae04ee545fa85f0a12006dfc3e, type: 2}
   - m_HabitatName: Overgrown Courtyard
     m_Layout: {fileID: 11400000, guid: 2def2d1844324d6787441cb65f52b4cf, type: 2}
     m_TileSet: {fileID: 11400000, guid: 106ca53536f74efda13d83b86e0e8cca, type: 2}
     m_HabitatHero: {fileID: 0}
-    m_HabitatBlurb: 'A courtyard nobody tends.
+    m_HabitatBlurb: 'A courtyard nobody tends. Every cavity that held a native bird
 
-      Every cavity that held a native bird holds a myna now, and the flock has stopped leaving.'
+      holds a myna now, and the flock has stopped leaving.'
     m_BirdLine: taken by the common myna
     m_AwardedBird: {fileID: 0}
   m_StartingBird: {fileID: 11400000, guid: c8039b8a2bc4c4fd4bb325bd11fb32c4, type: 2}
