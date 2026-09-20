@@ -96,6 +96,38 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
+		public void AFreshPodStopsAMynaStraightAway()
+		{
+			// The grace above is the bird's alone, and this is the pair of rules that keeps
+			// them apart. A myna placed nothing, so a pod stops it the moment it lands -
+			// which is why ArenaMynas asks HasPodAt and the bird asks IsBlocking. Collapsing
+			// the two into one call is the bug this guards: mynas walking over live pods.
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int cell = new Vector2Int(1, 1);
+
+			field.TryPlace(cell);
+
+			Assert.IsFalse(field.IsBlocking(cell), "the bird that placed it must be able to step off");
+			Assert.IsTrue(field.HasPodAt(cell), "a myna gets no grace and is stopped at once");
+		}
+
+		[Test]
+		public void ADetonatedPodStopsNobody()
+		{
+			// HasPodAt is only safe as the myna rule because a spent pod leaves the field,
+			// otherwise mynas would be walled out of a cell whose pod has already burst.
+			ArenaGrid grid = makeGrid();
+			PodField field = makeField(grid);
+			Vector2Int cell = new Vector2Int(1, 1);
+
+			field.TryPlace(cell);
+			field.TryDetonateAt(cell);
+
+			Assert.IsFalse(field.HasPodAt(cell), "the pod burst, so the cell is open again");
+		}
+
+		[Test]
 		public void MarkVacatedExcept_IsSafeToCallRepeatedlyAndOnAnEmptyField()
 		{
 			ArenaGrid grid = makeGrid();
