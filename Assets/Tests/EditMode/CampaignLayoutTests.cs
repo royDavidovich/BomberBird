@@ -307,5 +307,40 @@ namespace BomberBird.Arena.Tests
 				"Stage " + i_StageNumber + " boxes the boss in at " + bossCells[0] + " with only "
 				+ open + " open neighbour(s).");
 		}
+
+		/// <summary>
+		/// Every stage can fill its habitat screen.
+		///
+		/// The hero art is deliberately not required: the six habitat heroes are commissioned
+		/// separately and the screen falls back to the stage's own floor tile, so a stage
+		/// without one looks plainer rather than broken. The words are required, because a
+		/// habitat screen with no words is a picture and a press.
+		/// </summary>
+		[Test]
+		public void EveryStageCanFillItsHabitatScreen([ValueSource("StageNumbers")] int i_StageNumber)
+		{
+			Campaign.Stage stage = loadCampaign().GetStage(i_StageNumber);
+
+			Assert.IsFalse(string.IsNullOrEmpty(stage.HabitatName),
+				"Stage " + i_StageNumber + " has no habitat name.");
+
+			Assert.IsFalse(string.IsNullOrEmpty(stage.HabitatBlurb),
+				"Stage " + i_StageNumber + " has no habitat blurb, so its screen would show "
+				+ "a title over empty space.");
+
+			Assert.IsFalse(string.IsNullOrEmpty(stage.BirdLine),
+				"Stage " + i_StageNumber + " has no bird line. Every habitat belongs to a "
+				+ "bird, the courtyard included.");
+		}
+
+		/// <summary>
+		/// The campaign reports a stage missing either line rather than shipping it, which is
+		/// what makes the check above worth having: the game says so at load as well.
+		/// </summary>
+		[Test]
+		public void TheCampaignItselfIsHappyWithItsHabitatText()
+		{
+			Assert.IsNull(loadCampaign().DescribeProblems());
+		}
 	}
 }

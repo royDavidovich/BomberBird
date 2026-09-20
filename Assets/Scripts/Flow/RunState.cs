@@ -24,6 +24,7 @@ namespace BomberBird.Flow
 		private readonly List<BirdProfile> r_Roster = new List<BirdProfile>();
 
 		private int m_Lives;
+		private bool m_HasSeenInstructions;
 		private int m_StageNumber;
 		private BirdProfile m_SelectedBird;
 		private int m_TotalMynasDefeated;
@@ -104,6 +105,7 @@ namespace BomberBird.Flow
 		{
 			m_Lives = r_StartingLives;
 			m_StageNumber = k_FirstStage;
+			m_HasSeenInstructions = false;
 			m_TotalMynasDefeated = 0;
 			m_TotalPodsPlaced = 0;
 			m_TotalSeconds = 0f;
@@ -116,6 +118,29 @@ namespace BomberBird.Flow
 			}
 
 			m_SelectedBird = r_StartingBird;
+		}
+
+		/// <summary>
+		/// Whether the instructions have been put in front of the player during this run.
+		///
+		/// Once per run rather than once per stage one: the panel is shown on the way into
+		/// the intro, and a death there must not show it again. It is the run that forgets,
+		/// so a fresh campaign from the menu teaches the rules over.
+		///
+		/// Deliberately not <see cref="PlayerPrefs"/>. A player who has not touched the game
+		/// in a month is owed the rules again, and a lecturer opening a fresh copy on the
+		/// demonstration machine must see what a first player sees.
+		/// </summary>
+		public bool MarkInstructionsSeen()
+		{
+			if (m_HasSeenInstructions)
+			{
+				return false;
+			}
+
+			m_HasSeenInstructions = true;
+
+			return true;
 		}
 
 		/// <summary>
