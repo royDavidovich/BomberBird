@@ -5479,6 +5479,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.Flow::BomberBird.Flow.StageSetup
   m_Arena: {fileID: 1688113799}
   m_Renderer: {fileID: 1688113797}
+  m_Mynas: {fileID: 1688113803}
   m_Bird: {fileID: 1600481133}
   m_Animator: {fileID: 1600481132}
   m_Pods: {fileID: 1688113800}
@@ -5832,6 +5833,8 @@ MonoBehaviour:
   m_Prefab: {fileID: 2916023543840682989, guid: baa97522c9bd3405b950ea94b136bd34, type: 3}
   m_BossPrefab: {fileID: 6073608404563358969, guid: 992e9ff37928141fabe8248dac13415a, type: 3}
   m_RandomSeed: 0
+  m_EasySpeedScale: 0.5
+  m_EasyStraightChance: 0.8
   m_LethalSeconds: 0.45
   m_ScatterSeconds: 1.25
   m_ScatterSpeed: 3

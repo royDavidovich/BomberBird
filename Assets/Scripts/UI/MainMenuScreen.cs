@@ -1,4 +1,5 @@
 using BomberBird.Flow;
+using TMPro;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -13,6 +14,11 @@ namespace BomberBird.UI
 	/// </summary>
 	public class MainMenuScreen : MonoBehaviour
 	{
+		[Header("Mynas")]
+		[Tooltip("Reads the difficulty back to the player, so the button says what the game "
+			+ "will do rather than what pressing it does.")]
+		[SerializeField] private TMP_Text m_MynasLabel;
+
 		[Header("Sound")]
 		[Tooltip("Play is pressed and the run begins. The same clip the selection screen "
 			+ "confirms a bird with, because it is the same act.")]
@@ -32,12 +38,52 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
+		/// Wired to the mynas button. Flips the difficulty for every stage from here on and
+		/// says so on the button.
+		///
+		/// It is offered on the menu rather than mid-stage because it changes how a myna is
+		/// spawned, and a stage already under way keeps the mynas it was given.
+		/// </summary>
+		public void ToggleMynas()
+		{
+			if (GameFlow.Instance == null)
+			{
+				Debug.LogError(name + ": no GameFlow, so there is no run to set the mynas for.", this);
+				return;
+			}
+
+			UiSound.Play(m_Confirm);
+			GameFlow.Instance.EasyMynas = !GameFlow.Instance.EasyMynas;
+
+			showMynas();
+		}
+
+		/// <summary>
 		/// Wired to Quit. Does nothing in the editor, which is Unity's behaviour rather than
 		/// a bug worth working around.
 		/// </summary>
 		public void Quit()
 		{
 			Application.Quit();
+		}
+
+		private void Start()
+		{
+			// The setting is remembered between sittings, so the menu opens showing whichever
+			// way the player left it rather than the authored default.
+			showMynas();
+		}
+
+		private void showMynas()
+		{
+			if (m_MynasLabel == null)
+			{
+				return;
+			}
+
+			bool isEasy = GameFlow.Instance != null && GameFlow.Instance.EasyMynas;
+
+			m_MynasLabel.text = isEasy ? "Mynas: easy" : "Mynas: normal";
 		}
 	}
 }

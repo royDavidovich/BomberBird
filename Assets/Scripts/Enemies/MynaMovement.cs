@@ -21,6 +21,11 @@ namespace BomberBird.Enemies
 		[Tooltip("Cells per second.")]
 		[SerializeField] private float m_Speed = 2f;
 
+		[Range(0f, 1f)]
+		[Tooltip("How often a junction is walked straight through rather than turned at. "
+			+ "Raised by the easy mode; the ordinary game leaves it at zero.")]
+		[SerializeField] private float m_StraightChance;
+
 		// A full turn, counted down as the spin runs out: the myna passes through every
 		// facing exactly once.
 		private static readonly eFacing[] k_SpinOrder =
@@ -60,6 +65,20 @@ namespace BomberBird.Enemies
 		{
 			get { return m_Speed; }
 			set { m_Speed = value; }
+		}
+
+		/// <summary>
+		/// How often this myna carries straight on through a junction instead of picking a
+		/// way at random. Zero is the ordinary patrol; the easy mode raises it so a myna can
+		/// be read from across the arena.
+		///
+		/// Set by <see cref="ArenaMynas"/> at spawn, like <see cref="Speed"/>, rather than
+		/// authored per prefab: it belongs to the run's difficulty, not to the bird.
+		/// </summary>
+		public float StraightChance
+		{
+			get { return m_StraightChance; }
+			set { m_StraightChance = value; }
 		}
 
 		/// <summary>
@@ -197,7 +216,8 @@ namespace BomberBird.Enemies
 
 		private void chooseNextCell()
 		{
-			m_Direction = MynaWalk.ChooseDirection(m_Grid, m_Cell, m_Direction, m_AlsoBlocked, m_Random);
+			m_Direction = MynaWalk.ChooseDirection(
+				m_Grid, m_Cell, m_Direction, m_AlsoBlocked, m_Random, m_StraightChance);
 
 			// Walled in on every side: stand still and try again next frame, because a pod
 			// that bursts nearby can open the way back up.

@@ -29,6 +29,17 @@ namespace BomberBird.Enemies
 		[Tooltip("Seed for the wandering. Leave at 0 to have every run differ.")]
 		[SerializeField] private int m_RandomSeed;
 
+		[Header("Easy mynas")]
+		[Tooltip("What the mynas' authored speed is multiplied by in the easy mode. Applied "
+			+ "to the stage's mynas, the boss and its slaves alike.")]
+		[Range(0.2f, 1f)]
+		[SerializeField] private float m_EasySpeedScale = 0.5f;
+
+		[Range(0f, 1f)]
+		[Tooltip("How often an easy myna walks straight through a junction instead of picking "
+			+ "a way at random.")]
+		[SerializeField] private float m_EasyStraightChance = 0.8f;
+
 		[Header("Danger")]
 		[Tooltip("Seconds a burst keeps killing mynas. Keep this in step with BirdDeath.")]
 		[SerializeField] private float m_LethalSeconds = 0.45f;
@@ -54,6 +65,16 @@ namespace BomberBird.Enemies
 		private System.Random m_Random;
 		private System.Predicate<Vector2Int> m_AlsoBlocked;
 		private int m_SpawnedCount;
+
+		/// <summary>
+		/// Whether this stage's mynas walk the easy way: slower, and holding their line
+		/// through a junction most of the time.
+		///
+		/// Set by <see cref="BomberBird.Flow.StageSetup"/> before the mynas are spawned,
+		/// because the enemies know nothing about the run - the dependency runs the other
+		/// way. A gameplay scene opened on its own leaves it false and plays as authored.
+		/// </summary>
+		public bool UseEasyMynas { get; set; }
 
 		/// <summary>Raised when a burst catches a myna, with the cell it fell on.</summary>
 		public event Action<Vector2Int> MynaDefeated;
@@ -402,6 +423,22 @@ namespace BomberBird.Enemies
 
 			MynaMovement myna = Instantiate(i_Prefab, transform);
 			myna.name = i_Name;
+
+			if (UseEasyMynas)
+			{
+				// Before Initialise, which chooses the first cell on the spot: a myna set
+				// afterwards would take its opening turn at the hard difficulty.
+				myna.Speed *= m_EasySpeedScale;
+				myna.StraightChance = m_EasyStraightChance;
+
+				MynaBoss boss = myna.GetComponent<MynaBoss>();
+
+				if (boss != null)
+				{
+					boss.SlowTheFight(m_EasySpeedScale);
+				}
+			}
+
 			myna.Initialise(m_Arena.Grid, i_Cell, m_AlsoBlocked, m_Random);
 
 			r_Living.Add(myna);
