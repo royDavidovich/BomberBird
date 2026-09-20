@@ -1,3 +1,4 @@
+using BomberBird.Flow;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -25,13 +26,27 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
+		/// Whether the screens should be listening at all.
+		///
+		/// False while the game is fading between screens: the screen being entered is under
+		/// black and has not been seen yet, so a key held down through the transition would
+		/// answer a prompt the player has not read. Docs/GDD.md section 5 already promises
+		/// input is disabled during a stage transition, and this is where that holds for every
+		/// screen at once rather than in each of them.
+		/// </summary>
+		public static bool IsListening()
+		{
+			return GameFlow.Instance == null || !GameFlow.Instance.IsTransitioning;
+		}
+
+		/// <summary>
 		/// A key the player meant for the game: not a mouse button, not part of a system
-		/// shortcut. A click already selects whatever it landed on, so the mouse must never
-		/// stand in for a keystroke.
+		/// shortcut, and not one landing behind a transition. A click already selects whatever
+		/// it landed on, so the mouse must never stand in for a keystroke.
 		/// </summary>
 		public static bool WasKeyPressed()
 		{
-			if (!Input.anyKeyDown || IsModifierHeld())
+			if (!Input.anyKeyDown || IsModifierHeld() || !IsListening())
 			{
 				return false;
 			}
