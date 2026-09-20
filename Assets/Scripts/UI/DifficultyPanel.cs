@@ -70,8 +70,17 @@ namespace BomberBird.UI
 		private KeyCode[] m_CloseKeys = { KeyCode.Escape, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Space };
 
 		[Header("Sound")]
-		[Tooltip("The same clip the rest of the menu confirms with, because it is the same act.")]
+		[Tooltip("The same clip the rest of the menu confirms with, because it is the same act. "
+			+ "Played on opening the panel and on putting it away.")]
 		[SerializeField] private AudioClip m_Confirm;
+
+		[Tooltip("The lever moving from one stop to the next. The same clip the focus arrow uses "
+			+ "elsewhere - moving the lever is the same act as moving between buttons.")]
+		[SerializeField] private AudioClip m_Move;
+
+		[Tooltip("Quieter than a press, matching the navigation click on the other screens.")]
+		[Range(0f, 1f)]
+		[SerializeField] private float m_MoveVolume = 0.6f;
 
 		private GameObject m_SelectedBefore;
 		private bool m_IsClosing;
@@ -171,6 +180,12 @@ namespace BomberBird.UI
 		{
 			int stop = DifficultyChoice.Clamp(Mathf.RoundToInt(i_Value));
 
+			// The lever is the one control on this screen the arrows move without changing the
+			// selection, so the navigation component that covers every other screen never hears
+			// it. Unity raises this only when the value actually changes, and the slider counts
+			// in whole numbers, so this is one click per stop rather than one per frame.
+			UiSound.Play(m_Move, m_MoveVolume);
+
 			if (GameFlow.Instance != null)
 			{
 				// The property is what writes PlayerPrefs, so the setting is saved the moment
@@ -246,6 +261,10 @@ namespace BomberBird.UI
 
 		private void close()
 		{
+			// Opening said something; putting it away should too, or the keystroke that closes
+			// the panel is the only press on this screen that goes unanswered.
+			UiSound.Play(m_Confirm);
+
 			show(false);
 			m_IsClosing = false;
 

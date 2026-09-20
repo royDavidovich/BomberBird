@@ -8332,6 +8332,7 @@ GameObject:
   - component: {fileID: 1813632426}
   - component: {fileID: 1813632425}
   - component: {fileID: 1813632428}
+  - component: {fileID: 1813632429}
   m_Layer: 0
   m_Name: PauseOverlay
   m_TagString: Untagged
@@ -8415,6 +8416,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.FirstKeySelection
   m_FirstSelected: {fileID: 861326442}
   m_Difficulty: {fileID: 0}
+--- !u!114 &1813632429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813632424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4356c517ff9bb45819912076827c8e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.UiNavigationSound
+  m_Move: {fileID: 8300000, guid: 0250ac97dc9f94fd08b3ceeeb1d54f62, type: 3}
+  m_Volume: 0.6
 --- !u!1 &1821396470
 GameObject:
   m_ObjectHideFlags: 0
@@ -8528,6 +8543,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.PauseController
   m_Overlay: {fileID: 1813632424}
   m_Instructions: {fileID: 1912094774}
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
   m_Movement: {fileID: 1600481133}
   m_Placer: {fileID: 1600481138}
 --- !u!114 &1834911883
@@ -8677,6 +8693,7 @@ MonoBehaviour:
   m_TotalsText: {fileID: 1072569282}
   m_NextLabel: {fileID: 1641405951}
   m_ClearedFirstSelected: {fileID: 1852013829}
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
   m_GameOverBackdrop: {fileID: 3022872}
   m_GameOverStage: {fileID: 421220164}
   m_GameOverTaunt: {fileID: 472770588}
@@ -9392,6 +9409,7 @@ GameObject:
   - component: {fileID: 1919847635}
   - component: {fileID: 1919847634}
   - component: {fileID: 1919847636}
+  - component: {fileID: 1919847637}
   m_Layer: 0
   m_Name: ResultsOverlay
   m_TagString: Untagged
@@ -9473,6 +9491,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.FirstKeySelection
   m_FirstSelected: {fileID: 0}
   m_Difficulty: {fileID: 0}
+--- !u!114 &1919847637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919847632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4356c517ff9bb45819912076827c8e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.UiNavigationSound
+  m_Move: {fileID: 8300000, guid: 0250ac97dc9f94fd08b3ceeeb1d54f62, type: 3}
+  m_Volume: 0.6
 --- !u!1 &1936151692
 GameObject:
   m_ObjectHideFlags: 0

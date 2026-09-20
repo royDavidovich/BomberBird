@@ -89,6 +89,11 @@ namespace BomberBird.UI
 		[SerializeField] private TMP_Text m_NextLabel;
 		[SerializeField] private GameObject m_ClearedFirstSelected;
 
+		[Header("Sound")]
+		[Tooltip("The same clip the menus confirm with. These four buttons were silent, which on "
+			+ "a card that ends a stage reads as the press having been missed.")]
+		[SerializeField] private AudioClip m_Confirm;
+
 		[Header("Game over")]
 		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
 			+ "stage keeps the arena it just won showing through the scrim.")]
@@ -165,6 +170,8 @@ namespace BomberBird.UI
 				return;
 			}
 
+			UiSound.Play(m_Confirm);
+
 			GameFlow.Instance.AdvanceToNextStage(
 				m_Counters == null ? 0 : m_Counters.MynasDefeated,
 				m_Counters == null ? 0 : m_Counters.PodsPlaced,
@@ -176,6 +183,7 @@ namespace BomberBird.UI
 		{
 			if (GameFlow.Instance != null)
 			{
+				UiSound.Play(m_Confirm);
 				GameFlow.Instance.RestartStage();
 			}
 		}
@@ -188,6 +196,7 @@ namespace BomberBird.UI
 		{
 			if (GameFlow.Instance != null)
 			{
+				UiSound.Play(m_Confirm);
 				GameFlow.Instance.RetryAfterGameOver();
 			}
 		}
@@ -197,6 +206,7 @@ namespace BomberBird.UI
 		{
 			if (GameFlow.Instance != null)
 			{
+				UiSound.Play(m_Confirm);
 				GameFlow.Instance.GoToMainMenu();
 			}
 		}

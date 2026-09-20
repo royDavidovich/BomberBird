@@ -58,6 +58,10 @@ namespace BomberBird.UI
 		/// </summary>
 		public void Quit()
 		{
+			// The clip outlives this object by design - UiSound carries it across the teardown,
+			// which is the same reason Play can be heard over a scene load.
+			UiSound.Play(m_Confirm);
+
 			Application.Quit();
 		}
 	}

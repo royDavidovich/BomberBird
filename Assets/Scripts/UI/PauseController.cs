@@ -22,6 +22,11 @@ namespace BomberBird.UI
 			+ "unpause the game behind them.")]
 		[SerializeField] private InstructionsPanel m_Instructions;
 
+		[Header("Sound")]
+		[Tooltip("The same clip the menus confirm with. Every button on this overlay was silent, "
+			+ "which reads as the press not registering when the game behind is frozen anyway.")]
+		[SerializeField] private AudioClip m_Confirm;
+
 		[Header("Input to suspend")]
 		[SerializeField] private BirdMovement m_Movement;
 		[SerializeField] private BirdPodPlacer m_Placer;
@@ -93,6 +98,7 @@ namespace BomberBird.UI
 		{
 			if (m_Instructions != null)
 			{
+				UiSound.Play(m_Confirm);
 				m_Instructions.Show();
 			}
 		}
@@ -100,6 +106,8 @@ namespace BomberBird.UI
 		/// <summary>Wired to the overlay's Resume button.</summary>
 		public void Resume()
 		{
+			UiSound.Play(m_Confirm);
+
 			setPaused(false);
 		}
 
@@ -111,6 +119,8 @@ namespace BomberBird.UI
 				Debug.LogError(name + ": no GameFlow in the scene, so the stage cannot restart.", this);
 				return;
 			}
+
+			UiSound.Play(m_Confirm);
 
 			// GameFlow restores the clock itself, so a restart never loads into a frozen stage.
 			GameFlow.Instance.RestartStage();
@@ -124,6 +134,8 @@ namespace BomberBird.UI
 				Debug.LogError(name + ": no GameFlow in the scene, so the menu cannot be reached.", this);
 				return;
 			}
+
+			UiSound.Play(m_Confirm);
 
 			// GameFlow restores the clock, so the menu never loads into a frozen game.
 			GameFlow.Instance.GoToMainMenu();
