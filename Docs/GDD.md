@@ -103,7 +103,7 @@ The rule above holds regardless: a bird becomes playable by being discovered ins
 | Burst range | Area affected in each direction | Per bird | See the roster table below |
 | Active pod limit | Number of simultaneous placed pods | Per bird | See the roster table below |
 | Fuse duration | Time available to escape or prepare a chain | Shared | 2 seconds |
-| Starting lives | Attempts before the run ends | Shared | 3 |
+| Starting lives | Attempts before the run ends | Shared | 6 |
 | Enemy speed | Pressure inside the arena | Shared | To be tested |
 
 These values will be editable in the Unity Inspector or a configuration asset.
@@ -119,9 +119,9 @@ keeps the design clear of the "unique rule sets for every bird" exclusion in sec
 | Bird | Movement speed | Burst range | Active pods | Intended feel |
 |---|---|---|---|---|
 | Eurasian hoopoe | 4.0 | 2 | 1 | The starter. Balanced, and the baseline the others are read against |
-| White-throated kingfisher | 5.5 | 1 | 1 | Fast and nimble, but has to place pods close to what it wants to hit |
+| White-throated kingfisher | 5.5 | 1 | 2 | Fast and nimble, and carries two pods, but has to place them close to what it wants to hit |
 | Great white pelican | 3.0 | 3 | 1 | Slow and deliberate, with reach that clears a corridor at once |
-| Chukar partridge | 4.5 | 2 | 2 | Brisk, and the only bird that can hold two pods on the arena |
+| Chukar partridge | 4.5 | 2 | 2 | Brisk, and holds two pods with the burst range to use them |
 
 These numbers are first guesses to be settled by playtest, not balance decisions. The
 requirement they encode is that a player should feel the difference within one stage

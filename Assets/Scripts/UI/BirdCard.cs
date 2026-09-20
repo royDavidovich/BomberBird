@@ -23,13 +23,17 @@ namespace BomberBird.UI
 	/// Presentation only. It reports that it was pressed and knows nothing about whether the
 	/// run will accept that.
 	/// </summary>
-	public class BirdCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
-		ISelectHandler, IDeselectHandler
+	public class BirdCard : MonoBehaviour, ISelectHandler, IDeselectHandler
 	{
 		[Header("Parts")]
 		[SerializeField] private Image m_Portrait;
 		[SerializeField] private TMP_Text m_NameLabel;
-		[SerializeField] private TMP_Text m_StatsLabel;
+		[Tooltip("The three values, one per row, with the number on the right. Stacked rather "
+			+ "than run together on one line so two birds can be compared by reading straight "
+			+ "across the row.")]
+		[SerializeField] private TMP_Text m_SpeedValue;
+		[SerializeField] private TMP_Text m_BurstValue;
+		[SerializeField] private TMP_Text m_PodsValue;
 		[SerializeField] private TMP_Text m_HabitatLabel;
 		[SerializeField] private Button m_Button;
 
@@ -53,7 +57,6 @@ namespace BomberBird.UI
 		private Vector2 m_RestingPosition;
 		private BirdProfile m_Bird;
 		private bool m_IsUnlocked;
-		private bool m_IsPointerInside;
 		private bool m_IsSelected;
 
 		/// <summary>
@@ -61,6 +64,13 @@ namespace BomberBird.UI
 		/// press means, because only the screen knows what to do about a refusal.
 		/// </summary>
 		public event Action<BirdCard> Pressed;
+
+		/// <summary>
+		/// Raised when this card takes the focus, so the screen can sound the move. The card
+		/// does not play it itself: the screen is the one that knows the difference between
+		/// the player walking onto a card and the screen opening on one.
+		/// </summary>
+		public event Action<BirdCard> Focused;
 
 		public BirdProfile Bird
 		{
@@ -89,12 +99,12 @@ namespace BomberBird.UI
 				m_NameLabel.text = i_IsUnlocked ? m_Bird.DisplayName : "?";
 			}
 
-			if (m_StatsLabel != null)
-			{
-				// A locked card keeps an empty stats line rather than dropping it, so the
-				// habitat below lands on the same row as its neighbours'.
-				m_StatsLabel.text = i_IsUnlocked ? describeValues() : string.Empty;
-			}
+			// A locked card keeps its three rows and shows a dash in each, so the habitat below
+			// lands on the same line as its neighbours' and the card still reads as a bird with
+			// values waiting rather than a card with a hole in it.
+			setValue(m_SpeedValue, i_IsUnlocked ? m_Bird.Speed.ToString() : "-");
+			setValue(m_BurstValue, i_IsUnlocked ? m_Bird.BurstRange.ToString() : "-");
+			setValue(m_PodsValue, i_IsUnlocked ? m_Bird.MaxActivePods.ToString() : "-");
 
 			if (m_HabitatLabel != null)
 			{
@@ -120,22 +130,15 @@ namespace BomberBird.UI
 			refreshFocus();
 		}
 
-		public void OnPointerEnter(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = true;
-			refreshFocus();
-		}
-
-		public void OnPointerExit(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = false;
-			refreshFocus();
-		}
-
 		public void OnSelect(BaseEventData i_EventData)
 		{
 			m_IsSelected = true;
 			refreshFocus();
+
+			if (Focused != null)
+			{
+				Focused(this);
+			}
 		}
 
 		public void OnDeselect(BaseEventData i_EventData)
@@ -146,16 +149,20 @@ namespace BomberBird.UI
 
 		private void OnDisable()
 		{
-			// A card hidden mid-hover never receives its exit, so it would come back lifted.
-			m_IsPointerInside = false;
+			// A card hidden while focused never receives its deselect, so it would come back
+			// lifted.
 			m_IsSelected = false;
 			refreshFocus();
 		}
 
 		/// <summary>
-		/// The pointer and the keyboard overlap rather than replace each other - hover one card,
-		/// arrow-key to another, then move the mouse away - so they are tracked apart and the
-		/// card answers to either. Same reasoning as <see cref="ButtonFocusArrow"/>.
+		/// Selection alone decides which card is lifted and bracketed, so exactly one card can
+		/// ever look chosen.
+		///
+		/// Hover used to count too, and two cards could be lit at once: arrow onto one, leave
+		/// the mouse resting on another, and the screen showed two answers to a question with
+		/// one answer. The mouse still works - clicking a card selects it, which lands here
+		/// through <see cref="OnSelect"/> - it simply no longer highlights on its own.
 		/// </summary>
 		private void refreshFocus()
 		{
@@ -172,7 +179,7 @@ namespace BomberBird.UI
 				}
 			}
 
-			bool hasFocus = m_IsPointerInside || m_IsSelected;
+			bool hasFocus = m_IsSelected;
 
 			if (m_FocusBracket != null)
 			{
@@ -205,12 +212,12 @@ namespace BomberBird.UI
 			return i_Bird.Sprites == null ? null : i_Bird.Sprites.GetIdle(eFacing.Down);
 		}
 
-		/// <summary>The three values Docs/GDD.md says set the birds apart.</summary>
-		private string describeValues()
+		private static void setValue(TMP_Text i_Label, string i_Value)
 		{
-			return "Speed " + m_Bird.Speed
-				+ "   Burst " + m_Bird.BurstRange
-				+ "   Pods " + m_Bird.MaxActivePods;
+			if (i_Label != null)
+			{
+				i_Label.text = i_Value;
+			}
 		}
 
 		private void onPressed()

@@ -41,10 +41,15 @@ namespace BomberBird.UI
 
 		private void OnDisable()
 		{
-			// Never leave the game frozen because this object went away mid-pause.
+			// Never leave the game frozen, or silent, because this object went away mid-pause.
 			if (m_IsPaused)
 			{
 				Time.timeScale = 1f;
+
+				if (GameFlow.Instance != null)
+				{
+					GameFlow.Instance.SetMusicPaused(false);
+				}
 			}
 		}
 
@@ -115,6 +120,13 @@ namespace BomberBird.UI
 			if (m_Placer != null)
 			{
 				m_Placer.enabled = !i_IsPaused;
+			}
+
+			// The music runs on its own clock, so stopping time leaves it playing over a
+			// paused game.
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.SetMusicPaused(i_IsPaused);
 			}
 		}
 	}
