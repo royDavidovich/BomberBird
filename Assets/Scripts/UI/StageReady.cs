@@ -194,15 +194,7 @@ namespace BomberBird.UI
 				}
 			}
 
-			if (m_PulseSeconds <= 0f)
-			{
-				m_PromptText.alpha = 1f;
-				return;
-			}
-
-			float wave = 0.5f + 0.5f * Mathf.Cos(Time.unscaledTime / m_PulseSeconds * 2f * Mathf.PI);
-
-			m_PromptText.alpha = Mathf.Lerp(m_PulseFloor, 1f, wave);
+			m_PromptText.alpha = UiPulse.Alpha(Time.unscaledTime, m_PulseSeconds, m_PulseFloor);
 		}
 	}
 }
