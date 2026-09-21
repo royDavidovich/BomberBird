@@ -52,6 +52,13 @@ namespace BomberBird.Flow
 				+ "the boss, which award none and open their exit as soon as the arena is clear.")]
 			[SerializeField] private BirdProfile m_AwardedBird;
 
+			[Header("Sound")]
+			[Tooltip("The loop this habitat plays, from its card until the next habitat's "
+				+ "card - so the card, the stage, a death and its replay all sit under one "
+				+ "unbroken piece. Leave empty and the stage keeps the track the scene names, "
+				+ "which is what all six do today.")]
+			[SerializeField] private AudioClip m_Music;
+
 			public string HabitatName
 			{
 				get { return m_HabitatName; }
@@ -89,6 +96,15 @@ namespace BomberBird.Flow
 			public string BirdLine
 			{
 				get { return m_BirdLine; }
+			}
+
+			/// <summary>
+			/// This habitat's own loop, or null when it has none and the scene's track stands.
+			/// Read by <see cref="BomberBird.UI.SceneMusic"/> on the two screens a stage owns.
+			/// </summary>
+			public AudioClip Music
+			{
+				get { return m_Music; }
 			}
 		}
 
