@@ -7,8 +7,10 @@ using UnityEngine;
 namespace BomberBird.Tests
 {
 	/// <summary>
-	/// That the focus arrow answers to the mouse and the keyboard independently, and in
-	/// particular that letting go of one while the other still holds does not hide it.
+	/// That the focus arrow marks the selected button and nothing else.
+	///
+	/// It used to answer the pointer as well, which put two arrows on the menu whenever the
+	/// mouse rested on one button while the keyboard had moved to another.
 	/// </summary>
 	public class ButtonFocusArrowTests
 	{
@@ -49,18 +51,6 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
-		public void PointerShowsTheArrowAndLeavingHidesIt()
-		{
-			ButtonFocusArrow focus = makeButton(out GameObject arrow);
-
-			focus.OnPointerEnter(null);
-			Assert.IsTrue(arrow.activeSelf, "the pointer is over the button");
-
-			focus.OnPointerExit(null);
-			Assert.IsFalse(arrow.activeSelf, "the pointer has left and nothing else holds it");
-		}
-
-		[Test]
 		public void SelectionShowsTheArrowAndDeselectingHidesIt()
 		{
 			ButtonFocusArrow focus = makeButton(out GameObject arrow);
@@ -69,44 +59,41 @@ namespace BomberBird.Tests
 			Assert.IsTrue(arrow.activeSelf, "the keyboard has landed on the button");
 
 			focus.OnDeselect(null);
-			Assert.IsFalse(arrow.activeSelf, "the keyboard has moved on and nothing else holds it");
+			Assert.IsFalse(arrow.activeSelf, "the keyboard has moved on");
 		}
 
 		[Test]
-		public void LeavingWithThePointerKeepsTheArrowWhileTheButtonStaysSelected()
+		public void OnlyTheSelectedButtonWearsAnArrow()
 		{
-			ButtonFocusArrow focus = makeButton(out GameObject arrow);
+			// The menu is driven by the keyboard, and there is one selection, so there must be one
+			// arrow. When the arrow also answered the pointer, a mouse resting on one button while
+			// the keyboard sat on another put two on screen and the menu read as broken.
+			ButtonFocusArrow hovered = makeButton(out GameObject hoveredArrow);
+			ButtonFocusArrow selected = makeButton(out GameObject selectedArrow);
 
-			focus.OnPointerEnter(null);
-			focus.OnSelect(null);
-			focus.OnPointerExit(null);
+			selected.OnSelect(null);
 
-			Assert.IsTrue(arrow.activeSelf, "the keyboard still holds this button");
+			Assert.IsTrue(selectedArrow.activeSelf, "this is the button Return would press");
+			Assert.IsFalse(hoveredArrow.activeSelf,
+				"the pointer being over a button is not what Return acts on");
 		}
 
 		[Test]
-		public void DeselectingKeepsTheArrowWhileThePointerIsStillInside()
+		public void AButtonHiddenWhileSelectedComesBackWithoutAnArrow()
 		{
 			ButtonFocusArrow focus = makeButton(out GameObject arrow);
 
-			focus.OnPointerEnter(null);
 			focus.OnSelect(null);
-			focus.OnDeselect(null);
 
-			Assert.IsTrue(arrow.activeSelf, "the pointer is still over this button");
+			// Edit mode does not run the lifecycle for a plain MonoBehaviour, so the callback is
+			// invoked the way the Inspector reaches anything else private here.
+			MethodInfo disable = typeof(ButtonFocusArrow)
+				.GetMethod("OnDisable", BindingFlags.Instance | BindingFlags.NonPublic);
+			Assert.IsNotNull(disable, "OnDisable was renamed; a hidden button would keep its arrow");
+			disable.Invoke(focus, null);
+
+			Assert.IsFalse(arrow.activeSelf, "a hidden button never hears its deselect");
 		}
 
-		[Test]
-		public void ReleasingBothHidesTheArrow()
-		{
-			ButtonFocusArrow focus = makeButton(out GameObject arrow);
-
-			focus.OnPointerEnter(null);
-			focus.OnSelect(null);
-			focus.OnPointerExit(null);
-			focus.OnDeselect(null);
-
-			Assert.IsFalse(arrow.activeSelf, "nothing holds the button any more");
-		}
 	}
 }
