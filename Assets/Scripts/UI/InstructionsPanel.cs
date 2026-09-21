@@ -34,6 +34,11 @@ namespace BomberBird.UI
 			+ "and it arrives while the player is still pressing Play.")]
 		[SerializeField] private float m_Hold = 1.2f;
 
+		[Header("Sound")]
+		[Tooltip("The same clip the rest of the game confirms with. The lifebuoy that opens "
+			+ "this panel already says something; putting it away should too.")]
+		[SerializeField] private AudioClip m_Confirm;
+
 		private float m_ShownAt;
 		private bool m_IsClosing;
 
@@ -100,6 +105,9 @@ namespace BomberBird.UI
 
 			if (UiInput.WasKeyPressed())
 			{
+				// On the press rather than a frame later with the closing, so the sound answers
+				// the key at the moment it is struck.
+				UiSound.Play(m_Confirm);
 				m_IsClosing = true;
 			}
 		}

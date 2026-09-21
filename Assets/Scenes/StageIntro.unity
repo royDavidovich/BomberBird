@@ -686,6 +686,7 @@ MonoBehaviour:
   m_Hold: 1.6
   m_PulseSeconds: 1.4
   m_PulseFloor: 0.3
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
 --- !u!4 &721541406
 Transform:
   m_ObjectHideFlags: 0

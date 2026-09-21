@@ -62,6 +62,11 @@ namespace BomberBird.UI
 		[Range(0f, 1f)]
 		[SerializeField] private float m_PulseFloor = 0.3f;
 
+		[Header("Sound")]
+		[Tooltip("The same clip the rest of the game confirms with. UiSound carries it across "
+			+ "the load this press starts, so the card's own dismissal is still heard.")]
+		[SerializeField] private AudioClip m_Confirm;
+
 		private float m_ShownAt;
 		private TMP_Text m_HintText;
 
@@ -97,6 +102,8 @@ namespace BomberBird.UI
 			{
 				return;
 			}
+
+			UiSound.Play(m_Confirm);
 
 			if (GameFlow.Instance != null)
 			{

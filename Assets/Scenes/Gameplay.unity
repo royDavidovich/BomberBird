@@ -9939,6 +9939,7 @@ MonoBehaviour:
   m_Panel: {fileID: 415179754}
   m_ContinueHint: {fileID: 403562955}
   m_Hold: 1.2
+  m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
 --- !u!4 &1912094775
 Transform:
   m_ObjectHideFlags: 0
