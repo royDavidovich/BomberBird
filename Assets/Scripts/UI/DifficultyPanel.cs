@@ -84,6 +84,7 @@ namespace BomberBird.UI
 
 		private GameObject m_SelectedBefore;
 		private bool m_IsClosing;
+		private int m_OpenedFrame = -1;
 
 		/// <summary>
 		/// Whether the panel is up and owns the keyboard. Read by <see cref="FirstKeySelection"/>
@@ -125,6 +126,7 @@ namespace BomberBird.UI
 			UiSound.Play(m_Confirm);
 			show(true);
 			m_IsClosing = false;
+			m_OpenedFrame = Time.frameCount;
 
 			if (m_Slider != null)
 			{
@@ -161,7 +163,8 @@ namespace BomberBird.UI
 				return;
 			}
 
-			if (!IsShown || !UiInput.IsListening())
+			if (!IsShown || !UiInput.IsListening()
+				|| IsOpeningFrame(m_OpenedFrame, Time.frameCount))
 			{
 				return;
 			}
@@ -174,6 +177,25 @@ namespace BomberBird.UI
 					return;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Whether this is still the frame the panel opened on, in which case a close key is not
+		/// the player's - it is the press that opened the panel, still down.
+		///
+		/// The Difficulty button is reached with the arrows and taken with Return or Space, and
+		/// those are close keys too. <see cref="Input.GetKeyDown"/> stays true for the whole
+		/// frame, and Update order is undefined, so this component can run after the button has
+		/// already opened the panel and read that same press as the one putting it away: the
+		/// panel opens and shuts before the player sees it, and the button looks dead. The mouse
+		/// never showed it, because a click raises no key.
+		///
+		/// This is the mirror of the one-frame delay on closing - that one stops another reader
+		/// taking the closing press, this one stops the panel taking its own opening press.
+		/// </summary>
+		public static bool IsOpeningFrame(int i_OpenedFrame, int i_Frame)
+		{
+			return i_Frame == i_OpenedFrame;
 		}
 
 		private void onSliderMoved(float i_Value)
