@@ -54,6 +54,15 @@ namespace BomberBird.UI
 		[Tooltip("The bird is hit and a life is spent.")]
 		[SerializeField] private AudioClip m_BirdDeath;
 
+		[Tooltip("The gate in the wall stops being shut. Not the same moment as the stage "
+			+ "ending: this is the way out appearing, that is the bird walking into it.")]
+		[SerializeField] private AudioClip m_GateOpen;
+
+		[Tooltip("Seconds to hold the gate's sound back, for the same reason the cage's is "
+			+ "held: on the three stages that cage no feather the gate opens on the very "
+			+ "frame the last myna dies, and on the other three it follows the pickup.")]
+		[SerializeField] private float m_GateOpenDelay = 0.4f;
+
 		[Tooltip("The gate is reached and the stage ends.")]
 		[SerializeField] private AudioClip m_StageClear;
 
@@ -103,6 +112,7 @@ namespace BomberBird.UI
 
 			if (m_Exit != null)
 			{
+				m_Exit.GateOpened += exit_GateOpened;
 				m_Exit.StageCleared += exit_StageCleared;
 			}
 		}
@@ -133,6 +143,7 @@ namespace BomberBird.UI
 
 			if (m_Exit != null)
 			{
+				m_Exit.GateOpened -= exit_GateOpened;
 				m_Exit.StageCleared -= exit_StageCleared;
 			}
 		}
@@ -168,6 +179,11 @@ namespace BomberBird.UI
 		private void death_BirdDied()
 		{
 			play(m_BirdDeath);
+		}
+
+		private void exit_GateOpened()
+		{
+			StartCoroutine(playAfter(m_GateOpenDelay, m_GateOpen));
 		}
 
 		private void exit_StageCleared()
@@ -275,6 +291,11 @@ namespace BomberBird.UI
 			if (m_BirdDeath == null)
 			{
 				missing += " birdDeath";
+			}
+
+			if (m_GateOpen == null)
+			{
+				missing += " gateOpen";
 			}
 
 			if (m_StageClear == null)

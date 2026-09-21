@@ -8138,10 +8138,12 @@ MonoBehaviour:
   m_PodPlace: {fileID: 8300000, guid: 20f4e32d86a224fa28fac23a99ef340a, type: 3}
   m_Burst: {fileID: 8300000, guid: f060de3b1b53a40cb945509509afdae9, type: 3}
   m_MynaDefeated: {fileID: 8300000, guid: 12e8a5407de7947f0986231134d00963, type: 3}
-  m_CageOpen: {fileID: 0}
+  m_CageOpen: {fileID: 8300000, guid: a0d1bf4422daf4a52a6fb10e87d25f38, type: 3}
   m_CageOpenDelay: 0.4
   m_FeatherCollect: {fileID: 8300000, guid: 7c04a0d99c2ac433b8e472486933598e, type: 3}
   m_BirdDeath: {fileID: 8300000, guid: d9dd65e95bdbb41a982371d8a04d7192, type: 3}
+  m_GateOpen: {fileID: 8300000, guid: 80b55039a65d64e6bb8c02257bc8e9a9, type: 3}
+  m_GateOpenDelay: 0.4
   m_StageClear: {fileID: 8300000, guid: ee7dad8feb5394bd28f23f51b116abc1, type: 3}
 --- !u!82 &1688113806
 AudioSource:

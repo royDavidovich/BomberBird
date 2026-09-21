@@ -59,6 +59,15 @@ namespace BomberBird.Flow
 		public event Action StageCleared;
 
 		/// <summary>
+		/// Raised once, the moment the gate stops being shut - not when it is walked into.
+		///
+		/// On a stage that cages a feather this follows the feather being picked up; on the
+		/// three that cage none it follows the last myna falling, on that same frame. So a
+		/// listener that makes a noise about it should expect company either way.
+		/// </summary>
+		public event Action GateOpened;
+
+		/// <summary>
 		/// Whether the gate may be used. An exit with no objective assigned stays usable, so
 		/// a stage built without one is playable rather than unfinishable.
 		/// </summary>
@@ -138,6 +147,11 @@ namespace BomberBird.Flow
 			StageCleared?.Invoke();
 		}
 
+		private void OnGateOpened()
+		{
+			GateOpened?.Invoke();
+		}
+
 		/// <summary>
 		/// Opens the wall so the bird can walk into it, shows the open gate, and starts the
 		/// arrow. The grid change is what actually lets the bird through; the rest is signal.
@@ -155,6 +169,8 @@ namespace BomberBird.Flow
 			{
 				StartCoroutine(flashArrow());
 			}
+
+			OnGateOpened();
 		}
 
 		private IEnumerator flashArrow()
