@@ -95,7 +95,7 @@ namespace BomberBird.UI
 
 		private GameObject m_SelectedBefore;
 		private bool m_IsClosing;
-		private int m_OpenedFrame = -1;
+		private bool m_Armed;
 
 		/// <summary>
 		/// Whether the panel is up and owns the keyboard. Read by <see cref="FirstKeySelection"/>
@@ -148,7 +148,10 @@ namespace BomberBird.UI
 			UiSound.Play(m_Confirm);
 			show(true);
 			m_IsClosing = false;
-			m_OpenedFrame = Time.frameCount;
+
+			// The key that opened this is very likely still down. Nothing is taken until it is
+			// let go - see IsArmedNow.
+			m_Armed = false;
 
 			if (m_Slider != null)
 			{
@@ -186,8 +189,16 @@ namespace BomberBird.UI
 				return;
 			}
 
-			if (!IsShown || !UiInput.IsListening()
-				|| IsOpeningFrame(m_OpenedFrame, Time.frameCount))
+			if (!IsShown || !UiInput.IsListening())
+			{
+				return;
+			}
+
+			// Armed by the opening key being let go, and armed it stays. Reading the keyboard
+			// before that would take the press that opened the panel.
+			m_Armed = IsArmedNow(m_Armed, isAnyCloseKeyHeld());
+
+			if (!m_Armed)
 			{
 				return;
 			}
@@ -230,22 +241,51 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// Whether this is still the frame the panel opened on, in which case a close key is not
-		/// the player's - it is the press that opened the panel, still down.
+		/// Whether the panel may read the keyboard yet.
 		///
-		/// The Difficulty button is reached with the arrows and taken with Return or Space, and
-		/// those are close keys too. <see cref="Input.GetKeyDown"/> stays true for the whole
-		/// frame, and Update order is undefined, so this component can run after the button has
-		/// already opened the panel and read that same press as the one putting it away: the
-		/// panel opens and shuts before the player sees it, and the button looks dead. The mouse
-		/// never showed it, because a click raises no key.
+		/// The Difficulty button is reached with the arrows and taken with Return - which is also
+		/// the key that takes a difficulty and closes this panel. So the press that opens the panel
+		/// is still down when the panel starts reading the keyboard, and the panel would shut on the
+		/// press that opened it: the player hears the confirm, sees nothing, and the button looks
+		/// dead. A mouse click never showed it, because a click raises no key.
 		///
-		/// This is the mirror of the one-frame delay on closing - that one stops another reader
-		/// taking the closing press, this one stops the panel taking its own opening press.
+		/// This was first guarded by ignoring the single frame the panel opened on, which was not
+		/// wide enough: a real press was logged opening the panel on one frame and closing it two
+		/// frames later, because the EventSystem acts on a submit a frame before this component sees
+		/// the key down. Rather than guess at a number of frames or a number of seconds, the panel
+		/// waits to be armed by the key being released, and once armed it stays armed - a press
+		/// holds the key down on the very frame it is reported, so asking for a free keyboard at
+		/// that moment would refuse every real press. That is immune to any skew, and it also
+		/// stops a held Return from opening and shutting the panel over and over.
+		///
+		/// The mirror of this is the one-frame delay on closing, which stops another reader on the
+		/// screen taking the press that closes the panel.
 		/// </summary>
-		public static bool IsOpeningFrame(int i_OpenedFrame, int i_Frame)
+		public static bool IsArmedNow(bool i_WasArmed, bool i_IsAnyCloseKeyHeld)
 		{
-			return i_Frame == i_OpenedFrame;
+			return i_WasArmed || !i_IsAnyCloseKeyHeld;
+		}
+
+		/// <summary>Whether a key that would close the panel is down right now.</summary>
+		private bool isAnyCloseKeyHeld()
+		{
+			for (int key = 0; key < m_ChooseKeys.Length; ++key)
+			{
+				if (Input.GetKey(m_ChooseKeys[key]))
+				{
+					return true;
+				}
+			}
+
+			for (int key = 0; key < m_CancelKeys.Length; ++key)
+			{
+				if (Input.GetKey(m_CancelKeys[key]))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void onSliderMoved(float i_Value)

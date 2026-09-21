@@ -12,6 +12,10 @@ namespace BomberBird.Tests
 	/// That the panel keeps the keyboard it is given: it does not read the press that opened it
 	/// as the press putting it away, and it does not let an arrow wander off the lever onto the
 	/// menu still standing behind it.
+	///
+	/// The opening press was first guarded by one frame, which a real press walked through - the
+	/// EventSystem acts on a submit a frame before this panel sees the key down. The guard is the
+	/// key being released instead, which no skew can outrun.
 	/// </summary>
 	public class DifficultyPanelTests
 	{
@@ -29,25 +33,26 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
-		public void TheOpeningPressIsNotAlsoTheClosingPress()
+		public void APanelJustOpenedWillNotReadTheKeyStillHoldingItOpen()
 		{
-			Assert.IsTrue(DifficultyPanel.IsOpeningFrame(120, 120),
-				"the panel opened on this frame, so a close key down now is the press that opened it");
+			Assert.IsFalse(DifficultyPanel.IsArmedNow(false, true),
+				"Return is still down from opening the panel, so it is not the player's press");
 		}
 
 		[Test]
-		public void TheNextFrameBelongsToThePlayer()
+		public void LettingTheKeyGoArmsThePanel()
 		{
-			Assert.IsFalse(DifficultyPanel.IsOpeningFrame(120, 121),
-				"a frame later the player has had a chance to press something of their own");
+			Assert.IsTrue(DifficultyPanel.IsArmedNow(false, false),
+				"nothing is held, so the next press belongs to the player");
 		}
 
 		[Test]
-		public void APanelThatWasNeverOpenedHoldsNoFrame()
+		public void OnceArmedItStaysArmedThroughThePressItself()
 		{
-			// -1 is what the field carries before the first Show, and frame counts start at 0.
-			Assert.IsFalse(DifficultyPanel.IsOpeningFrame(-1, 0),
-				"nothing opened, so no frame is spoken for");
+			// A press holds its key down on the very frame it is reported, so a panel that asked
+			// for a free keyboard at that moment would refuse every real press.
+			Assert.IsTrue(DifficultyPanel.IsArmedNow(true, true),
+				"the panel was already armed; the key being down now is the player pressing it");
 		}
 
 		[Test]
