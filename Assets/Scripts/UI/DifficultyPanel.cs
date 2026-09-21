@@ -111,6 +111,17 @@ namespace BomberBird.UI
 				m_Slider.minValue = 0f;
 				m_Slider.maxValue = DifficultyChoice.StopCount - 1;
 				m_Slider.onValueChanged.AddListener(onSliderMoved);
+
+				// The lever is the only thing the player is offered while the panel is up, but
+				// the menu's buttons are still standing behind it, and Unity's automatic
+				// navigation happily carries Up and Down onto them: the focus leaves the lever,
+				// the arrows stop moving it, the focus arrow lights up behind the panel, and
+				// Return presses a button nobody can see. None holds every arrow on the slider.
+				// Left and Right still move the value, because a Slider only hands an arrow to
+				// navigation when there is something to navigate to.
+				Navigation nav = m_Slider.navigation;
+				nav.mode = Navigation.Mode.None;
+				m_Slider.navigation = nav;
 			}
 		}
 
