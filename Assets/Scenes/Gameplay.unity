@@ -480,8 +480,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: ESCAPE PAUSES
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
-  m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: 6
+  m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -9939,6 +9939,8 @@ MonoBehaviour:
   m_Panel: {fileID: 415179754}
   m_ContinueHint: {fileID: 403562955}
   m_Hold: 1.2
+  m_PulseSeconds: 1.4
+  m_PulseFloor: 0.3
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
 --- !u!4 &1912094775
 Transform:

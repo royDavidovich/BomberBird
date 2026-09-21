@@ -1,4 +1,5 @@
 using BomberBird.Flow;
+using TMPro;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -34,12 +35,20 @@ namespace BomberBird.UI
 			+ "and it arrives while the player is still pressing Play.")]
 		[SerializeField] private float m_Hold = 1.2f;
 
+		[Tooltip("Seconds for one full fade of the prompt, matching the closing screens.")]
+		[SerializeField] private float m_PulseSeconds = 1.4f;
+
+		[Tooltip("How far down the pulse fades. 1 would not move at all.")]
+		[Range(0f, 1f)]
+		[SerializeField] private float m_PulseFloor = 0.3f;
+
 		[Header("Sound")]
 		[Tooltip("The same clip the rest of the game confirms with. The lifebuoy that opens "
 			+ "this panel already says something; putting it away should too.")]
 		[SerializeField] private AudioClip m_Confirm;
 
 		private float m_ShownAt;
+		private TMP_Text m_HintText;
 		private bool m_IsClosing;
 
 		/// <summary>
@@ -103,6 +112,8 @@ namespace BomberBird.UI
 				m_ContinueHint.SetActive(true);
 			}
 
+			pulseHint();
+
 			if (UiInput.WasKeyPressed())
 			{
 				// On the press rather than a frame later with the closing, so the sound answers
@@ -110,6 +121,31 @@ namespace BomberBird.UI
 				UiSound.Play(m_Confirm);
 				m_IsClosing = true;
 			}
+		}
+
+		/// <summary>
+		/// Breathes the prompt, the way the habitat card and the closing screens do. Unscaled,
+		/// because this panel is usually up over a game held at zero.
+		/// </summary>
+		private void pulseHint()
+		{
+			if (m_ContinueHint == null)
+			{
+				return;
+			}
+
+			if (m_HintText == null)
+			{
+				m_HintText = m_ContinueHint.GetComponent<TMP_Text>();
+
+				if (m_HintText == null)
+				{
+					return;
+				}
+			}
+
+			m_HintText.alpha = UiPulse.Alpha(
+				Time.unscaledTime - m_ShownAt - m_Hold, m_PulseSeconds, m_PulseFloor);
 		}
 
 		private void show(bool i_IsShown)

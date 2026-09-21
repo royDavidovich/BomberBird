@@ -197,16 +197,8 @@ namespace BomberBird.UI
 				}
 			}
 
-			if (m_PulseSeconds <= 0f)
-			{
-				m_HintText.alpha = 1f;
-				return;
-			}
-
-			float phase = (Time.unscaledTime - m_ShownAt - m_Hold) / m_PulseSeconds;
-			float wave = 0.5f + 0.5f * Mathf.Cos(phase * 2f * Mathf.PI);
-
-			m_HintText.alpha = Mathf.Lerp(m_PulseFloor, 1f, wave);
+			m_HintText.alpha = UiPulse.Alpha(
+				Time.unscaledTime - m_ShownAt - m_Hold, m_PulseSeconds, m_PulseFloor);
 		}
 
 		private void show(GameObject i_Shown, GameObject i_Hidden, float i_Hold)
