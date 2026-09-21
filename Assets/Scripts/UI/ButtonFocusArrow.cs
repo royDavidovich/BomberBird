@@ -4,35 +4,24 @@ using UnityEngine.EventSystems;
 namespace BomberBird.UI
 {
 	/// <summary>
-	/// Shows an arrow beside its button while that button has the player's attention.
+	/// Shows an arrow beside its button while that button is the one selected.
 	///
-	/// The menu is reachable by mouse and by keyboard, and the two forms of attention overlap
-	/// rather than replace each other: the player can hover Play, arrow-key across to Quit, and
-	/// then move the mouse away. A single flag would leave an arrow stranded on the button the
-	/// pointer has left, so the pointer and the selection are tracked apart and the arrow
-	/// answers to either.
+	/// The arrow used to answer to the pointer as well as the selection, so that a hovered
+	/// button wore one too. That put **two** arrows on the menu whenever the mouse happened to
+	/// be resting over one button while the keyboard had moved to another - the menu read as
+	/// broken, and neither arrow was telling the truth about what Return would press.
+	///
+	/// There is exactly one selection, so there is now exactly one arrow. The mouse has not lost
+	/// anything: clicking a button selects it, so the arrow follows a click, and a button under
+	/// the pointer still lights through its own Button transition.
 	/// </summary>
-	public class ButtonFocusArrow : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
-		ISelectHandler, IDeselectHandler
+	public class ButtonFocusArrow : MonoBehaviour, ISelectHandler, IDeselectHandler
 	{
 		[Header("Parts")]
-		[Tooltip("Hidden until the button is hovered or selected.")]
+		[Tooltip("Hidden until the button is the selected one.")]
 		[SerializeField] private GameObject m_Arrow;
 
-		private bool m_IsPointerInside;
 		private bool m_IsSelected;
-
-		public void OnPointerEnter(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = true;
-			refreshArrow();
-		}
-
-		public void OnPointerExit(PointerEventData i_EventData)
-		{
-			m_IsPointerInside = false;
-			refreshArrow();
-		}
 
 		public void OnSelect(BaseEventData i_EventData)
 		{
@@ -48,9 +37,8 @@ namespace BomberBird.UI
 
 		private void OnDisable()
 		{
-			// A button hidden mid-hover never receives its exit, so it would come back wearing
-			// an arrow it has not earned.
-			m_IsPointerInside = false;
+			// A button hidden while selected never receives its deselect, so it would come back
+			// wearing an arrow it has not earned.
 			m_IsSelected = false;
 			refreshArrow();
 		}
@@ -59,7 +47,7 @@ namespace BomberBird.UI
 		{
 			if (m_Arrow != null)
 			{
-				m_Arrow.SetActive(m_IsPointerInside || m_IsSelected);
+				m_Arrow.SetActive(m_IsSelected);
 			}
 		}
 	}

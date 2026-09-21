@@ -26,8 +26,13 @@ namespace BomberBird.UI
 	/// <see cref="InstructionsPanel"/> is the pattern being followed here - the same hide-in-Awake,
 	/// the same <see cref="IsShown"/> that the screen's other keyboard reader stands down against,
 	/// and the same deliberate one-frame delay on closing. The one thing it cannot copy is "any
-	/// key closes": the arrows belong to the slider, so only the keys listed in
-	/// <see cref="m_CloseKeys"/> put the panel away.
+	/// key closes": the arrows belong to the lever, so the keys are split by what they mean -
+	/// <see cref="m_ChooseKeys"/> takes the stop the lever is standing on, <see cref="m_CancelKeys"/>
+	/// leaves the setting as it was found.
+	///
+	/// Moving the lever decides nothing. It used to write the setting on every move, which made
+	/// looking at a stop the same act as choosing it; now the ladder can be walked and read, and
+	/// the difficulty changes only when the player says so.
 	/// </summary>
 	public class DifficultyPanel : MonoBehaviour
 	{
@@ -64,10 +69,16 @@ namespace BomberBird.UI
 		[SerializeField] private Color m_OtherName = new Color(0.471f, 0.314f, 0.173f, 1f);
 
 		[Header("Keys")]
-		[Tooltip("What puts the panel away. Deliberately not 'any key': the arrows are the "
-			+ "slider's, and Tab and the mouse belong to Unity's own navigation.")]
+		[Tooltip("What takes the difficulty the lever is standing on and closes the panel. "
+			+ "Deliberately only Return: the arrows move the lever, and the choice is not made "
+			+ "until the player says so.")]
 		[SerializeField]
-		private KeyCode[] m_CloseKeys = { KeyCode.Escape, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Space };
+		private KeyCode[] m_ChooseKeys = { KeyCode.Return, KeyCode.KeypadEnter };
+
+		[Tooltip("What closes the panel without taking what the lever is standing on. The "
+			+ "setting is left as it was found.")]
+		[SerializeField]
+		private KeyCode[] m_CancelKeys = { KeyCode.Escape };
 
 		[Header("Sound")]
 		[Tooltip("The same clip the rest of the menu confirms with, because it is the same act. "
@@ -84,6 +95,7 @@ namespace BomberBird.UI
 
 		private GameObject m_SelectedBefore;
 		private bool m_IsClosing;
+		private bool m_Armed;
 
 		/// <summary>
 		/// Whether the panel is up and owns the keyboard. Read by <see cref="FirstKeySelection"/>
@@ -97,6 +109,19 @@ namespace BomberBird.UI
 
 		private void Awake()
 		{
+			// Switched on once here and straight back off, because the *first* time this panel
+			// is switched on it costs over a second - measured at 1227ms, against 0.3ms for
+			// every activation after it. Unity pays for the panel's materials and shader
+			// variants the first time they are drawn, and until now the player paid it, by
+			// pressing Difficulty: the menu froze for a second and the confirm sound the same
+			// press had just started was destroyed inside that one frozen frame, unheard. The
+			// button looked like the only one in the game with no sound.
+			//
+			// Paid here it is invisible, because the screen is still arriving behind the fade.
+			// Play and Quit never showed this: neither switches anything on.
+			show(true);
+			Canvas.ForceUpdateCanvases();
+
 			// Hidden here rather than trusted to be hidden in the scene, because the panel is
 			// worked on with it open and would otherwise ship that way.
 			show(false);
@@ -110,6 +135,17 @@ namespace BomberBird.UI
 				m_Slider.minValue = 0f;
 				m_Slider.maxValue = DifficultyChoice.StopCount - 1;
 				m_Slider.onValueChanged.AddListener(onSliderMoved);
+
+				// The lever is the only thing the player is offered while the panel is up, but
+				// the menu's buttons are still standing behind it, and Unity's automatic
+				// navigation happily carries Up and Down onto them: the focus leaves the lever,
+				// the arrows stop moving it, the focus arrow lights up behind the panel, and
+				// Return presses a button nobody can see. None holds every arrow on the slider.
+				// Left and Right still move the value, because a Slider only hands an arrow to
+				// navigation when there is something to navigate to.
+				Navigation nav = m_Slider.navigation;
+				nav.mode = Navigation.Mode.None;
+				m_Slider.navigation = nav;
 			}
 		}
 
@@ -125,6 +161,10 @@ namespace BomberBird.UI
 			UiSound.Play(m_Confirm);
 			show(true);
 			m_IsClosing = false;
+
+			// The key that opened this is very likely still down. Nothing is taken until it is
+			// let go - see IsArmedNow.
+			m_Armed = false;
 
 			if (m_Slider != null)
 			{
@@ -146,6 +186,7 @@ namespace BomberBird.UI
 				if (m_Slider != null)
 				{
 					EventSystem.current.SetSelectedGameObject(m_Slider.gameObject);
+					holdTheNavigationClick();
 				}
 			}
 		}
@@ -166,14 +207,98 @@ namespace BomberBird.UI
 				return;
 			}
 
-			for (int key = 0; key < m_CloseKeys.Length; ++key)
+			// Armed by the opening key being let go, and armed it stays. Reading the keyboard
+			// before that would take the press that opened the panel.
+			m_Armed = IsArmedNow(m_Armed, isAnyCloseKeyHeld());
+
+			if (!m_Armed)
 			{
-				if (Input.GetKeyDown(m_CloseKeys[key]))
+				return;
+			}
+
+			for (int key = 0; key < m_ChooseKeys.Length; ++key)
+			{
+				if (Input.GetKeyDown(m_ChooseKeys[key]))
+				{
+					take();
+					m_IsClosing = true;
+					return;
+				}
+			}
+
+			for (int key = 0; key < m_CancelKeys.Length; ++key)
+			{
+				if (Input.GetKeyDown(m_CancelKeys[key]))
 				{
 					m_IsClosing = true;
 					return;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Takes the difficulty the lever is standing on.
+		///
+		/// The panel used to write the setting the moment the lever moved, on the grounds that
+		/// it showed what the game would do and was already doing it. That makes the lever the
+		/// choice and leaves no way to look without deciding, so the write waits for the player
+		/// to say yes. The property is still what saves to PlayerPrefs, so taking it here is
+		/// what remembers it between sittings.
+		/// </summary>
+		private void take()
+		{
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.EasyMynas = DifficultyChoice.IsEasyAt(currentStop());
+			}
+		}
+
+		/// <summary>
+		/// Whether the panel may read the keyboard yet.
+		///
+		/// The Difficulty button is reached with the arrows and taken with Return - which is also
+		/// the key that takes a difficulty and closes this panel. So the press that opens the panel
+		/// is still down when the panel starts reading the keyboard, and the panel would shut on the
+		/// press that opened it: the player hears the confirm, sees nothing, and the button looks
+		/// dead. A mouse click never showed it, because a click raises no key.
+		///
+		/// This was first guarded by ignoring the single frame the panel opened on, which was not
+		/// wide enough: a real press was logged opening the panel on one frame and closing it two
+		/// frames later, because the EventSystem acts on a submit a frame before this component sees
+		/// the key down. Rather than guess at a number of frames or a number of seconds, the panel
+		/// waits to be armed by the key being released, and once armed it stays armed - a press
+		/// holds the key down on the very frame it is reported, so asking for a free keyboard at
+		/// that moment would refuse every real press. That is immune to any skew, and it also
+		/// stops a held Return from opening and shutting the panel over and over.
+		///
+		/// The mirror of this is the one-frame delay on closing, which stops another reader on the
+		/// screen taking the press that closes the panel.
+		/// </summary>
+		public static bool IsArmedNow(bool i_WasArmed, bool i_IsAnyCloseKeyHeld)
+		{
+			return i_WasArmed || !i_IsAnyCloseKeyHeld;
+		}
+
+		/// <summary>Whether a key that would close the panel is down right now.</summary>
+		private bool isAnyCloseKeyHeld()
+		{
+			for (int key = 0; key < m_ChooseKeys.Length; ++key)
+			{
+				if (Input.GetKey(m_ChooseKeys[key]))
+				{
+					return true;
+				}
+			}
+
+			for (int key = 0; key < m_CancelKeys.Length; ++key)
+			{
+				if (Input.GetKey(m_CancelKeys[key]))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void onSliderMoved(float i_Value)
@@ -186,14 +311,9 @@ namespace BomberBird.UI
 			// in whole numbers, so this is one click per stop rather than one per frame.
 			UiSound.Play(m_Move, m_MoveVolume);
 
-			if (GameFlow.Instance != null)
-			{
-				// The property is what writes PlayerPrefs, so the setting is saved the moment
-				// the lever moves. There is no confirm step and deliberately no cancel: the
-				// panel shows what the game will do, and it is already doing it.
-				GameFlow.Instance.EasyMynas = DifficultyChoice.IsEasyAt(stop);
-			}
-
+			// Moving the lever changes nothing but what the panel shows. The setting is written
+			// by take(), when the player says yes, so a player can walk the ladder and look at
+			// each stop without having chosen any of them.
 			showStop(stop);
 		}
 
@@ -271,9 +391,33 @@ namespace BomberBird.UI
 			if (EventSystem.current != null && m_SelectedBefore != null)
 			{
 				EventSystem.current.SetSelectedGameObject(m_SelectedBefore);
+				holdTheNavigationClick();
 			}
 
 			m_SelectedBefore = null;
+		}
+
+		/// <summary>
+		/// Tells the screen's navigation click that the focus it is about to find somewhere new
+		/// was moved by this panel, not by the player.
+		///
+		/// Opening raised a confirm and then handed the keyboard to the lever in the same frame,
+		/// so the click meant for "you moved between buttons" landed on top of it. Two clips in
+		/// one frame read as neither, which is why the Difficulty button sounded as though it
+		/// had no sound of its own while Play, which moves no focus, sounded fine.
+		///
+		/// Found by component rather than wired, because <see cref="UiNavigationSound"/>'s own
+		/// summary says to put it beside the screen's <see cref="FirstKeySelection"/> - which is
+		/// this object. A screen without one simply has no click to hold.
+		/// </summary>
+		private void holdTheNavigationClick()
+		{
+			UiNavigationSound click = GetComponent<UiNavigationSound>();
+
+			if (click != null)
+			{
+				click.Resync();
+			}
 		}
 
 		private void show(bool i_IsShown)
