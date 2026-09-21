@@ -357,10 +357,14 @@ namespace BomberBird.UI
 				// One line under a rule: the label quiet, the three figures bold, the way the
 				// tiles option had it. Rich text rather than three labels, because the run
 				// tally is one sentence and splitting it would need its own layout group.
-				m_TotalsText.text = "<color=#5C4A33>Whole game</color>    <b>"
-					+ (flow.TotalMynasDefeated + countMynas()) + " mynas</b>    <b>"
-					+ (flow.TotalPodsPlaced + countPods()) + " pods</b>    <b>"
-					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds()) + "</b>";
+				// The figures are set in Handjet and the words are not, because this row is
+				// Pixelify and Pixelify draws a 2 as a Z - the same fault the how-to-play step
+				// numbers were moved off. The font tag resolves by name through a Resources
+				// folder, which is why the asset sits under TextMesh Pro/Resources.
+				m_TotalsText.text = "<color=#5C4A33>Whole game</color>    <b><font=\"Handjet SDF\">"
+					+ (flow.TotalMynasDefeated + countMynas()) + "</font> mynas</b>    <b><font=\"Handjet SDF\">"
+					+ (flow.TotalPodsPlaced + countPods()) + "</font> pods</b>    <b><font=\"Handjet SDF\">"
+					+ StageCounters.FormatTime(flow.TotalSeconds + countSeconds()) + "</font></b>";
 			}
 
 			setText(m_NextLabel, isFinale ? "Continue" : "Next stage");
