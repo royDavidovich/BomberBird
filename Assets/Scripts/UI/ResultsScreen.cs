@@ -94,6 +94,10 @@ namespace BomberBird.UI
 			+ "a card that ends a stage reads as the press having been missed.")]
 		[SerializeField] private AudioClip m_Confirm;
 
+		[Tooltip("The sting on the GAME OVER card. Played over the stage's music as that fades "
+			+ "out from under it, so the run ends on a note rather than on a cut.")]
+		[SerializeField] private AudioClip m_GameOverJingle;
+
 		[Header("Game over")]
 		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
 			+ "stage keeps the arena it just won showing through the scrim.")]
@@ -379,6 +383,15 @@ namespace BomberBird.UI
 				: "Stage " + StageWords.Spelled(flow.StageNumber) + " beat you");
 
 			showTaunt();
+
+			// The loop leaves and the sting does not: both start here, on the one call
+			// gameFlow_StageEnded guards to once per game over.
+			if (flow != null)
+			{
+				flow.FadeOutMusic();
+			}
+
+			UiSound.Play(m_GameOverJingle);
 		}
 
 		/// <summary>

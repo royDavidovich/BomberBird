@@ -42,6 +42,10 @@ namespace BomberBird.Flow
 		[Range(0f, 1f)]
 		[SerializeField] private float m_MusicDuckFloor;
 
+		[Tooltip("Seconds the music takes to leave when a run ends. The jingle laid over it "
+			+ "does not fade - it lands at full while the loop underneath is already going.")]
+		[SerializeField] private float m_MusicFadeSeconds = 1.6f;
+
 		// Scenes are loaded by name, never by build index: adding a scene renumbers every
 		// index, and an index load would silently start sending the player somewhere else.
 		public const string k_MainMenuScene = "MainMenu";
@@ -58,6 +62,7 @@ namespace BomberBird.Flow
 		private bool m_EasyMynas;
 		private AudioSource m_Music;
 		private float m_MusicVolume = 1f;
+		private Coroutine m_MusicFade;
 		private bool m_IsTransitioning;
 
 		/// <summary>
@@ -230,6 +235,29 @@ namespace BomberBird.Flow
 
 			m_Music.clip = i_Clip;
 			m_Music.Play();
+		}
+
+		/// <summary>
+		/// Takes the music out from under a run that has ended.
+		///
+		/// The stage loop is the wrong thing to hear over a GAME OVER card, but cutting it dead
+		/// on the frame the card arrives is worse than either - the silence reads as a fault.
+		/// So it leaves, and the jingle over it does not fade: the sting lands at full while the
+		/// loop underneath is already going.
+		///
+		/// Unscaled, because the card that calls this has just set the clock to zero. The source
+		/// is stopped at the end rather than left running silent, so Retry starts the stage's
+		/// track from its beginning instead of halfway through the bar that lost.
+		/// </summary>
+		public void FadeOutMusic()
+		{
+			if (m_Music == null || !m_Music.isPlaying)
+			{
+				return;
+			}
+
+			stopMusicFade();
+			m_MusicFade = StartCoroutine(fadeOutMusic());
 		}
 
 		/// <summary>
@@ -531,6 +559,10 @@ namespace BomberBird.Flow
 		{
 			m_IsTransitioning = true;
 
+			// A fade-out still running would write the volume every frame that setCover does,
+			// and the two would fight over the same field all the way to black.
+			stopMusicFade();
+
 			yield return fade(0f, 1f, i_Seconds);
 
 			// Only now. Held until full black, a Restart from the pause overlay does not run
@@ -558,6 +590,44 @@ namespace BomberBird.Flow
 		/// Walks the cover from one opacity to another on unscaled time, because a transition
 		/// out of a paused game runs with the clock stopped.
 		/// </summary>
+		private void stopMusicFade()
+		{
+			if (m_MusicFade == null)
+			{
+				return;
+			}
+
+			StopCoroutine(m_MusicFade);
+			m_MusicFade = null;
+
+			if (m_Music != null)
+			{
+				m_Music.volume = m_MusicVolume;
+			}
+		}
+
+		private IEnumerator fadeOutMusic()
+		{
+			float elapsed = 0f;
+
+			for (float t = ScreenFade.Ramp(elapsed, m_MusicFadeSeconds); t < 1f;
+				t = ScreenFade.Ramp(elapsed, m_MusicFadeSeconds))
+			{
+				m_Music.volume = m_MusicVolume * (1f - t);
+
+				yield return null;
+
+				elapsed += Time.unscaledDeltaTime;
+			}
+
+			m_Music.Stop();
+
+			// Back to the stored level rather than left at zero: the next track to play reads
+			// its volume from this source, and one stopped at zero would come back silent.
+			m_Music.volume = m_MusicVolume;
+			m_MusicFade = null;
+		}
+
 		private IEnumerator fade(float i_From, float i_To, float i_Seconds)
 		{
 			float elapsed = 0f;
