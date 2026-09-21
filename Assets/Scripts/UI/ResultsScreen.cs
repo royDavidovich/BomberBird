@@ -296,7 +296,7 @@ namespace BomberBird.UI
 			// on its own; the card that reports the last stage is still a report.
 			setText(m_ClearedTitle, isFinale
 				? "Game cleared"
-				: "Stage " + flow.StageNumber + " cleared");
+				: "Stage " + StageWords.Spelled(flow.StageNumber) + " cleared");
 
 			Campaign.Stage stage = flow.CurrentStage;
 			setText(m_ClearedHabitat, stage == null ? string.Empty : stage.HabitatName);
@@ -372,7 +372,7 @@ namespace BomberBird.UI
 
 			setText(m_GameOverStage, flow == null
 				? string.Empty
-				: "Stage " + flow.StageNumber + " beat you");
+				: "Stage " + StageWords.Spelled(flow.StageNumber) + " beat you");
 
 			showTaunt();
 		}

@@ -68,8 +68,8 @@ namespace BomberBird.UI
 				string habitat = stage == null ? null : stage.HabitatName;
 
 				m_StageLabel.text = string.IsNullOrEmpty(habitat)
-					? "Stage " + GameFlow.Instance.StageNumber
-					: "Stage " + GameFlow.Instance.StageNumber + " - " + habitat;
+					? "Stage " + StageWords.Spelled(GameFlow.Instance.StageNumber)
+					: "Stage " + StageWords.Spelled(GameFlow.Instance.StageNumber) + " - " + habitat;
 			}
 
 			buildCards();

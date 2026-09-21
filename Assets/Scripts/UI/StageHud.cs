@@ -72,7 +72,7 @@ namespace BomberBird.UI
 				return;
 			}
 
-			m_StageLabel.text = "Stage " + flow.StageNumber;
+			m_StageLabel.text = "Stage " + StageWords.Spelled(flow.StageNumber);
 
 			// Pods and lives are labelled by the icon beside them, so the number stands alone.
 			// The stage keeps its word: there is no stage icon, and a bare number would not
