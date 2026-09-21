@@ -52,6 +52,21 @@ namespace BomberBird.UI
 			m_Before = EventSystem.current == null ? null : EventSystem.current.currentSelectedGameObject;
 		}
 
+		/// <summary>
+		/// Takes the selection as it stands without calling it a move.
+		///
+		/// A screen that hands the focus somewhere itself - the difficulty panel taking the
+		/// keyboard onto its lever and giving it back on the way out - has not had the player
+		/// move between buttons, and the click that says so lands on top of the confirm the
+		/// same press already raised. Two clips in one frame do not read as either of them.
+		/// The screen doing the handing says so here, the way the first selection of all is
+		/// already not a move.
+		/// </summary>
+		public void Resync()
+		{
+			m_Before = EventSystem.current == null ? null : EventSystem.current.currentSelectedGameObject;
+		}
+
 		private void Update()
 		{
 			if (EventSystem.current == null)

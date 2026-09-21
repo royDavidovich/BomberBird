@@ -605,7 +605,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9fe9419be524a4127b92bc3200c2ca57, type: 3}
   m_ChosenName: {r: 0.957, g: 0.804, b: 0.475, a: 1}
   m_OtherName: {r: 0.16862746, g: 0.11764706, b: 0.078431375, a: 1}
-  m_CloseKeys: 1b0000000d0000000f01000020000000
+  m_ChooseKeys: 0d0000000f010000
+  m_CancelKeys: 1b000000
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
   m_Move: {fileID: 8300000, guid: 0250ac97dc9f94fd08b3ceeeb1d54f62, type: 3}
   m_MoveVolume: 0.6
@@ -1602,7 +1603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LEFT / RIGHT TO CHOOSE
+  m_text: LEFT / RIGHT TO MOVE, ENTER TO CHOOSE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
   m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
@@ -1624,7 +1625,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2

@@ -26,8 +26,13 @@ namespace BomberBird.UI
 	/// <see cref="InstructionsPanel"/> is the pattern being followed here - the same hide-in-Awake,
 	/// the same <see cref="IsShown"/> that the screen's other keyboard reader stands down against,
 	/// and the same deliberate one-frame delay on closing. The one thing it cannot copy is "any
-	/// key closes": the arrows belong to the slider, so only the keys listed in
-	/// <see cref="m_CloseKeys"/> put the panel away.
+	/// key closes": the arrows belong to the lever, so the keys are split by what they mean -
+	/// <see cref="m_ChooseKeys"/> takes the stop the lever is standing on, <see cref="m_CancelKeys"/>
+	/// leaves the setting as it was found.
+	///
+	/// Moving the lever decides nothing. It used to write the setting on every move, which made
+	/// looking at a stop the same act as choosing it; now the ladder can be walked and read, and
+	/// the difficulty changes only when the player says so.
 	/// </summary>
 	public class DifficultyPanel : MonoBehaviour
 	{
@@ -64,10 +69,16 @@ namespace BomberBird.UI
 		[SerializeField] private Color m_OtherName = new Color(0.471f, 0.314f, 0.173f, 1f);
 
 		[Header("Keys")]
-		[Tooltip("What puts the panel away. Deliberately not 'any key': the arrows are the "
-			+ "slider's, and Tab and the mouse belong to Unity's own navigation.")]
+		[Tooltip("What takes the difficulty the lever is standing on and closes the panel. "
+			+ "Deliberately only Return: the arrows move the lever, and the choice is not made "
+			+ "until the player says so.")]
 		[SerializeField]
-		private KeyCode[] m_CloseKeys = { KeyCode.Escape, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Space };
+		private KeyCode[] m_ChooseKeys = { KeyCode.Return, KeyCode.KeypadEnter };
+
+		[Tooltip("What closes the panel without taking what the lever is standing on. The "
+			+ "setting is left as it was found.")]
+		[SerializeField]
+		private KeyCode[] m_CancelKeys = { KeyCode.Escape };
 
 		[Header("Sound")]
 		[Tooltip("The same clip the rest of the menu confirms with, because it is the same act. "
@@ -159,6 +170,7 @@ namespace BomberBird.UI
 				if (m_Slider != null)
 				{
 					EventSystem.current.SetSelectedGameObject(m_Slider.gameObject);
+					holdTheNavigationClick();
 				}
 			}
 		}
@@ -180,13 +192,40 @@ namespace BomberBird.UI
 				return;
 			}
 
-			for (int key = 0; key < m_CloseKeys.Length; ++key)
+			for (int key = 0; key < m_ChooseKeys.Length; ++key)
 			{
-				if (Input.GetKeyDown(m_CloseKeys[key]))
+				if (Input.GetKeyDown(m_ChooseKeys[key]))
+				{
+					take();
+					m_IsClosing = true;
+					return;
+				}
+			}
+
+			for (int key = 0; key < m_CancelKeys.Length; ++key)
+			{
+				if (Input.GetKeyDown(m_CancelKeys[key]))
 				{
 					m_IsClosing = true;
 					return;
 				}
+			}
+		}
+
+		/// <summary>
+		/// Takes the difficulty the lever is standing on.
+		///
+		/// The panel used to write the setting the moment the lever moved, on the grounds that
+		/// it showed what the game would do and was already doing it. That makes the lever the
+		/// choice and leaves no way to look without deciding, so the write waits for the player
+		/// to say yes. The property is still what saves to PlayerPrefs, so taking it here is
+		/// what remembers it between sittings.
+		/// </summary>
+		private void take()
+		{
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.EasyMynas = DifficultyChoice.IsEasyAt(currentStop());
 			}
 		}
 
@@ -219,14 +258,9 @@ namespace BomberBird.UI
 			// in whole numbers, so this is one click per stop rather than one per frame.
 			UiSound.Play(m_Move, m_MoveVolume);
 
-			if (GameFlow.Instance != null)
-			{
-				// The property is what writes PlayerPrefs, so the setting is saved the moment
-				// the lever moves. There is no confirm step and deliberately no cancel: the
-				// panel shows what the game will do, and it is already doing it.
-				GameFlow.Instance.EasyMynas = DifficultyChoice.IsEasyAt(stop);
-			}
-
+			// Moving the lever changes nothing but what the panel shows. The setting is written
+			// by take(), when the player says yes, so a player can walk the ladder and look at
+			// each stop without having chosen any of them.
 			showStop(stop);
 		}
 
@@ -304,9 +338,33 @@ namespace BomberBird.UI
 			if (EventSystem.current != null && m_SelectedBefore != null)
 			{
 				EventSystem.current.SetSelectedGameObject(m_SelectedBefore);
+				holdTheNavigationClick();
 			}
 
 			m_SelectedBefore = null;
+		}
+
+		/// <summary>
+		/// Tells the screen's navigation click that the focus it is about to find somewhere new
+		/// was moved by this panel, not by the player.
+		///
+		/// Opening raised a confirm and then handed the keyboard to the lever in the same frame,
+		/// so the click meant for "you moved between buttons" landed on top of it. Two clips in
+		/// one frame read as neither, which is why the Difficulty button sounded as though it
+		/// had no sound of its own while Play, which moves no focus, sounded fine.
+		///
+		/// Found by component rather than wired, because <see cref="UiNavigationSound"/>'s own
+		/// summary says to put it beside the screen's <see cref="FirstKeySelection"/> - which is
+		/// this object. A screen without one simply has no click to hold.
+		/// </summary>
+		private void holdTheNavigationClick()
+		{
+			UiNavigationSound click = GetComponent<UiNavigationSound>();
+
+			if (click != null)
+			{
+				click.Resync();
+			}
 		}
 
 		private void show(bool i_IsShown)
