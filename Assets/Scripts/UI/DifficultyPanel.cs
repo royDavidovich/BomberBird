@@ -109,6 +109,19 @@ namespace BomberBird.UI
 
 		private void Awake()
 		{
+			// Switched on once here and straight back off, because the *first* time this panel
+			// is switched on it costs over a second - measured at 1227ms, against 0.3ms for
+			// every activation after it. Unity pays for the panel's materials and shader
+			// variants the first time they are drawn, and until now the player paid it, by
+			// pressing Difficulty: the menu froze for a second and the confirm sound the same
+			// press had just started was destroyed inside that one frozen frame, unheard. The
+			// button looked like the only one in the game with no sound.
+			//
+			// Paid here it is invisible, because the screen is still arriving behind the fade.
+			// Play and Quit never showed this: neither switches anything on.
+			show(true);
+			Canvas.ForceUpdateCanvases();
+
 			// Hidden here rather than trusted to be hidden in the scene, because the panel is
 			// worked on with it open and would otherwise ship that way.
 			show(false);
