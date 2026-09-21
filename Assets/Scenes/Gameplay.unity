@@ -8138,6 +8138,8 @@ MonoBehaviour:
   m_PodPlace: {fileID: 8300000, guid: 20f4e32d86a224fa28fac23a99ef340a, type: 3}
   m_Burst: {fileID: 8300000, guid: f060de3b1b53a40cb945509509afdae9, type: 3}
   m_MynaDefeated: {fileID: 8300000, guid: 12e8a5407de7947f0986231134d00963, type: 3}
+  m_CageOpen: {fileID: 0}
+  m_CageOpenDelay: 0.4
   m_FeatherCollect: {fileID: 8300000, guid: 7c04a0d99c2ac433b8e472486933598e, type: 3}
   m_BirdDeath: {fileID: 8300000, guid: d9dd65e95bdbb41a982371d8a04d7192, type: 3}
   m_StageClear: {fileID: 8300000, guid: ee7dad8feb5394bd28f23f51b116abc1, type: 3}
@@ -8258,6 +8260,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: fad471ac2ddc5478283439490fae1112, type: 3}
     - {fileID: 21300000, guid: fb63cbdb4624048089b47654dbedb5ca, type: 3}
     - {fileID: 21300000, guid: 23e92ad91fe4c452e8efb1d61ba0bf4f, type: 3}
+    Seconds: 0.3
+    SortingOrder: 21
+  m_CagePuff:
+    Frames: []
     Seconds: 0.3
     SortingOrder: 21
   m_FeatherSparkle:

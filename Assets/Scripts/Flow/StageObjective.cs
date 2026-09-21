@@ -54,6 +54,16 @@ namespace BomberBird.Flow
 		public event Action<Vector2Int> FeatherCollected;
 
 		/// <summary>
+		/// Raised when the last myna falls and the bars come away, with the cell they stood on.
+		///
+		/// The cage is never broken: it stops bursts and blocks movement for the whole stage,
+		/// and clearing the arena is the only thing that opens it. So this is the arena giving
+		/// the feather up rather than the player forcing it, and anything listening should say
+		/// so.
+		/// </summary>
+		public event Action<Vector2Int> CageOpened;
+
+		/// <summary>
 		/// The bird whose feather was actually picked up this stage, or null if none was.
 		///
 		/// The results screen cannot ask <see cref="GameFlow.AwardedBird"/> for this: the
@@ -168,13 +178,17 @@ namespace BomberBird.Flow
 		{
 			m_IsCageOpen = true;
 
-			m_Arena.Grid.TryOpen(m_Arena.Grid.CageCell);
+			Vector2Int cell = m_Arena.Grid.CageCell;
+
+			m_Arena.Grid.TryOpen(cell);
 
 			if (m_CageVisual != null)
 			{
 				Destroy(m_CageVisual);
 				m_CageVisual = null;
 			}
+
+			OnCageOpened(cell);
 		}
 
 		private void collectFeather()
@@ -201,6 +215,11 @@ namespace BomberBird.Flow
 		private void OnFeatherCollected(Vector2Int i_Cell)
 		{
 			FeatherCollected?.Invoke(i_Cell);
+		}
+
+		private void OnCageOpened(Vector2Int i_Cell)
+		{
+			CageOpened?.Invoke(i_Cell);
 		}
 
 		/// <summary>

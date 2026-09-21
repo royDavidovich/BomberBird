@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using BomberBird.Enemies;
 using BomberBird.Flow;
@@ -37,6 +38,15 @@ namespace BomberBird.UI
 
 		[Tooltip("A myna is caught in a burst.")]
 		[SerializeField] private AudioClip m_MynaDefeated;
+
+		[Tooltip("The last myna falls and the cage gives up the feather. The cage is never "
+			+ "struck: clearing the arena is the only thing that opens it.")]
+		[SerializeField] private AudioClip m_CageOpen;
+
+		[Tooltip("Seconds to hold the cage's sound back. The last myna dies on the very same "
+			+ "frame and its squawk runs about a third of a second, so landing together makes "
+			+ "one muddled noise instead of a cause and its effect.")]
+		[SerializeField] private float m_CageOpenDelay = 0.4f;
 
 		[Tooltip("The bird picks up the freed feather.")]
 		[SerializeField] private AudioClip m_FeatherCollect;
@@ -82,6 +92,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened += objective_CageOpened;
 				m_Objective.FeatherCollected += objective_FeatherCollected;
 			}
 
@@ -111,6 +122,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened -= objective_CageOpened;
 				m_Objective.FeatherCollected -= objective_FeatherCollected;
 			}
 
@@ -138,6 +150,14 @@ namespace BomberBird.UI
 		private void mynas_MynaDefeated(Vector2Int i_Cell)
 		{
 			play(m_MynaDefeated);
+		}
+
+		private void objective_CageOpened(Vector2Int i_Cell)
+		{
+			// Held back rather than played here: see m_CageOpenDelay. Scaled time is right -
+			// the arena is running normally when the last myna dies - and a scene load in the
+			// meantime takes this component and the wait with it, which is what should happen.
+			StartCoroutine(playAfter(m_CageOpenDelay, m_CageOpen));
 		}
 
 		private void objective_FeatherCollected(Vector2Int i_Cell)
@@ -168,6 +188,16 @@ namespace BomberBird.UI
 			{
 				m_Source.PlayOneShot(i_Clip);
 			}
+		}
+
+		private IEnumerator playAfter(float i_Seconds, AudioClip i_Clip)
+		{
+			if (i_Seconds > 0f)
+			{
+				yield return new WaitForSeconds(i_Seconds);
+			}
+
+			play(i_Clip);
 		}
 
 		/// <summary>
@@ -230,6 +260,11 @@ namespace BomberBird.UI
 			if (m_MynaDefeated == null)
 			{
 				missing += " mynaDefeated";
+			}
+
+			if (m_CageOpen == null)
+			{
+				missing += " cageOpen";
 			}
 
 			if (m_FeatherCollect == null)
