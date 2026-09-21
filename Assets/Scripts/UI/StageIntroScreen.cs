@@ -62,6 +62,11 @@ namespace BomberBird.UI
 		[Range(0f, 1f)]
 		[SerializeField] private float m_PulseFloor = 0.3f;
 
+		private static readonly string[] sr_NumberWords =
+		{
+			"ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX"
+		};
+
 		private float m_ShownAt;
 		private TMP_Text m_HintText;
 
@@ -122,7 +127,7 @@ namespace BomberBird.UI
 				? RunState.k_FirstStage
 				: GameFlow.Instance.StageNumber;
 
-			setText(m_StageLabel, "STAGE " + stageNumber);
+			setText(m_StageLabel, "STAGE " + spelled(stageNumber));
 
 			if (m_IntroTag != null)
 			{
@@ -164,6 +169,22 @@ namespace BomberBird.UI
 			m_Hero.sprite = i_Stage.TileSet.GetSprite(eCell.Floor, Vector2Int.zero);
 			m_Hero.type = Image.Type.Tiled;
 			m_Hero.pixelsPerUnitMultiplier = m_FallbackTileScale;
+		}
+
+		/// <summary>
+		/// The stage number as a word. A campaign of six never needs a numeral here, and the
+		/// display face this label is set in draws digits far less clearly than letters: a
+		/// player reading the card at a glance could not tell its 5 from its 2. A number
+		/// beyond the words falls back to the numeral rather than losing the line.
+		/// </summary>
+		private static string spelled(int i_StageNumber)
+		{
+			if (i_StageNumber < 1 || i_StageNumber > sr_NumberWords.Length)
+			{
+				return i_StageNumber.ToString();
+			}
+
+			return sr_NumberWords[i_StageNumber - 1];
 		}
 
 		private static void setText(TMP_Text i_Label, string i_Text)
