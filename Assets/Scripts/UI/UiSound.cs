@@ -16,18 +16,22 @@ namespace BomberBird.UI
 	/// </summary>
 	public static class UiSound
 	{
-		public static void Play(AudioClip i_Clip)
+		public static AudioSource Play(AudioClip i_Clip)
 		{
-			Play(i_Clip, 1f);
+			return Play(i_Clip, 1f);
 		}
 
-		public static void Play(AudioClip i_Clip, float i_Volume)
+		/// <summary>
+		/// Returns the carrier's source, for the rare caller that has to cut the clip short.
+		/// Null when there was nothing to play.
+		/// </summary>
+		public static AudioSource Play(AudioClip i_Clip, float i_Volume)
 		{
 			// An unassigned slot should be silence, not an error every time the player presses
 			// a button. PlayOneShot and Play both log on a null clip.
 			if (i_Clip == null)
 			{
-				return;
+				return null;
 			}
 
 			GameObject carrier = new GameObject("UiSound (" + i_Clip.name + ")");
@@ -41,6 +45,8 @@ namespace BomberBird.UI
 			source.Play();
 
 			Object.Destroy(carrier, i_Clip.length);
+
+			return source;
 		}
 	}
 }

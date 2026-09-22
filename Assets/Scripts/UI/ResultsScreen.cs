@@ -126,6 +126,8 @@ namespace BomberBird.UI
 		[SerializeField] private GameObject m_GameOverFirstSelected;
 
 		private bool m_IsShowing;
+		private Coroutine m_ClearedSounds;
+		private AudioSource m_ClearedJinglePlaying;
 		private bool m_IsSubscribed;
 
 		/// <summary>
@@ -187,6 +189,7 @@ namespace BomberBird.UI
 				return;
 			}
 
+			stopClearedSounds();
 			UiSound.Play(m_Confirm);
 
 			GameFlow.Instance.AdvanceToNextStage(
@@ -200,6 +203,7 @@ namespace BomberBird.UI
 		{
 			if (GameFlow.Instance != null)
 			{
+				stopClearedSounds();
 				UiSound.Play(m_Confirm);
 				GameFlow.Instance.RestartStage();
 			}
@@ -223,6 +227,7 @@ namespace BomberBird.UI
 		{
 			if (GameFlow.Instance != null)
 			{
+				stopClearedSounds();
 				UiSound.Play(m_Confirm);
 				GameFlow.Instance.GoToMainMenu();
 			}
@@ -425,7 +430,7 @@ namespace BomberBird.UI
 
 			bool isFinale = flow != null && flow.IsFinalStage;
 
-			StartCoroutine(playClearedSounds(isFinale ? m_EndingTrack : null));
+			m_ClearedSounds = StartCoroutine(playClearedSounds(isFinale ? m_EndingTrack : null));
 		}
 
 		// Realtime, because the card has just stopped the clock.
@@ -436,7 +441,7 @@ namespace BomberBird.UI
 				yield return new WaitForSecondsRealtime(m_ClearedJingleDelay);
 			}
 
-			UiSound.Play(m_ClearedJingle);
+			m_ClearedJinglePlaying = UiSound.Play(m_ClearedJingle);
 
 			if (i_ThenMusic == null || GameFlow.Instance == null)
 			{
@@ -449,6 +454,26 @@ namespace BomberBird.UI
 			}
 
 			GameFlow.Instance.PlayMusic(i_ThenMusic);
+		}
+
+		/// <summary>
+		/// The jingle rides a carrier that survives the load, so a player who presses on
+		/// before it ends would hear it over the next scene's loop - and on the finale, over
+		/// the ending it is meant to hand over to. Leaving the card ends both.
+		/// </summary>
+		private void stopClearedSounds()
+		{
+			if (m_ClearedSounds != null)
+			{
+				StopCoroutine(m_ClearedSounds);
+				m_ClearedSounds = null;
+			}
+
+			if (m_ClearedJinglePlaying != null)
+			{
+				m_ClearedJinglePlaying.Stop();
+				m_ClearedJinglePlaying = null;
+			}
 		}
 
 		/// <summary>
