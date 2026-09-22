@@ -1,3 +1,4 @@
+using System.Collections;
 using BomberBird.Flow;
 using BomberBird.Player;
 using TMPro;
@@ -97,6 +98,14 @@ namespace BomberBird.UI
 		[Tooltip("The sting on the GAME OVER card. Played over the stage's music as that fades "
 			+ "out from under it, so the run ends on a note rather than on a cut.")]
 		[SerializeField] private AudioClip m_GameOverJingle;
+
+		[Tooltip("The sting on every stage cleared card, the finale's included. The stage's "
+			+ "music fades out under it the way it does for GAME OVER.")]
+		[SerializeField] private AudioClip m_ClearedJingle;
+
+		[Tooltip("Seconds the fade gets before the cleared jingle lands. Zero starts both "
+			+ "together, which left the loop too loud under the jingle's opening.")]
+		[SerializeField] private float m_ClearedJingleDelay = 0.8f;
 
 		[Header("Game over")]
 		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
@@ -227,6 +236,7 @@ namespace BomberBird.UI
 			if (i_Outcome == eStageOutcome.Cleared)
 			{
 				fillCleared();
+				playClearedJingle();
 			}
 			else
 			{
@@ -392,6 +402,32 @@ namespace BomberBird.UI
 			}
 
 			UiSound.Play(m_GameOverJingle);
+		}
+
+		/// <summary>
+		/// Same shape as GAME OVER's sting, but the loop gets a head start: the jingle waits
+		/// for the fade to be under way. The next scene's SceneMusic restarts the stopped
+		/// loop, so nothing here has to bring it back.
+		/// </summary>
+		private void playClearedJingle()
+		{
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.FadeOutMusic();
+			}
+
+			StartCoroutine(playAfterRealtime(m_ClearedJingleDelay, m_ClearedJingle));
+		}
+
+		// Realtime, because the card has just stopped the clock.
+		private static IEnumerator playAfterRealtime(float i_Seconds, AudioClip i_Clip)
+		{
+			if (i_Seconds > 0f)
+			{
+				yield return new WaitForSecondsRealtime(i_Seconds);
+			}
+
+			UiSound.Play(i_Clip);
 		}
 
 		/// <summary>
