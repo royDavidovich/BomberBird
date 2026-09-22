@@ -1444,7 +1444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a645e5efcfc294ede99db81b37ac674e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.SceneMusic
-  m_Track: {fileID: 8300000, guid: 6a08deae92c6e4bdfb8f8a4fc193c140, type: 3}
+  m_Track: {fileID: 8300000, guid: 61c7d47df1164f59b4e682194eb6d479, type: 3}
   m_StageOwnsTheTrack: 0
 --- !u!1 &688260795
 GameObject:

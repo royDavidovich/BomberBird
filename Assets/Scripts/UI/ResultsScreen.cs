@@ -107,6 +107,10 @@ namespace BomberBird.UI
 			+ "together, which left the loop too loud under the jingle's opening.")]
 		[SerializeField] private float m_ClearedJingleDelay = 0.8f;
 
+		[Tooltip("The ending's loop, started on the finale card once the jingle is over. The "
+			+ "closing scene names the same track, so it carries on there without a restart.")]
+		[SerializeField] private AudioClip m_EndingTrack;
+
 		[Header("Game over")]
 		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
 			+ "stage keeps the arena it just won showing through the scrim.")]
@@ -407,27 +411,44 @@ namespace BomberBird.UI
 		/// <summary>
 		/// Same shape as GAME OVER's sting, but the loop gets a head start: the jingle waits
 		/// for the fade to be under way. The next scene's SceneMusic restarts the stopped
-		/// loop, so nothing here has to bring it back.
+		/// loop, so nothing here has to bring it back - except on the finale, where the
+		/// ending track starts as the jingle ends and the closing screens carry it on.
 		/// </summary>
 		private void playClearedJingle()
 		{
-			if (GameFlow.Instance != null)
+			GameFlow flow = GameFlow.Instance;
+
+			if (flow != null)
 			{
-				GameFlow.Instance.FadeOutMusic();
+				flow.FadeOutMusic();
 			}
 
-			StartCoroutine(playAfterRealtime(m_ClearedJingleDelay, m_ClearedJingle));
+			bool isFinale = flow != null && flow.IsFinalStage;
+
+			StartCoroutine(playClearedSounds(isFinale ? m_EndingTrack : null));
 		}
 
 		// Realtime, because the card has just stopped the clock.
-		private static IEnumerator playAfterRealtime(float i_Seconds, AudioClip i_Clip)
+		private IEnumerator playClearedSounds(AudioClip i_ThenMusic)
 		{
-			if (i_Seconds > 0f)
+			if (m_ClearedJingleDelay > 0f)
 			{
-				yield return new WaitForSecondsRealtime(i_Seconds);
+				yield return new WaitForSecondsRealtime(m_ClearedJingleDelay);
 			}
 
-			UiSound.Play(i_Clip);
+			UiSound.Play(m_ClearedJingle);
+
+			if (i_ThenMusic == null || GameFlow.Instance == null)
+			{
+				yield break;
+			}
+
+			if (m_ClearedJingle != null)
+			{
+				yield return new WaitForSecondsRealtime(m_ClearedJingle.length);
+			}
+
+			GameFlow.Instance.PlayMusic(i_ThenMusic);
 		}
 
 		/// <summary>
