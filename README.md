@@ -48,12 +48,6 @@ Overgrown Courtyard where the boss waits.
 
 ![Stage six intro card, Overgrown Courtyard: a dead tree whose every cavity holds a common myna, over a cracked stone courtyard at nightfall](Docs/Images/habitat-6-overgrown-courtyard.png)
 
-## The endings
-
-| | |
-|---|---|
-| ![The game over screen: a cream card reading GAME OVER over a dark valley with mynas silhouetted in the branches](Docs/Images/game-over.png) | ![The closing screen, headed in Hebrew and English "The birds we saved together", showing all four rescued birds as framed field-guide cards](Docs/Images/closing-birds-saved.png) |
-
 ## Status
 
 The campaign is playable end to end: six handmade stages, each in its own habitat, from the
