@@ -43,11 +43,6 @@ namespace BomberBird.UI
 			+ "struck: clearing the arena is the only thing that opens it.")]
 		[SerializeField] private AudioClip m_CageOpen;
 
-		[Tooltip("Seconds to hold the cage's sound back. The last myna dies on the very same "
-			+ "frame and its squawk runs about a third of a second, so landing together makes "
-			+ "one muddled noise instead of a cause and its effect.")]
-		[SerializeField] private float m_CageOpenDelay = 0.4f;
-
 		[Tooltip("The bird picks up the freed feather.")]
 		[SerializeField] private AudioClip m_FeatherCollect;
 
@@ -165,10 +160,9 @@ namespace BomberBird.UI
 
 		private void objective_CageOpened(Vector2Int i_Cell)
 		{
-			// Held back rather than played here: see m_CageOpenDelay. Scaled time is right -
-			// the arena is running normally when the last myna dies - and a scene load in the
-			// meantime takes this component and the wait with it, which is what should happen.
-			StartCoroutine(playAfter(m_CageOpenDelay, m_CageOpen));
+			// Straight through. StageObjective holds the whole moment back - bars, effect and
+			// this - so a second wait here would only pull the sound off the picture again.
+			play(m_CageOpen);
 		}
 
 		private void objective_FeatherCollected(Vector2Int i_Cell)
