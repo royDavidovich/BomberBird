@@ -58,11 +58,21 @@ namespace BomberBird.UI
 			+ "frame the last myna dies, and on the other three it follows the pickup.")]
 		[SerializeField] private float m_GateOpenDelay = 0.4f;
 
+		[Tooltip("Rides the exit arrow, one on each flash. The same clip every time: repeated in "
+			+ "step with the blink it reads as a signal, and a climbing set of three would only be "
+			+ "three files to keep in tune for no more meaning.")]
+		[SerializeField] private AudioClip m_GateBeep;
+
+		[Tooltip("How many flashes get one. The arrow goes on blinking afterwards - this is the "
+			+ "length of the phrase, not the length of the invitation.")]
+		[SerializeField] private int m_GateBeepCount = 3;
+
 		[Tooltip("The gate is reached and the stage ends.")]
 		[SerializeField] private AudioClip m_StageClear;
 
 		private AudioSource m_Source;
 		private PodField m_Field;
+		private int m_BeepsPlayed;
 
 		private void Awake()
 		{
@@ -108,8 +118,13 @@ namespace BomberBird.UI
 			if (m_Exit != null)
 			{
 				m_Exit.GateOpened += exit_GateOpened;
+				m_Exit.ArrowFlashed += exit_ArrowFlashed;
 				m_Exit.StageCleared += exit_StageCleared;
 			}
+
+			// Reset here rather than only on construction: a component switched off and back on
+			// should say the phrase again, not sit silent because it once finished it.
+			m_BeepsPlayed = 0;
 		}
 
 		private void OnDisable()
@@ -139,6 +154,7 @@ namespace BomberBird.UI
 			if (m_Exit != null)
 			{
 				m_Exit.GateOpened -= exit_GateOpened;
+				m_Exit.ArrowFlashed -= exit_ArrowFlashed;
 				m_Exit.StageCleared -= exit_StageCleared;
 			}
 		}
@@ -178,6 +194,24 @@ namespace BomberBird.UI
 		private void exit_GateOpened()
 		{
 			StartCoroutine(playAfter(m_GateOpenDelay, m_GateOpen));
+		}
+
+		/// <summary>
+		/// The arrow has just come on, so the next beep goes with it.
+		///
+		/// Driven by the flash rather than scheduled beside it: the arrow's rate is a serialized
+		/// number, and a timer that assumed the current one would drift off the picture the
+		/// moment anybody tuned it.
+		/// </summary>
+		private void exit_ArrowFlashed()
+		{
+			if (m_BeepsPlayed >= m_GateBeepCount)
+			{
+				return;
+			}
+
+			play(m_GateBeep);
+			m_BeepsPlayed++;
 		}
 
 		private void exit_StageCleared()
@@ -290,6 +324,11 @@ namespace BomberBird.UI
 			if (m_GateOpen == null)
 			{
 				missing += " gateOpen";
+			}
+
+			if (m_GateBeep == null)
+			{
+				missing += " gateBeep";
 			}
 
 			if (m_StageClear == null)

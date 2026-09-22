@@ -8077,6 +8077,7 @@ MonoBehaviour:
   m_GateOpen: {fileID: 21300000, guid: 9adac1bec85354c0bac7374e871e15a3, type: 3}
   m_Arrow: {fileID: 21300000, guid: 8df2788840fdd4b12b82b5e63000bb23, type: 3}
   m_ArrowFlashRate: 3
+  m_ArrowDelay: 1.15
   m_SortingOrder: 2
   m_ArrowSortingOrder: 7
 --- !u!114 &1688113803
@@ -8116,8 +8117,8 @@ MonoBehaviour:
   m_Bird: {fileID: 1600481133}
   m_CageSprite: {fileID: 21300000, guid: d1db9f72e642f4039a9ce89fbdea8516, type: 3}
   m_CageSortingOrder: 6
-  m_FrameRate: 4
   m_BreakDelay: 0.25
+  m_FrameRate: 4
   m_SortingOrder: 5
 --- !u!114 &1688113805
 MonoBehaviour:
@@ -8144,6 +8145,8 @@ MonoBehaviour:
   m_BirdDeath: {fileID: 8300000, guid: d9dd65e95bdbb41a982371d8a04d7192, type: 3}
   m_GateOpen: {fileID: 8300000, guid: 80b55039a65d64e6bb8c02257bc8e9a9, type: 3}
   m_GateOpenDelay: 0.4
+  m_GateBeep: {fileID: 8300000, guid: 008c4b34e9914433b947cf01912af967, type: 3}
+  m_GateBeepCount: 3
   m_StageClear: {fileID: 8300000, guid: ee7dad8feb5394bd28f23f51b116abc1, type: 3}
 --- !u!82 &1688113806
 AudioSource:

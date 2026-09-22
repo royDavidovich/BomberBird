@@ -38,6 +38,11 @@ namespace BomberBird.Flow
 		[Tooltip("Arrow flashes per second.")]
 		[SerializeField] private float m_ArrowFlashRate = 3f;
 
+		[Tooltip("Seconds the arrow waits after the gate opens. Long enough for the gate's own "
+			+ "sound to finish, so the blink and the beeps riding it start in silence rather than "
+			+ "over the top of it. StageAudio holds that sound back 0.4s and the clip runs 0.74s.")]
+		[SerializeField] private float m_ArrowDelay = 1.15f;
+
 		[Tooltip("Sorting order for the gate. Above the arena tiles, below the birds.")]
 		[SerializeField] private int m_SortingOrder = 2;
 
@@ -66,6 +71,15 @@ namespace BomberBird.Flow
 		/// listener that makes a noise about it should expect company either way.
 		/// </summary>
 		public event Action GateOpened;
+
+		/// <summary>
+		/// Raised each time the exit arrow becomes visible, for as long as it goes on blinking.
+		///
+		/// Per flash rather than once with a rate attached, because the rate is a serialized
+		/// number: anything answering the arrow has to land on it, and a listener timing itself
+		/// off the current rate would drift off the picture the moment that number was tuned.
+		/// </summary>
+		public event Action ArrowFlashed;
 
 		/// <summary>
 		/// Whether the gate may be used. An exit with no objective assigned stays usable, so
@@ -152,6 +166,11 @@ namespace BomberBird.Flow
 			GateOpened?.Invoke();
 		}
 
+		private void OnArrowFlashed()
+		{
+			ArrowFlashed?.Invoke();
+		}
+
 		/// <summary>
 		/// Opens the wall so the bird can walk into it, shows the open gate, and starts the
 		/// arrow. The grid change is what actually lets the bird through; the rest is signal.
@@ -175,6 +194,11 @@ namespace BomberBird.Flow
 
 		private IEnumerator flashArrow()
 		{
+			if (m_ArrowDelay > 0f)
+			{
+				yield return new WaitForSeconds(m_ArrowDelay);
+			}
+
 			GameObject visual = new GameObject("ExitArrow");
 			visual.transform.SetParent(transform, false);
 
@@ -185,12 +209,24 @@ namespace BomberBird.Flow
 			m_ArrowRenderer.sprite = m_Arrow;
 			m_ArrowRenderer.sortingOrder = m_ArrowSortingOrder;
 
+			// Off to begin with, so the first turn of the loop below brings it on. Left enabled
+			// the arrow would spend its first interval dark and come on one flash after the beep
+			// that is meant to arrive with it.
+			m_ArrowRenderer.enabled = false;
+
 			float secondsPerFlash = m_ArrowFlashRate <= 0f ? 0.25f : 1f / m_ArrowFlashRate;
 
 			// Runs until the stage ends, which is what the player is being told to do.
 			while (true)
 			{
 				m_ArrowRenderer.enabled = !m_ArrowRenderer.enabled;
+
+				// Only the frames it comes on, so the beep lands with the arrow rather than
+				// between two of them.
+				if (m_ArrowRenderer.enabled)
+				{
+					OnArrowFlashed();
+				}
 
 				yield return new WaitForSeconds(secondsPerFlash);
 			}
