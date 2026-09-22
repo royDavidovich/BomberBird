@@ -41,7 +41,7 @@ MonoBehaviour:
       The kingfisher waits on low branches to dive for what swims below.'
     m_BirdLine: home of the white-throated kingfisher
     m_AwardedBird: {fileID: 11400000, guid: 19a4810925a0b461e88f4aa6b90ae12e, type: 2}
-    m_Music: {fileID: 0}
+    m_Music: {fileID: 8300000, guid: c99b5f64a007341f3b61dcd3df284c35, type: 3}
   - m_HabitatName: Lagoon Shore
     m_Layout: {fileID: 11400000, guid: 924e4331b8ca49968c00ab6c11d79019, type: 2}
     m_TileSet: {fileID: 11400000, guid: 2dfd643542e54515adb3f185a85d2042, type: 2}
@@ -52,7 +52,7 @@ MonoBehaviour:
       the migration route. Flocks land to scoop fish and wait out the heat.'
     m_BirdLine: home of the great white pelican
     m_AwardedBird: {fileID: 11400000, guid: 855760986c2b84e54bfa7256d7f25806, type: 2}
-    m_Music: {fileID: 0}
+    m_Music: {fileID: 8300000, guid: c99b5f64a007341f3b61dcd3df284c35, type: 3}
   - m_HabitatName: Rocky Upland
     m_Layout: {fileID: 11400000, guid: 8e7fe54346c5429f895d67c9ffcfd964, type: 2}
     m_TileSet: {fileID: 11400000, guid: cd801a67ca214e2cb23b14ac64bdc6f9, type: 2}
@@ -63,7 +63,7 @@ MonoBehaviour:
       to run rather than fly, climbing the rocky slopes to forage.'
     m_BirdLine: home of the chukar partridge
     m_AwardedBird: {fileID: 11400000, guid: b2b399ae04ee545fa85f0a12006dfc3e, type: 2}
-    m_Music: {fileID: 0}
+    m_Music: {fileID: 8300000, guid: d15347e912beb4b788d8532ba8581d86, type: 3}
   - m_HabitatName: Overgrown Courtyard
     m_Layout: {fileID: 11400000, guid: 2def2d1844324d6787441cb65f52b4cf, type: 2}
     m_TileSet: {fileID: 11400000, guid: 106ca53536f74efda13d83b86e0e8cca, type: 2}
@@ -74,5 +74,5 @@ MonoBehaviour:
       a myna now, and the flock has stopped leaving.'
     m_BirdLine: taken by the common myna
     m_AwardedBird: {fileID: 0}
-    m_Music: {fileID: 0}
+    m_Music: {fileID: 8300000, guid: 2cc3c4dd750d642b3b3b992de1f5a29f, type: 3}
   m_StartingBird: {fileID: 11400000, guid: c8039b8a2bc4c4fd4bb325bd11fb32c4, type: 2}

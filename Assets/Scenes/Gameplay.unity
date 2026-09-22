@@ -9452,6 +9452,7 @@ MonoBehaviour:
   m_NextLabel: {fileID: 1641405951}
   m_ClearedFirstSelected: {fileID: 1852013829}
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
+  m_GameOverJingle: {fileID: 8300000, guid: c94b321bbda044b25b20b2caf34f4d66, type: 3}
   m_GameOverBackdrop: {fileID: 3022872}
   m_GameOverStage: {fileID: 421220164}
   m_GameOverTaunt: {fileID: 472770588}
