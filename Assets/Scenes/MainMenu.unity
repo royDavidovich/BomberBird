@@ -602,7 +602,7 @@ MonoBehaviour:
   - {fileID: 161893747}
   m_StopPortraits:
   - {fileID: 21300000, guid: 23e8ba1656d2247a6be82ca6561f8cc1, type: 3}
-  - {fileID: 21300000, guid: 9fe9419be524a4127b92bc3200c2ca57, type: 3}
+  - {fileID: 21300000, guid: f7f244a8bfec844e281766a3ca7b0a82, type: 3}
   m_ChosenName: {r: 0.957, g: 0.804, b: 0.475, a: 1}
   m_OtherName: {r: 0.16862746, g: 0.11764706, b: 0.078431375, a: 1}
   m_ChooseKeys: 0d0000000f010000
@@ -2514,7 +2514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a645e5efcfc294ede99db81b37ac674e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.SceneMusic
-  m_Track: {fileID: 8300000, guid: 6a08deae92c6e4bdfb8f8a4fc193c140, type: 3}
+  m_Track: {fileID: 8300000, guid: 520f0ece66f54bafb2e3772213844364, type: 3}
 --- !u!1 &1855394586
 GameObject:
   m_ObjectHideFlags: 0
