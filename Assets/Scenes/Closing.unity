@@ -2275,7 +2275,7 @@ MonoBehaviour:
   m_text: The thought behind the game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 475e60215bb734b71bac86ee1324c334, type: 2}
-  m_sharedMaterial: {fileID: 1574108239253749198, guid: 475e60215bb734b71bac86ee1324c334, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 065e3d44dc02741cbaf3d27f245569e8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
