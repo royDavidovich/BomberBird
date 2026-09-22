@@ -602,7 +602,7 @@ MonoBehaviour:
   - {fileID: 161893747}
   m_StopPortraits:
   - {fileID: 21300000, guid: 23e8ba1656d2247a6be82ca6561f8cc1, type: 3}
-  - {fileID: 21300000, guid: 9fe9419be524a4127b92bc3200c2ca57, type: 3}
+  - {fileID: 21300000, guid: f7f244a8bfec844e281766a3ca7b0a82, type: 3}
   m_ChosenName: {r: 0.957, g: 0.804, b: 0.475, a: 1}
   m_OtherName: {r: 0.16862746, g: 0.11764706, b: 0.078431375, a: 1}
   m_ChooseKeys: 0d0000000f010000
