@@ -50,6 +50,11 @@ namespace BomberBird.UI
 		[Tooltip("Drawn over the burst that killed it, so the two read as separate things.")]
 		[SerializeField] private Effect m_MynaPuff = new Effect();
 
+		[Header("The last myna falls and the cage opens")]
+		[Tooltip("Plays on the frame the bars vanish, so it has something to cover. The sound "
+			+ "for the same moment is held back a little; this is not.")]
+		[SerializeField] private Effect m_CagePuff = new Effect();
+
 		[Header("The bird picks up the freed feather")]
 		[SerializeField] private Effect m_FeatherSparkle = new Effect();
 
@@ -115,6 +120,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened += objective_CageOpened;
 				m_Objective.FeatherCollected += objective_FeatherCollected;
 			}
 		}
@@ -133,6 +139,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened -= objective_CageOpened;
 				m_Objective.FeatherCollected -= objective_FeatherCollected;
 			}
 
@@ -149,6 +156,11 @@ namespace BomberBird.UI
 		private void mynas_MynaDefeated(Vector2Int i_Cell)
 		{
 			play(m_MynaPuff, i_Cell);
+		}
+
+		private void objective_CageOpened(Vector2Int i_Cell)
+		{
+			play(m_CagePuff, i_Cell);
 		}
 
 		private void objective_FeatherCollected(Vector2Int i_Cell)
@@ -260,6 +272,11 @@ namespace BomberBird.UI
 			if (m_MynaPuff.Frames == null || m_MynaPuff.Frames.Length == 0)
 			{
 				missing += " mynaPuff";
+			}
+
+			if (m_CagePuff.Frames == null || m_CagePuff.Frames.Length == 0)
+			{
+				missing += " cagePuff";
 			}
 
 			if (m_FeatherSparkle.Frames == null || m_FeatherSparkle.Frames.Length == 0)

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using BomberBird.Enemies;
 using BomberBird.Flow;
@@ -38,17 +39,40 @@ namespace BomberBird.UI
 		[Tooltip("A myna is caught in a burst.")]
 		[SerializeField] private AudioClip m_MynaDefeated;
 
+		[Tooltip("The last myna falls and the cage gives up the feather. The cage is never "
+			+ "struck: clearing the arena is the only thing that opens it.")]
+		[SerializeField] private AudioClip m_CageOpen;
+
 		[Tooltip("The bird picks up the freed feather.")]
 		[SerializeField] private AudioClip m_FeatherCollect;
 
 		[Tooltip("The bird is hit and a life is spent.")]
 		[SerializeField] private AudioClip m_BirdDeath;
 
+		[Tooltip("The gate in the wall stops being shut. Not the same moment as the stage "
+			+ "ending: this is the way out appearing, that is the bird walking into it.")]
+		[SerializeField] private AudioClip m_GateOpen;
+
+		[Tooltip("Seconds to hold the gate's sound back, for the same reason the cage's is "
+			+ "held: on the three stages that cage no feather the gate opens on the very "
+			+ "frame the last myna dies, and on the other three it follows the pickup.")]
+		[SerializeField] private float m_GateOpenDelay = 0.4f;
+
+		[Tooltip("Rides the exit arrow, one on each flash. The same clip every time: repeated in "
+			+ "step with the blink it reads as a signal, and a climbing set of three would only be "
+			+ "three files to keep in tune for no more meaning.")]
+		[SerializeField] private AudioClip m_GateBeep;
+
+		[Tooltip("How many flashes get one. The arrow goes on blinking afterwards - this is the "
+			+ "length of the phrase, not the length of the invitation.")]
+		[SerializeField] private int m_GateBeepCount = 3;
+
 		[Tooltip("The gate is reached and the stage ends.")]
 		[SerializeField] private AudioClip m_StageClear;
 
 		private AudioSource m_Source;
 		private PodField m_Field;
+		private int m_BeepsPlayed;
 
 		private void Awake()
 		{
@@ -82,6 +106,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened += objective_CageOpened;
 				m_Objective.FeatherCollected += objective_FeatherCollected;
 			}
 
@@ -92,8 +117,14 @@ namespace BomberBird.UI
 
 			if (m_Exit != null)
 			{
+				m_Exit.GateOpened += exit_GateOpened;
+				m_Exit.ArrowFlashed += exit_ArrowFlashed;
 				m_Exit.StageCleared += exit_StageCleared;
 			}
+
+			// Reset here rather than only on construction: a component switched off and back on
+			// should say the phrase again, not sit silent because it once finished it.
+			m_BeepsPlayed = 0;
 		}
 
 		private void OnDisable()
@@ -111,6 +142,7 @@ namespace BomberBird.UI
 
 			if (m_Objective != null)
 			{
+				m_Objective.CageOpened -= objective_CageOpened;
 				m_Objective.FeatherCollected -= objective_FeatherCollected;
 			}
 
@@ -121,6 +153,8 @@ namespace BomberBird.UI
 
 			if (m_Exit != null)
 			{
+				m_Exit.GateOpened -= exit_GateOpened;
+				m_Exit.ArrowFlashed -= exit_ArrowFlashed;
 				m_Exit.StageCleared -= exit_StageCleared;
 			}
 		}
@@ -140,6 +174,13 @@ namespace BomberBird.UI
 			play(m_MynaDefeated);
 		}
 
+		private void objective_CageOpened(Vector2Int i_Cell)
+		{
+			// Straight through. StageObjective holds the whole moment back - bars, effect and
+			// this - so a second wait here would only pull the sound off the picture again.
+			play(m_CageOpen);
+		}
+
 		private void objective_FeatherCollected(Vector2Int i_Cell)
 		{
 			play(m_FeatherCollect);
@@ -148,6 +189,29 @@ namespace BomberBird.UI
 		private void death_BirdDied()
 		{
 			play(m_BirdDeath);
+		}
+
+		private void exit_GateOpened()
+		{
+			StartCoroutine(playAfter(m_GateOpenDelay, m_GateOpen));
+		}
+
+		/// <summary>
+		/// The arrow has just come on, so the next beep goes with it.
+		///
+		/// Driven by the flash rather than scheduled beside it: the arrow's rate is a serialized
+		/// number, and a timer that assumed the current one would drift off the picture the
+		/// moment anybody tuned it.
+		/// </summary>
+		private void exit_ArrowFlashed()
+		{
+			if (m_BeepsPlayed >= m_GateBeepCount)
+			{
+				return;
+			}
+
+			play(m_GateBeep);
+			m_BeepsPlayed++;
 		}
 
 		private void exit_StageCleared()
@@ -168,6 +232,16 @@ namespace BomberBird.UI
 			{
 				m_Source.PlayOneShot(i_Clip);
 			}
+		}
+
+		private IEnumerator playAfter(float i_Seconds, AudioClip i_Clip)
+		{
+			if (i_Seconds > 0f)
+			{
+				yield return new WaitForSeconds(i_Seconds);
+			}
+
+			play(i_Clip);
 		}
 
 		/// <summary>
@@ -232,6 +306,11 @@ namespace BomberBird.UI
 				missing += " mynaDefeated";
 			}
 
+			if (m_CageOpen == null)
+			{
+				missing += " cageOpen";
+			}
+
 			if (m_FeatherCollect == null)
 			{
 				missing += " featherCollect";
@@ -240,6 +319,16 @@ namespace BomberBird.UI
 			if (m_BirdDeath == null)
 			{
 				missing += " birdDeath";
+			}
+
+			if (m_GateOpen == null)
+			{
+				missing += " gateOpen";
+			}
+
+			if (m_GateBeep == null)
+			{
+				missing += " gateBeep";
 			}
 
 			if (m_StageClear == null)

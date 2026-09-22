@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using BomberBird.Enemies;
 using BomberBird.Player;
 using UnityEngine;
@@ -33,6 +34,12 @@ namespace BomberBird.Flow
 		[Tooltip("Sorting order for the cage. Above the feather, below the birds.")]
 		[SerializeField] private int m_CageSortingOrder = 6;
 
+		[Tooltip("Seconds the bars hold before they come away. The last myna dies on the very "
+			+ "frame the cage opens and its squawk runs about a third of a second, so the break "
+			+ "waits for it. Picture and sound move together on this one number - split them and "
+			+ "it reads as a lag rather than a beat.")]
+		[SerializeField] private float m_BreakDelay = 0.25f;
+
 		[Header("The feather")]
 		[Tooltip("Shimmer frames per second. Slower than the pod's pulse, which means danger.")]
 		[SerializeField] private float m_FrameRate = 4f;
@@ -52,6 +59,16 @@ namespace BomberBird.Flow
 		/// Raised the moment the bird walks onto the freed feather, with the cell it lay on.
 		/// </summary>
 		public event Action<Vector2Int> FeatherCollected;
+
+		/// <summary>
+		/// Raised when the last myna falls and the bars come away, with the cell they stood on.
+		///
+		/// The cage is never broken: it stops bursts and blocks movement for the whole stage,
+		/// and clearing the arena is the only thing that opens it. So this is the arena giving
+		/// the feather up rather than the player forcing it, and anything listening should say
+		/// so.
+		/// </summary>
+		public event Action<Vector2Int> CageOpened;
 
 		/// <summary>
 		/// The bird whose feather was actually picked up this stage, or null if none was.
@@ -168,13 +185,38 @@ namespace BomberBird.Flow
 		{
 			m_IsCageOpen = true;
 
-			m_Arena.Grid.TryOpen(m_Arena.Grid.CageCell);
+			Vector2Int cell = m_Arena.Grid.CageCell;
+
+			// The rule, now. The GDD has defeating the last myna open the cage, and the player
+			// must be able to walk in the moment it does - only the bars coming away is held.
+			m_Arena.Grid.TryOpen(cell);
+
+			StartCoroutine(breakCage(cell));
+		}
+
+		/// <summary>
+		/// The bars coming away, held back so they do not land under the squawk of the myna
+		/// whose death opened them.
+		///
+		/// The sprite, the effect and the sound all hang off the one event raised at the end of
+		/// this, so they cannot drift apart. They did once: the puff played on the frame the cage
+		/// opened while the sound waited on a timer of its own, and the quarter second between
+		/// them read as the game lagging rather than as a beat.
+		/// </summary>
+		private IEnumerator breakCage(Vector2Int i_Cell)
+		{
+			if (m_BreakDelay > 0f)
+			{
+				yield return new WaitForSeconds(m_BreakDelay);
+			}
 
 			if (m_CageVisual != null)
 			{
 				Destroy(m_CageVisual);
 				m_CageVisual = null;
 			}
+
+			OnCageOpened(i_Cell);
 		}
 
 		private void collectFeather()
@@ -201,6 +243,11 @@ namespace BomberBird.Flow
 		private void OnFeatherCollected(Vector2Int i_Cell)
 		{
 			FeatherCollected?.Invoke(i_Cell);
+		}
+
+		private void OnCageOpened(Vector2Int i_Cell)
+		{
+			CageOpened?.Invoke(i_Cell);
 		}
 
 		/// <summary>

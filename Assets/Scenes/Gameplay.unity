@@ -8077,6 +8077,7 @@ MonoBehaviour:
   m_GateOpen: {fileID: 21300000, guid: 9adac1bec85354c0bac7374e871e15a3, type: 3}
   m_Arrow: {fileID: 21300000, guid: 8df2788840fdd4b12b82b5e63000bb23, type: 3}
   m_ArrowFlashRate: 3
+  m_ArrowDelay: 1.15
   m_SortingOrder: 2
   m_ArrowSortingOrder: 7
 --- !u!114 &1688113803
@@ -8116,6 +8117,7 @@ MonoBehaviour:
   m_Bird: {fileID: 1600481133}
   m_CageSprite: {fileID: 21300000, guid: d1db9f72e642f4039a9ce89fbdea8516, type: 3}
   m_CageSortingOrder: 6
+  m_BreakDelay: 0.25
   m_FrameRate: 4
   m_SortingOrder: 5
 --- !u!114 &1688113805
@@ -8138,8 +8140,13 @@ MonoBehaviour:
   m_PodPlace: {fileID: 8300000, guid: 20f4e32d86a224fa28fac23a99ef340a, type: 3}
   m_Burst: {fileID: 8300000, guid: f060de3b1b53a40cb945509509afdae9, type: 3}
   m_MynaDefeated: {fileID: 8300000, guid: 12e8a5407de7947f0986231134d00963, type: 3}
+  m_CageOpen: {fileID: 8300000, guid: a0d1bf4422daf4a52a6fb10e87d25f38, type: 3}
   m_FeatherCollect: {fileID: 8300000, guid: 7c04a0d99c2ac433b8e472486933598e, type: 3}
   m_BirdDeath: {fileID: 8300000, guid: d9dd65e95bdbb41a982371d8a04d7192, type: 3}
+  m_GateOpen: {fileID: 8300000, guid: 80b55039a65d64e6bb8c02257bc8e9a9, type: 3}
+  m_GateOpenDelay: 0.4
+  m_GateBeep: {fileID: 8300000, guid: 008c4b34e9914433b947cf01912af967, type: 3}
+  m_GateBeepCount: 3
   m_StageClear: {fileID: 8300000, guid: ee7dad8feb5394bd28f23f51b116abc1, type: 3}
 --- !u!82 &1688113806
 AudioSource:
@@ -8258,6 +8265,13 @@ MonoBehaviour:
     - {fileID: 21300000, guid: fad471ac2ddc5478283439490fae1112, type: 3}
     - {fileID: 21300000, guid: fb63cbdb4624048089b47654dbedb5ca, type: 3}
     - {fileID: 21300000, guid: 23e92ad91fe4c452e8efb1d61ba0bf4f, type: 3}
+    Seconds: 0.3
+    SortingOrder: 21
+  m_CagePuff:
+    Frames:
+    - {fileID: 21300000, guid: 15c1b9fea82b043168775dc5d2ca274f, type: 3}
+    - {fileID: 21300000, guid: bde7c1ec717e84e368bd9d40b7c8c442, type: 3}
+    - {fileID: 21300000, guid: 4f6e0887517b445e58c0d5a19d929b69, type: 3}
     Seconds: 0.3
     SortingOrder: 21
   m_FeatherSparkle:
