@@ -2138,7 +2138,7 @@ MonoBehaviour:
     \u05D4\u05DE\u05E9\u05D7\u05E7"
   m_isRightToLeft: 1
   m_fontAsset: {fileID: 11400000, guid: fb7dacc0c49d74ddaa8c1a6b4dfd8fe8, type: 2}
-  m_sharedMaterial: {fileID: -6240343481976573163, guid: fb7dacc0c49d74ddaa8c1a6b4dfd8fe8, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 5a68bea408622403f8db45bc9b5464fe, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
