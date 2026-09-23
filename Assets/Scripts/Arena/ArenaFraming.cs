@@ -65,7 +65,7 @@ namespace BomberBird.Arena
 		/// </summary>
 		private void LateUpdate()
 		{
-			if (Screen.width == m_FramedWidth && Screen.height == m_FramedHeight)
+			if (m_Camera.pixelWidth == m_FramedWidth && m_Camera.pixelHeight == m_FramedHeight)
 			{
 				return;
 			}
@@ -77,8 +77,8 @@ namespace BomberBird.Arena
 				return;
 			}
 
-			m_FramedWidth = Screen.width;
-			m_FramedHeight = Screen.height;
+			m_FramedWidth = m_Camera.pixelWidth;
+			m_FramedHeight = m_Camera.pixelHeight;
 
 			float size = OrthographicSize(grid.Width, grid.Height, m_Camera.aspect, m_ArenaShare);
 			Vector3 position = transform.position;

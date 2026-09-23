@@ -12,7 +12,7 @@ namespace BomberBird.Tests
 		private const float k_Tolerance = 0.001f;
 		private const float k_Wide = 16f / 9f;
 		private const float k_Laptop = 16f / 10f;
-		private const float k_Square = 4f / 3f;
+		private const float k_FourByThree = 4f / 3f;
 		private const float k_TwoThirds = 2f / 3f;
 
 		[Test]
@@ -31,13 +31,13 @@ namespace BomberBird.Tests
 		[Test]
 		public void AFourByThreeScreenIsHeldByTheWidth()
 		{
-			Assert.AreEqual(7.3125f, ArenaFraming.OrthographicSize(13, 11, k_Square, k_TwoThirds), k_Tolerance);
+			Assert.AreEqual(7.3125f, ArenaFraming.OrthographicSize(13, 11, k_FourByThree, k_TwoThirds), k_Tolerance);
 		}
 
 		[Test]
 		public void TheArenaFitsWholeInsideItsShareAtEveryCheckedAspect()
 		{
-			float[] aspects = { k_Wide, k_Laptop, k_Square };
+			float[] aspects = { k_Wide, k_Laptop, k_FourByThree };
 			int[] widths = { 13, 15 };
 
 			foreach (float aspect in aspects)

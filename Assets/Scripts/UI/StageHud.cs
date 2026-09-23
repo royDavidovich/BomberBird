@@ -95,9 +95,21 @@ namespace BomberBird.UI
 		/// <summary>
 		/// Lives and the stage are read once. Both only ever change across a scene reload,
 		/// which builds this HUD again, so there is nothing here to keep in step per frame.
+		///
+		/// The pods are drawn again here because OnEnable ran before StageSetup handed the
+		/// field the chosen bird's pod limit, so a two-pod bird would otherwise start on one
+		/// hollow.
 		/// </summary>
 		private void Start()
 		{
+			if (m_Pods.MaxActivePods > m_PodHollows.Length)
+			{
+				Debug.LogWarning(name + ": the bird carries " + m_Pods.MaxActivePods + " pods but there are only "
+					+ m_PodHollows.Length + " hollows, so the extra pods are not shown.", this);
+			}
+
+			refreshPods();
+
 			GameFlow flow = GameFlow.Instance;
 
 			if (flow == null)
@@ -210,12 +222,6 @@ namespace BomberBird.UI
 			{
 				Debug.LogError(name + ": the ArenaPods component has no field.", this);
 				return false;
-			}
-
-			if (m_Pods.MaxActivePods > m_PodHollows.Length)
-			{
-				Debug.LogWarning(name + ": the bird carries " + m_Pods.MaxActivePods + " pods but there are only "
-					+ m_PodHollows.Length + " hollows, so the extra pods are not shown.", this);
 			}
 
 			return true;
