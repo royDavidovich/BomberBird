@@ -6900,12 +6900,12 @@ MonoBehaviour:
   m_HabitatLabel: {fileID: 975822366}
   m_Hero: {fileID: 2111706981}
   m_LifeIcons:
-  - {fileID: 1289937386}
-  - {fileID: 605760341}
-  - {fileID: 1323595836}
-  - {fileID: 1823904113}
   - {fileID: 1146773597}
   - {fileID: 138304214}
+  - {fileID: 1323595836}
+  - {fileID: 1823904113}
+  - {fileID: 1289937386}
+  - {fileID: 605760341}
   m_PodHollows:
   - {fileID: 1887716608}
   - {fileID: 58877734}

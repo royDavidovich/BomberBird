@@ -28,10 +28,12 @@ namespace BomberBird.UI
 		[SerializeField] private Image m_Hero;
 
 		[Header("The trunk")]
-		[Tooltip("One heart per hollow, in the order they are lost: the last one empties first.")]
+		[Tooltip("One heart per hollow. The last entry is the first life lost, so list them in the "
+			+ "order the trunk should keep them.")]
 		[SerializeField] private Image[] m_LifeIcons;
 
-		[Tooltip("The whole hollow, hidden when the bird carries fewer pods than there are hollows.")]
+		[Tooltip("The whole hollow, hidden when the bird carries fewer pods than there are hollows. "
+			+ "A one-pod bird's hollow moves to the middle of the first two.")]
 		[SerializeField] private GameObject[] m_PodHollows;
 
 		[Tooltip("The pod inside each hollow, in the same order as the hollows.")]
@@ -109,6 +111,7 @@ namespace BomberBird.UI
 			}
 
 			refreshPods();
+			centreALonePod();
 
 			GameFlow flow = GameFlow.Instance;
 
@@ -149,6 +152,26 @@ namespace BomberBird.UI
 			{
 				m_LifeIcons[i].enabled = i < i_Lives;
 			}
+		}
+
+		/// <summary>
+		/// A one-pod bird's hollow sits between the two places a pair would take, so it reads
+		/// as the bird's pod rather than as the first of two with one missing. The limit is
+		/// fixed for the stage by now, so this runs once.
+		/// </summary>
+		private void centreALonePod()
+		{
+			if (m_Pods.MaxActivePods != 1 || m_PodHollows.Length < 2)
+			{
+				return;
+			}
+
+			RectTransform lone = (RectTransform)m_PodHollows[0].transform;
+			RectTransform partner = (RectTransform)m_PodHollows[1].transform;
+			Vector2 shift = new Vector2((partner.anchorMin.x - lone.anchorMin.x) * 0.5f, 0f);
+
+			lone.anchorMin += shift;
+			lone.anchorMax += shift;
 		}
 
 		private void podField_PodPlaced(Vector2Int i_Cell)
