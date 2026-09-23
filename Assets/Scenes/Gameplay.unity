@@ -8536,6 +8536,7 @@ GameObject:
   - component: {fileID: 1834911888}
   - component: {fileID: 1834911887}
   - component: {fileID: 1834911889}
+  - component: {fileID: 1834911890}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -8735,6 +8736,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.SceneMusic
   m_Track: {fileID: 8300000, guid: 6a08deae92c6e4bdfb8f8a4fc193c140, type: 3}
   m_StageOwnsTheTrack: 1
+--- !u!114 &1834911890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834911881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca70968bdb6394b91a16f4fe8544c6b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.CursorVisibility
 --- !u!1 &1852013829
 GameObject:
   m_ObjectHideFlags: 0
