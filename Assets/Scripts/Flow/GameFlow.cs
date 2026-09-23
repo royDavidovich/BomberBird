@@ -113,6 +113,10 @@ namespace BomberBird.Flow
 			{
 				m_EasyMynas = value;
 				PlayerPrefs.SetInt(k_EasyMynasPref, value ? 1 : 0);
+
+				// A Web build only writes prefs to browser storage on Save, and closing the tab
+				// is not a quit, so without it the setting would be lost between visits.
+				PlayerPrefs.Save();
 			}
 		}
 
