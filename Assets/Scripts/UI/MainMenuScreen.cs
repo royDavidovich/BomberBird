@@ -23,6 +23,21 @@ namespace BomberBird.UI
 			+ "confirms a bird with, because it is the same act.")]
 		[SerializeField] private AudioClip m_Confirm;
 
+		[Header("Web")]
+		[Tooltip("Hidden in a Web build, where a browser tab cannot be closed from inside the page "
+			+ "and Quit would do nothing.")]
+		[SerializeField] private GameObject m_QuitButton;
+
+		private void Awake()
+		{
+#if UNITY_WEBGL && !UNITY_EDITOR
+			if (m_QuitButton != null)
+			{
+				m_QuitButton.SetActive(false);
+			}
+#endif
+		}
+
 		/// <summary>Wired to Play.</summary>
 		public void Play()
 		{
