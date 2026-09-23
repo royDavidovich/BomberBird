@@ -552,6 +552,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.MainMenuScreen
   m_Difficulty: {fileID: 659733010}
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
+  m_QuitButton: {fileID: 1855394586}
 --- !u!4 &659733008
 Transform:
   m_ObjectHideFlags: 0

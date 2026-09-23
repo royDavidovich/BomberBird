@@ -8,6 +8,8 @@ habitats as its theme: the player controls a local bird defending its habitat fr
 common mynas, moving through compact grid arenas and placing timed seed pods instead of
 bombs to clear obstacles, defeat enemies, and reach the exit.
 
+**Play it in the browser: [roydavidovich.itch.io/bomberbird](https://roydavidovich.itch.io/bomberbird)**
+
 ## How to play
 
 ![The in-game How to Play card, showing three panels: walk with WASD or the arrow keys, place a pod with Space and step away, and the pod bursting in four directions two seconds later](Docs/Images/how-to-play.png)
