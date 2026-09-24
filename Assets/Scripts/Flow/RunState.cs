@@ -25,6 +25,8 @@ namespace BomberBird.Flow
 
 		private int m_Lives;
 		private bool m_HasSeenInstructions;
+		private bool m_HasShownCageRule;
+		private bool m_HasExplainedCageStrike;
 		private int m_StageNumber;
 		private BirdProfile m_SelectedBird;
 		private int m_TotalMynasDefeated;
@@ -106,6 +108,8 @@ namespace BomberBird.Flow
 			m_Lives = r_StartingLives;
 			m_StageNumber = k_FirstStage;
 			m_HasSeenInstructions = false;
+			m_HasShownCageRule = false;
+			m_HasExplainedCageStrike = false;
 			m_TotalMynasDefeated = 0;
 			m_TotalPodsPlaced = 0;
 			m_TotalSeconds = 0f;
@@ -139,6 +143,39 @@ namespace BomberBird.Flow
 			}
 
 			m_HasSeenInstructions = true;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Claims the one showing of the cage rule this run - "the cage opens when every myna
+		/// is gone" - at the first stage that holds a cage. Run-scoped for the same reasons as
+		/// <see cref="MarkInstructionsSeen"/>: a retry does not repeat it, a new campaign does.
+		/// </summary>
+		public bool MarkCageRuleShown()
+		{
+			if (m_HasShownCageRule)
+			{
+				return false;
+			}
+
+			m_HasShownCageRule = true;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Claims the one label this run that tells a player whose burst just hit the cage that
+		/// pods cannot break it. The clank and the shake answer every hit; the words only the first.
+		/// </summary>
+		public bool MarkCageStrikeExplained()
+		{
+			if (m_HasExplainedCageStrike)
+			{
+				return false;
+			}
+
+			m_HasExplainedCageStrike = true;
 
 			return true;
 		}

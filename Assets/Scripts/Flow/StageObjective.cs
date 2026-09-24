@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using BomberBird.Enemies;
 using BomberBird.Player;
+using BomberBird.Pods;
 using UnityEngine;
 
 namespace BomberBird.Flow
@@ -26,6 +28,10 @@ namespace BomberBird.Flow
 
 		[Header("Who collects the feather")]
 		[SerializeField] private BirdMovement m_Bird;
+
+		[Header("What can strike the cage")]
+		[Tooltip("Read so a burst that reaches the cage can be answered. It never opens it.")]
+		[SerializeField] private ArenaPods m_Pods;
 
 		[Header("The cage")]
 		[Tooltip("Drawn over the feather, so its bars must be see-through.")]
@@ -69,6 +75,19 @@ namespace BomberBird.Flow
 		/// so.
 		/// </summary>
 		public event Action<Vector2Int> CageOpened;
+
+		/// <summary>
+		/// Raised whenever a burst reaches the closed cage, with the cage's cell. Nothing
+		/// changes - the cage holds - but a player aiming pods at it needs to hear that it
+		/// holds, or silence reads as "not enough pods yet".
+		/// </summary>
+		public event Action<Vector2Int> CageStruck;
+
+		/// <summary>The cage's bars while they stand, for anything that shakes them; null once open.</summary>
+		public Transform CageVisual
+		{
+			get { return m_CageVisual == null ? null : m_CageVisual.transform; }
+		}
 
 		/// <summary>
 		/// The bird whose feather was actually picked up this stage, or null if none was.
@@ -128,6 +147,25 @@ namespace BomberBird.Flow
 			if (m_AwardsFeather)
 			{
 				placeCagedFeather();
+				m_Pods.Field.PodExploded += podField_PodExploded;
+			}
+		}
+
+		private void OnDestroy()
+		{
+			if (m_Pods != null && m_Pods.Field != null)
+			{
+				m_Pods.Field.PodExploded -= podField_PodExploded;
+			}
+		}
+
+		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
+		{
+			Vector2Int cage = m_Arena.Grid.CageCell;
+
+			if (!m_IsCageOpen && BurstShape.StopsAt(m_Arena.Grid, i_Origin, m_Pods.Field.BurstRange, cage))
+			{
+				CageStruck?.Invoke(cage);
 			}
 		}
 
@@ -283,6 +321,12 @@ namespace BomberBird.Flow
 			if (m_Bird == null)
 			{
 				Debug.LogError(name + ": m_Bird is not assigned.", this);
+				return false;
+			}
+
+			if (m_Pods == null || m_Pods.Field == null)
+			{
+				Debug.LogError(name + ": m_Pods is not assigned or has no field.", this);
 				return false;
 			}
 

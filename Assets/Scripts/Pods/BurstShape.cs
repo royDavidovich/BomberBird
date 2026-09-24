@@ -40,13 +40,44 @@ namespace BomberBird.Pods
 
 			foreach (Vector2Int direction in sr_Directions)
 			{
-				addArm(i_Grid, i_Origin, direction, i_Range, covered);
+				walkArm(i_Grid, i_Origin, direction, i_Range, covered);
 			}
 
 			return covered;
 		}
 
-		private static void addArm(
+		/// <summary>
+		/// Whether a burst from <paramref name="i_Origin"/> is stopped by
+		/// <paramref name="i_Cell"/>: an arm reaches it within range and it is one of the
+		/// cells a burst cannot pass. Lets the cage answer a pod aimed at it, so a player
+		/// trying to break it out hears that it holds.
+		/// </summary>
+		public static bool StopsAt(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range, Vector2Int i_Cell)
+		{
+			if (i_Grid == null || !i_Grid.IsInside(i_Origin))
+			{
+				return false;
+			}
+
+			foreach (Vector2Int direction in sr_Directions)
+			{
+				Vector2Int? stop = walkArm(i_Grid, i_Origin, direction, i_Range, null);
+
+				if (stop.HasValue && stop.Value == i_Cell)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Walks one arm, adding what it covers to <paramref name="io_Covered"/> when given one,
+		/// and returns the indestructible cell that stopped it, or null when the arm ran out of
+		/// range, left the grid, or was absorbed by a soft block.
+		/// </summary>
+		private static Vector2Int? walkArm(
 			ArenaGrid i_Grid,
 			Vector2Int i_Origin,
 			Vector2Int i_Direction,
@@ -59,7 +90,7 @@ namespace BomberBird.Pods
 
 				if (!i_Grid.IsInside(cell))
 				{
-					break;
+					return null;
 				}
 
 				eCell contents = i_Grid.GetCell(cell);
@@ -69,17 +100,22 @@ namespace BomberBird.Pods
 					// Indestructible: the arm stops short and does not cover this cell. A cage
 					// belongs here and not with the soft blocks - nothing the player aims at it
 					// opens it, because clearing the arena is what earns the feather inside.
-					break;
+					return cell;
 				}
 
-				io_Covered.Add(cell);
+				if (io_Covered != null)
+				{
+					io_Covered.Add(cell);
+				}
 
 				if (contents == eCell.SoftBlock)
 				{
 					// The block absorbs the burst. It is destroyed, but nothing behind it is.
-					break;
+					return null;
 				}
 			}
+
+			return null;
 		}
 	}
 }

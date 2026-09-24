@@ -54,6 +54,12 @@ namespace BomberBird.UI
 		private bool m_IsWaiting;
 		private bool m_IsReleasing;
 
+		/// <summary>Whether the stage is still frozen, waiting for Space.</summary>
+		public bool IsHolding
+		{
+			get { return m_IsWaiting; }
+		}
+
 		private void Start()
 		{
 			hold();

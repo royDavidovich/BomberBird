@@ -430,6 +430,23 @@ namespace BomberBird.Flow
 			return m_Run != null && m_Run.MarkInstructionsSeen();
 		}
 
+		/// <summary>
+		/// Whether the cage rule still owes the player its one showing this run, claiming it if so.
+		/// </summary>
+		public bool ClaimCageRuleShowing()
+		{
+			return m_Run != null && m_Run.MarkCageRuleShown();
+		}
+
+		/// <summary>
+		/// Whether a burst on the cage still owes the player its one explaining label this run,
+		/// claiming it if so.
+		/// </summary>
+		public bool ClaimCageStrikeExplained()
+		{
+			return m_Run != null && m_Run.MarkCageStrikeExplained();
+		}
+
 		/// <summary>Chooses the bird to play, for the selection screen.</summary>
 		public bool SelectBird(BirdProfile i_Bird)
 		{
