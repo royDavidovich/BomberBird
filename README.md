@@ -18,7 +18,7 @@ Clear every common myna from the arena. A burst does not care who placed it, so 
 opens a path will take the bird that placed it just as readily. Some habitats cage a feather:
 clear the arena, collect the feather, and the exit gate opens.
 
-![Stage one of BomberBird in play: a walled green arena of hard blocks and soft bushes, the hoopoe in the top-left corner, three mynas spread across the grid, and the exit gate set in the right-hand wall](Docs/Images/arena-stage-1.png)
+![Stage one of BomberBird in play: on the left, the olive-tree HUD with the garden seen through its canopy, the stage named on its sign and six hearts in its trunk; on the right, a walled green arena of hard blocks and soft bushes, the hoopoe in the top-left corner, three mynas spread across the grid, and the exit gate set in the right-hand wall](Docs/Images/arena-stage-1.png)
 
 ## The birds
 

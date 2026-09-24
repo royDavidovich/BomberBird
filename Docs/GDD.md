@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.18, 2026-09-20 |
+| Document version | v0.20, 2026-09-24 |
 
 ## 1. High Concept
 
@@ -145,7 +145,7 @@ Gameplay input is disabled while paused and during stage transitions. Losing foc
 1. **Main menu:** title art, Play, Difficulty, and Quit. Difficulty opens a panel rather than changing anything itself: a slider with the easiest flock on the left, the bird standing for each setting riding the lever, and each setting named under its own notch. The easier flock is slower and mostly holds its line through a junction rather than choosing afresh at each one. The choice is remembered between sittings.
 2. **Bird selection:** the birds unlocked so far, each showing the three values that make it different, and Continue. It is skipped while the roster holds a single bird, because a screen offering one option is not a choice.
 3. **Habitat screen:** a full screen before each stage, carrying art of the habitat, its name, two lines on what the place is, and the bird it belongs to. Shown on arriving at a stage, not on retrying one: a player on their fifth attempt at the upland is not there to be told what an upland is. The intro and the orchard both name the hoopoe; the courtyard is the one the myna has taken rather than one it is home to.
-4. **Gameplay:** the arena and a compact HUD carrying the pods available to place, the current stage, and the lives remaining. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
+4. **Gameplay:** the arena in the right two-thirds of the screen, and in the left third a HUD drawn as an old olive tree: the habitat seen through its canopy, the stage and habitat named on a sign hanging from its branch, and the lives and the pods available to place held in hollows down its trunk. A lost life leaves its hollow empty. A pod is spent when placed and returns to the player when it bursts, so the count refills on its own.
 5. **Pause overlay:** Resume, Restart, and Main Menu, with a lifebuoy in the panel's top corner that reopens How to play. An icon rather than a fourth entry: the three entries are things the player came to the menu to do, and the rules are a thing they may want while they are there.
 5a. **How to play:** the rules, over the arena they apply to. Three frames cut from the game itself - walking, a pod placed, the burst - with the objective under them. Shown once a run as the intro stage opens, and again whenever it is asked for from the pause overlay. It is the same panel both times, so the rules cannot drift into two versions. Showing it over the loaded arena is the point: every word has the thing it names on screen behind it.
 6. **Results:** shown when a stage ends. On a clear it names the stage and habitat, the bird flown, the feather if one was earned, and what the stage cost: mynas defeated, pods placed and time taken. It offers Next Stage and Retry, and on the final stage it carries the campaign totals before handing over to the closing screens. On the last life it becomes GAME OVER, offering Retry and Main Menu.
@@ -157,16 +157,17 @@ habitats. They carry no gameplay rules: removing all of them would leave the cam
 fully playable, which is the separation section 7 requires of presentation.
 
 ```text
-+----------------------------------------------------+
-| Stage                                Pause          |
-|                                                    |
-|                 GAMEPLAY ARENA                     |
-|                                                    |
-| Pods available                            Lives    |
-+----------------------------------------------------+
++-----------------+----------------------------------+
+|  canopy framing |                                  |
+|  the habitat    |                                  |
+|  [STAGE / name] |          GAMEPLAY ARENA          |
+|  lives: 2 x 3   |                                  |
+|  pods           |                                  |
++-----------------+----------------------------------+
+   left third              right two-thirds
 ```
 
-The final placement and visual treatment will be decided after the first playable arena. The Canvas will scale from a 1920 x 1080 reference resolution, and important information will not rely on color alone.
+The camera sizes itself from the arena's own cells and fits the whole arena into the right two-thirds on any screen, so a wider screen shows more of the backdrop around it, never more of the game. The Canvas will scale from a 1920 x 1080 reference resolution, and important information will not rely on color alone.
 
 ## 6. Art and Audio
 
@@ -289,3 +290,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.17 | 2026-09-20 | No design change. Brought the document back in line with what is built, after an audit found it describing a project that no longer exists: the section 8.1 MVP list stood entirely unticked though seven of its eight lines had shipped, section 7 still named two scenes when there are four, and the enemy speed was still "to be tested" after the mynas toggle settled it. The one MVP line left unticked is the builds, which are real and out of date rather than absent. |
 | v0.18 | 2026-09-20 | Built section 5's habitat card, the last screen in the list that had never been made, and made it a screen rather than a card: the campaign is six habitats and the player never saw any of them named before walking into one. It carries the habitat's own art, two lines on the place, and the bird it belongs to. It shows on arriving at a stage and not on retrying one, so it never stands between a player and another attempt. Added a How to play panel beside it, shown once a run as the intro opens and reachable after that from a lifebuoy in the corner of the pause panel. It teaches by picture rather than by paragraph - three frames cut from the running game showing a walk, a pod placed and the burst - because a player who has to read a description of a chain reaction has already been failed by it. |
 | v0.19 | 2026-09-20 | Turned the mynas toggle into a choice the player is shown. The menu's third button stated the difficulty and flipped it when pressed, so the only way to find out what else was on offer was to change the setting. It now reads DIFFICULTY and opens a panel: a slider, easiest on the left, with the myna that stands for each setting riding the lever and each setting named under its own notch. **No change to the difficulty itself** - the same one stored flag, the same easier flock, the same PlayerPrefs memory between sittings; only how it is offered changed. The button is set in Pixelify at the painted labels' own gold and outline rather than commissioned as a word sprite, and the three menu buttons moved from a 100px pitch to 150px, because three buttons 20px apart read as clamped on the screen that is the game's face. Built to hold a third setting: the ladder is one file, and Hard needs its tuning decided before it is added. |
+| v0.20 | 2026-09-24 | Settled the gameplay HUD, which section 5 had left to be decided after the first playable arena. The corner counters became one olive tree standing in the left third of the screen, with the arena framed into the right two-thirds. Its canopy shows the habitat the stage is set in, a sign on its branch names the stage and the habitat, and hollows in its trunk hold the lives and the pods, so a lost life reads as an empty hollow rather than a smaller number. At 16:9 the arena grew about a tenth on the regular stages, because the camera now fits it from its cells rather than from a fixed size. **No rule changed** - the HUD still carries exactly the pods, the stage and the lives it did. |
