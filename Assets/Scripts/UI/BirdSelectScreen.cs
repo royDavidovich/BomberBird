@@ -84,7 +84,10 @@ namespace BomberBird.UI
 		/// </summary>
 		public void Choose(BirdCard i_Card)
 		{
-			if (i_Card == null)
+			// A click lands whenever the mouse does, fades included. One on its way out after a
+			// choice would swap the bird under a load already going; one on the way in would
+			// confirm a screen nobody has seen.
+			if (i_Card == null || !UiInput.IsListening())
 			{
 				return;
 			}
