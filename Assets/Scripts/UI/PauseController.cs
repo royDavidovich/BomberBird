@@ -1,6 +1,7 @@
 using BomberBird.Flow;
 using BomberBird.Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace BomberBird.UI
@@ -195,6 +196,13 @@ namespace BomberBird.UI
 
 			if (i_IsPaused)
 			{
+				// Hiding the overlay does not clear the selection, so without this it would reopen
+				// on whatever was focused last instead of waiting to hand the first key to Resume.
+				if (EventSystem.current != null)
+				{
+					EventSystem.current.SetSelectedGameObject(null);
+				}
+
 				// Without notifying: showing the stored level is not the player changing it, and
 				// the effects slider would otherwise play its preview as the overlay opens.
 				if (m_MusicSlider != null)
