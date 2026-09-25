@@ -10143,7 +10143,6 @@ MonoBehaviour:
   m_GameOverJingle: {fileID: 8300000, guid: c94b321bbda044b25b20b2caf34f4d66, type: 3}
   m_ClearedJingle: {fileID: 8300000, guid: 0935dcb43d644baf901bfb032dc31a5c, type: 3}
   m_ClearedJingleDelay: 0.8
-  m_EndingTrack: {fileID: 8300000, guid: 61c7d47df1164f59b4e682194eb6d479, type: 3}
   m_GameOverBackdrop: {fileID: 3022872}
   m_GameOverStage: {fileID: 421220164}
   m_GameOverTaunt: {fileID: 472770588}

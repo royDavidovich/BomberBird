@@ -107,10 +107,6 @@ namespace BomberBird.UI
 			+ "together, which left the loop too loud under the jingle's opening.")]
 		[SerializeField] private float m_ClearedJingleDelay = 0.8f;
 
-		[Tooltip("The ending's loop, started on the finale card once the jingle is over. The "
-			+ "closing scene names the same track, so it carries on there without a restart.")]
-		[SerializeField] private AudioClip m_EndingTrack;
-
 		[Header("Game over")]
 		[Tooltip("The valley at night, behind the card. Only game over gets one: a cleared "
 			+ "stage keeps the arena it just won showing through the scrim.")]
@@ -416,25 +412,22 @@ namespace BomberBird.UI
 		/// <summary>
 		/// Same shape as GAME OVER's sting, but the loop gets a head start: the jingle waits
 		/// for the fade to be under way. The next scene's SceneMusic restarts the stopped
-		/// loop, so nothing here has to bring it back - except on the finale, where the
-		/// ending track starts as the jingle ends and the closing screens carry it on.
+		/// loop, so nothing here has to bring it back. The finale card stays quiet after its
+		/// jingle too: the closing screens open on a celebration of their own, and the ending
+		/// track starts after it rather than being cut into.
 		/// </summary>
 		private void playClearedJingle()
 		{
-			GameFlow flow = GameFlow.Instance;
-
-			if (flow != null)
+			if (GameFlow.Instance != null)
 			{
-				flow.FadeOutMusic();
+				GameFlow.Instance.FadeOutMusic();
 			}
 
-			bool isFinale = flow != null && flow.IsFinalStage;
-
-			m_ClearedSounds = StartCoroutine(playClearedSounds(isFinale ? m_EndingTrack : null));
+			m_ClearedSounds = StartCoroutine(playClearedSounds());
 		}
 
 		// Realtime, because the card has just stopped the clock.
-		private IEnumerator playClearedSounds(AudioClip i_ThenMusic)
+		private IEnumerator playClearedSounds()
 		{
 			if (m_ClearedJingleDelay > 0f)
 			{
@@ -442,24 +435,12 @@ namespace BomberBird.UI
 			}
 
 			m_ClearedJinglePlaying = UiSound.Play(m_ClearedJingle);
-
-			if (i_ThenMusic == null || GameFlow.Instance == null)
-			{
-				yield break;
-			}
-
-			if (m_ClearedJingle != null)
-			{
-				yield return new WaitForSecondsRealtime(m_ClearedJingle.length);
-			}
-
-			GameFlow.Instance.PlayMusic(i_ThenMusic);
 		}
 
 		/// <summary>
 		/// The jingle rides a carrier that survives the load, so a player who presses on
 		/// before it ends would hear it over the next scene's loop - and on the finale, over
-		/// the ending it is meant to hand over to. Leaving the card ends both.
+		/// the celebration that opens the closing screens. Leaving the card ends it.
 		/// </summary>
 		private void stopClearedSounds()
 		{

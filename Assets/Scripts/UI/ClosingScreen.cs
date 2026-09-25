@@ -7,10 +7,11 @@ using UnityEngine;
 namespace BomberBird.UI
 {
 	/// <summary>
-	/// The end of the campaign, in two panels on one scene: the birds the player rescued, and
-	/// then the note about the common myna as a real invasive species in Israel.
+	/// The end of the campaign, in three panels on one scene: the valley handed back with feathers
+	/// thrown in from both sides, the birds the player rescued, and then the note about the
+	/// common myna as a real invasive species in Israel.
 	///
-	/// One scene rather than two, because the second panel is a page turn rather than a place.
+	/// One scene rather than three, because each panel is a page turn rather than a place.
 	/// A second scene would want its own canvas, its own entry in the build settings and its own
 	/// copy of everything already loaded here, to show a card and take one keypress.
 	///
@@ -36,6 +37,10 @@ namespace BomberBird.UI
 		}
 
 		[Header("Panels, in the order they are shown")]
+		[Tooltip("\"The valley is yours again\", with the feathers. The celebration before the "
+			+ "birds are named.")]
+		[SerializeField] private GameObject m_ValleyPanel;
+
 		[Tooltip("The birds rescued across the campaign.")]
 		[SerializeField] private GameObject m_RescuedPanel;
 
@@ -54,10 +59,12 @@ namespace BomberBird.UI
 		[Tooltip("Hint that a press moves on. Hidden until the player has had a moment to read.")]
 		[SerializeField] private GameObject m_ContinueHint;
 
-		[Tooltip("Seconds the rescued birds hold before a press is accepted. Long, because the "
-			+ "player arrives here still pressing the key that finished the boss, and this is "
-			+ "the screen that rewards them for it.")]
-		[SerializeField] private float m_RescuedHold = 5f;
+		[Tooltip("Seconds the valley holds before a press is accepted. Long enough for the burst "
+			+ "to land, and for a key still held from the boss not to skip the celebration.")]
+		[SerializeField] private float m_ValleyHold = 3f;
+
+		[Tooltip("Seconds the rescued birds hold before a press is accepted.")]
+		[SerializeField] private float m_RescuedHold = 3f;
 
 		[Tooltip("Seconds the note holds before a press is accepted. The longest hold in the "
 			+ "game: this card is the reason it exists, and a press meant for the screen before "
@@ -73,15 +80,22 @@ namespace BomberBird.UI
 		[Range(0f, 1f)]
 		[SerializeField] private float m_PulseFloor = 0.3f;
 
+		[Header("Music")]
+		[Tooltip("The celebration under the valley panel.")]
+		[SerializeField] private AudioClip m_ValleyMusic;
+
+		[Tooltip("The ending track, from the rescued birds to the end.")]
+		[SerializeField] private AudioClip m_EndingMusic;
+
 		private float m_ShownAt;
 		private float m_Hold;
-		private bool m_IsOnNote;
+		private int m_Page;
 		private TMP_Text m_HintText;
 
 		private void Start()
 		{
 			ShowRescued(GameFlow.Instance == null ? null : GameFlow.Instance.Roster);
-			show(m_RescuedPanel, m_NotePanel, m_RescuedHold);
+			showPage(0);
 		}
 
 		/// <summary>
@@ -160,7 +174,7 @@ namespace BomberBird.UI
 				return;
 			}
 
-			if (m_IsOnNote)
+			if (m_Page == 2)
 			{
 				// The menu restarts the run, which is what makes the next Play a fresh campaign
 				// rather than one that thinks it has already finished.
@@ -172,8 +186,28 @@ namespace BomberBird.UI
 				return;
 			}
 
-			m_IsOnNote = true;
-			show(m_NotePanel, m_RescuedPanel, m_NoteHold);
+			showPage(m_Page + 1);
+		}
+
+		/// <summary>
+		/// Turns to one of the three panels: 0 the valley, 1 the rescued birds, 2 the note.
+		/// </summary>
+		private void showPage(int i_Page)
+		{
+			m_Page = i_Page;
+
+			setShown(m_ValleyPanel, i_Page == 0);
+			setShown(m_RescuedPanel, i_Page == 1);
+			setShown(m_NotePanel, i_Page == 2);
+
+			// The celebration belongs to the valley alone; the ending track starts with the
+			// birds and carries on through the note, where PlayMusic ignores the repeat.
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.PlayMusic(i_Page == 0 ? m_ValleyMusic : m_EndingMusic);
+			}
+
+			restartHint(i_Page == 0 ? m_ValleyHold : i_Page == 1 ? m_RescuedHold : m_NoteHold);
 		}
 
 		/// <summary>
@@ -201,18 +235,16 @@ namespace BomberBird.UI
 				Time.unscaledTime - m_ShownAt - m_Hold, m_PulseSeconds, m_PulseFloor);
 		}
 
-		private void show(GameObject i_Shown, GameObject i_Hidden, float i_Hold)
+		private static void setShown(GameObject i_Panel, bool i_IsShown)
 		{
-			if (i_Hidden != null)
+			if (i_Panel != null)
 			{
-				i_Hidden.SetActive(false);
+				i_Panel.SetActive(i_IsShown);
 			}
+		}
 
-			if (i_Shown != null)
-			{
-				i_Shown.SetActive(true);
-			}
-
+		private void restartHint(float i_Hold)
+		{
 			if (m_ContinueHint != null)
 			{
 				m_ContinueHint.SetActive(false);
