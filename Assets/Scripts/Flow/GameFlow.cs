@@ -229,10 +229,22 @@ namespace BomberBird.Flow
 		/// and this decides whether anything changes: asking for the track already playing is
 		/// ignored, so returning to the arena after a results card does not restart the loop
 		/// half way through.
+		///
+		/// A track that is a piece rather than a loop, like the closing celebration, asks not to
+		/// repeat: it ends where it ends, and whatever the next screen plays follows it.
 		/// </summary>
-		public void PlayMusic(AudioClip i_Clip)
+		public void PlayMusic(AudioClip i_Clip, bool i_IsLooping = true)
 		{
-			if (m_Music == null || i_Clip == null || (m_Music.clip == i_Clip && m_Music.isPlaying))
+			if (m_Music == null || i_Clip == null)
+			{
+				return;
+			}
+
+			// Taken even when the track is already playing, so asking for it once more still
+			// decides whether it repeats.
+			m_Music.loop = i_IsLooping;
+
+			if (m_Music.clip == i_Clip && m_Music.isPlaying)
 			{
 				return;
 			}
@@ -604,6 +616,40 @@ namespace BomberBird.Flow
 		/// </summary>
 		private void loadScene(string i_Scene, float i_Seconds, Action i_AtBlack = null)
 		{
+			fadeThrough(i_Seconds, () =>
+			{
+				// Only now. Held until full black, a Restart from the pause overlay does not run
+				// the arena for an eighth of a second behind the cover on its way out.
+				Time.timeScale = 1f;
+
+				if (i_AtBlack != null)
+				{
+					i_AtBlack();
+				}
+
+				SceneManager.LoadScene(i_Scene);
+			});
+		}
+
+		/// <summary>
+		/// The same fade a change of screen gets, for a change inside one scene: the closing
+		/// screens turning from one beat to the next, so the ending reads as one sequence of
+		/// screens rather than a sequence with some cuts in it.
+		/// </summary>
+		public void FadeThrough(Action i_AtBlack)
+		{
+			// Thrown inside the coroutine, a null would leave the flag set and every screen deaf.
+			if (i_AtBlack == null)
+			{
+				Debug.LogError(name + ": FadeThrough was given nothing to do at black.", this);
+				return;
+			}
+
+			fadeThrough(m_FadeSeconds, i_AtBlack);
+		}
+
+		private void fadeThrough(float i_Seconds, Action i_AtBlack)
+		{
 			if (m_IsTransitioning)
 			{
 				// A second request while one is already running: Retry pressed twice, or a
@@ -615,21 +661,18 @@ namespace BomberBird.Flow
 			{
 				// No cover on this object. The hard cut is what the game did before this
 				// existed, so a GameFlow without one is plain rather than broken.
-				Time.timeScale = 1f;
-
-				if (i_AtBlack != null)
-				{
-					i_AtBlack();
-				}
-
-				SceneManager.LoadScene(i_Scene);
+				i_AtBlack();
 				return;
 			}
 
-			StartCoroutine(transition(i_Scene, i_Seconds, i_AtBlack));
+			StartCoroutine(transition(i_Seconds, i_AtBlack));
 		}
 
-		private IEnumerator transition(string i_Scene, float i_Seconds, Action i_AtBlack)
+		/// <summary>
+		/// Out to black, the work, back in. Shared by scene loads and by the closing screens'
+		/// page turns, so the work is not always a load.
+		/// </summary>
+		private IEnumerator transition(float i_Seconds, Action i_AtBlack)
 		{
 			m_IsTransitioning = true;
 
@@ -639,18 +682,9 @@ namespace BomberBird.Flow
 
 			yield return fade(0f, 1f, i_Seconds);
 
-			// Only now. Held until full black, a Restart from the pause overlay does not run
-			// the arena for an eighth of a second behind the cover on its way out.
-			Time.timeScale = 1f;
+			i_AtBlack();
 
-			if (i_AtBlack != null)
-			{
-				i_AtBlack();
-			}
-
-			SceneManager.LoadScene(i_Scene);
-
-			// One frame for the new scene's Awake and Start, so it is dressed before it is
+			// One frame for a new scene's Awake and Start, so it is dressed before it is
 			// uncovered: SceneMusic asks for its track there, and it should arrive under
 			// black rather than a beat after the picture.
 			yield return null;
