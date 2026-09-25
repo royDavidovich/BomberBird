@@ -20,6 +20,15 @@ namespace BomberBird.UI
 	///
 	/// It started inside <see cref="MainMenuScreen"/> and was pulled out when the results
 	/// cards and the pause overlay wanted the same opening.
+	///
+	/// It also gives focus back after a click on empty space, which clears the selection and
+	/// would otherwise leave the arrows and Enter doing nothing. The player gets back the
+	/// button they were last on, not the first one, so a stray click does not undo their place.
+	///
+	/// The key that gives focus does only that, because this runs after the EventSystem (ugui
+	/// pins it at execution order -1000). Run first, the input module would see the same press
+	/// on the button just selected: an arrow would move one past it, and Enter would press a
+	/// button the player never saw focused.
 	/// </summary>
 	public class FirstKeySelection : MonoBehaviour
 	{
@@ -34,6 +43,7 @@ namespace BomberBird.UI
 		[SerializeField] private DifficultyPanel m_Difficulty;
 
 		private bool m_HasSeenIdle;
+		private GameObject m_LastSelected;
 
 		/// <summary>
 		/// Points this at the button to open on, and clears whatever was selected before, so
@@ -43,6 +53,7 @@ namespace BomberBird.UI
 		public void Arm(GameObject i_FirstSelected)
 		{
 			m_FirstSelected = i_FirstSelected;
+			m_LastSelected = null;
 
 			if (EventSystem.current != null)
 			{
@@ -53,10 +64,27 @@ namespace BomberBird.UI
 		private void OnEnable()
 		{
 			m_HasSeenIdle = false;
+			m_LastSelected = null;
+		}
+
+		/// <summary>
+		/// What a keypress on an empty selection brings back: the button last on, while it is
+		/// still showing, otherwise the screen's first.
+		/// </summary>
+		public static GameObject ChooseRestore(GameObject i_Last, GameObject i_First)
+		{
+			return i_Last != null && i_Last.activeInHierarchy ? i_Last : i_First;
 		}
 
 		private void Update()
 		{
+			// Before the early returns below, so a click made while they hold still leaves
+			// something to come back to.
+			if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
+			{
+				m_LastSelected = EventSystem.current.currentSelectedGameObject;
+			}
+
 			if (!m_HasSeenIdle)
 			{
 				// Whatever was being held when this screen opened has to be let go of first.
@@ -77,9 +105,11 @@ namespace BomberBird.UI
 				return;
 			}
 
-			if (m_FirstSelected != null && UiInput.WasKeyPressed())
+			GameObject restore = ChooseRestore(m_LastSelected, m_FirstSelected);
+
+			if (restore != null && UiInput.WasKeyPressed())
 			{
-				EventSystem.current.SetSelectedGameObject(m_FirstSelected);
+				EventSystem.current.SetSelectedGameObject(restore);
 			}
 		}
 	}

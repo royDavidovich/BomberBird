@@ -156,6 +156,8 @@ namespace BomberBird.UI
 			// Keyboard and gamepad need something focused, or the screen cannot be driven
 			// without a mouse - and Docs/GDD.md commits to a D-pad. With no Continue to fall
 			// back on, an unfocused screen would not merely look odd, it would be a dead end.
+			// The FirstKeySelection beside this screen keeps it from becoming one after a click
+			// on empty space clears the focus.
 			if (opensOn != null && EventSystem.current != null)
 			{
 				// Silent: the screen arriving on a card is not the player moving onto one, and
