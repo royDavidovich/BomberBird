@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using BomberBird.Player;
 using BomberBird.Pods;
@@ -59,18 +60,39 @@ namespace BomberBird.Enemies
 			+ "measure as BirdDeath's flash.")]
 		[SerializeField] private float m_SummonBlinkRate = 10f;
 
+		[Tooltip("Seconds a summoned helper takes to spin out of the boss to its cell, turning one "
+			+ "full circle on the way. Harmless, and out of reach of the flames, until it lands; "
+			+ "the blinking grace starts then.")]
+		[SerializeField] private float m_SummonFlightSeconds = 0.5f;
+
+		[Tooltip("How high, in cells, the way out arcs above the straight line from the boss. "
+			+ "0 is a straight slide.")]
+		[SerializeField] private float m_SummonArcHeight;
+
+		[Tooltip("Added to a helper's sorting order on its way out, so it passes over the walls "
+			+ "rather than behind them.")]
+		[SerializeField] private int m_SummonFlightSortingBoost = 20;
+
 		[Header("The boss falling")]
-		[Tooltip("Seconds the slaves scatter for after the boss dies, before they are gone.")]
+		[Tooltip("Seconds the slaves spin on the spot, blinking, after the boss dies, before they "
+			+ "are gone.")]
 		[SerializeField] private float m_ScatterSeconds = 1.25f;
 
-		[Tooltip("Speed the slaves scatter at. A little above a walk - enough to read as a "
-			+ "rout, not so much that it looks like a glitch.")]
-		[SerializeField] private float m_ScatterSpeed = 3f;
+		[Tooltip("Full turns each slave spins through in that time. Several, so it reads as "
+			+ "reeling rather than turning to look.")]
+		[SerializeField] private int m_ScatterTurns = 5;
+
+		// How long a spin outlasts the flight or reel it covers. Both count Update's deltaTime,
+		// so the margin holds at any frame rate.
+		private const float k_SpinPastLanding = 0.1f;
 
 		private readonly List<MynaMovement> r_Living = new List<MynaMovement>();
 		private readonly BurstDanger r_Danger = new BurstDanger();
 		private readonly Dictionary<MynaMovement, float> r_HarmlessUntil = new Dictionary<MynaMovement, float>();
 		private readonly List<SpriteRenderer> r_BlinkRenderers = new List<SpriteRenderer>();
+
+		// A helper on its way out of the boss, and the cell it is going to.
+		private readonly Dictionary<MynaMovement, Vector2Int> r_Flying = new Dictionary<MynaMovement, Vector2Int>();
 
 		private BomberBird.Arena.Arena m_Arena;
 		private PodField m_Field;
@@ -208,6 +230,13 @@ namespace BomberBird.Enemies
 					continue;
 				}
 
+				// Still on its way out: not standing in any cell the flames could reach, and not
+				// yet blinking, because its grace starts when it lands.
+				if (r_Flying.ContainsKey(myna))
+				{
+					continue;
+				}
+
 				if (r_Danger.IsBurning(myna.Cell, Time.time))
 				{
 					Vector2Int cell = myna.Cell;
@@ -330,11 +359,11 @@ namespace BomberBird.Enemies
 		}
 
 		/// <summary>
-		/// The boss falls and takes its fight with it: every slave still standing scatters
-		/// and is gone.
+		/// The boss falls and takes its fight with it: every slave still standing reels on the
+		/// spot, spinning and blinking, and is gone.
 		///
 		/// They leave <see cref="r_Living"/> at once rather than when they vanish, which is
-		/// what makes them harmless on the way out - <see cref="IsMynaAt"/> reads that list,
+		/// what makes them harmless while they go - <see cref="IsMynaAt"/> reads that list,
 		/// and it is the only thing the bird's death check asks about touching a myna. It is
 		/// also what drops <see cref="LivingCount"/> to zero on the killing blow, so the
 		/// stage ends there instead of after a chase.
@@ -353,17 +382,42 @@ namespace BomberBird.Enemies
 
 				r_Living.RemoveAt(i);
 
-				// A slave caught mid-blink would otherwise flee half drawn, or not at all.
-				if (r_HarmlessUntil.Remove(slave))
-				{
-					setDrawn(slave, true);
-				}
+				// Its grace is over, and one still on its way out is set down on its cell, so the
+				// reeling happens where the player can see it end.
+				r_HarmlessUntil.Remove(slave);
+				land(slave);
 
-				slave.Speed = m_ScatterSpeed;
-				Destroy(slave.gameObject, m_ScatterSeconds);
+				// Past the vanishing, so it never gets to walk off between the two. The coroutine's
+				// first step runs inside StartCoroutine and draws it, so one caught mid-blink is
+				// shown again at once.
+				slave.Spin(m_ScatterSeconds + k_SpinPastLanding, m_ScatterTurns);
+				StartCoroutine(reelAndVanish(slave));
 			}
 
 			OnMynaDefeated(cell);
+		}
+
+		/// <summary>
+		/// Blinks a slave left behind by the fallen boss while it spins, then removes it.
+		/// </summary>
+		private IEnumerator reelAndVanish(MynaMovement i_Slave)
+		{
+			for (float elapsed = 0f; elapsed < m_ScatterSeconds; elapsed += Time.deltaTime)
+			{
+				if (i_Slave == null)
+				{
+					yield break;
+				}
+
+				setDrawn(i_Slave, Mathf.FloorToInt(elapsed * m_SummonBlinkRate) % 2 == 0);
+
+				yield return null;
+			}
+
+			if (i_Slave != null)
+			{
+				Destroy(i_Slave.gameObject);
+			}
 		}
 
 		/// <summary>
@@ -371,12 +425,15 @@ namespace BomberBird.Enemies
 		/// when the cells around the boss cannot hold them all. A wave that does not fit
 		/// spawns short rather than putting a myna inside a wall.
 		///
-		/// Each one starts harmless for a moment. The bird has usually just hit the boss from
-		/// close by, and a myna appearing on or beside it used to kill it before the player
+		/// Each one spins out of the boss to its cell, so the wave reads as hers, and is harmless
+		/// until it has landed and blinked for a moment. The bird has usually just hit the boss
+		/// from close by, and a myna appearing on or beside it used to kill it before the player
 		/// could have seen it coming.
 		/// </summary>
 		private void summonSlaves(Vector2Int i_Around, int i_Count)
 		{
+			Vector3 from = m_Arena.Grid.CellToWorld(i_Around);
+
 			for (int spawned = 0; spawned < i_Count; ++spawned)
 			{
 				Vector2Int cell;
@@ -390,9 +447,83 @@ namespace BomberBird.Enemies
 
 				if (slave != null)
 				{
-					r_HarmlessUntil[slave] = Time.time + m_SummonGrace;
+					r_HarmlessUntil[slave] = Time.time + m_SummonFlightSeconds + m_SummonGrace;
+					StartCoroutine(flyOut(slave, from, cell));
 				}
 			}
+		}
+
+		/// <summary>
+		/// Carries a slave from the boss to the cell it was spawned for, spinning the way the
+		/// boss does when hit, so the escort reads as thrown out of her. The cell is already
+		/// claimed, because the slave was spawned on it; only the drawing travels.
+		///
+		/// A spinning myna holds its walk, which is what keeps it from stepping off mid-air. The
+		/// spin runs a moment past the landing so it cannot run out first.
+		/// </summary>
+		private IEnumerator flyOut(MynaMovement i_Slave, Vector3 i_From, Vector2Int i_Cell)
+		{
+			Vector3 to = m_Arena.Grid.CellToWorld(i_Cell);
+
+			r_Flying[i_Slave] = i_Cell;
+			i_Slave.Spin(m_SummonFlightSeconds + k_SpinPastLanding);
+			boostSorting(i_Slave, m_SummonFlightSortingBoost);
+
+			for (float elapsed = 0f; elapsed < m_SummonFlightSeconds; elapsed += Time.deltaTime)
+			{
+				// Landed early by the boss falling, or gone with the stage.
+				if (i_Slave == null || !r_Flying.ContainsKey(i_Slave))
+				{
+					yield break;
+				}
+
+				i_Slave.transform.position = SummonArcPosition(i_From, to, m_SummonArcHeight, elapsed / m_SummonFlightSeconds);
+
+				yield return null;
+			}
+
+			if (i_Slave != null)
+			{
+				land(i_Slave);
+			}
+		}
+
+		/// <summary>Sets a slave on its way out down on its cell. Nothing for one on foot.</summary>
+		private void land(MynaMovement i_Slave)
+		{
+			Vector2Int cell;
+
+			if (!r_Flying.TryGetValue(i_Slave, out cell))
+			{
+				return;
+			}
+
+			r_Flying.Remove(i_Slave);
+			i_Slave.transform.position = m_Arena.Grid.CellToWorld(cell);
+			boostSorting(i_Slave, -m_SummonFlightSortingBoost);
+		}
+
+		private void boostSorting(MynaMovement i_Myna, int i_By)
+		{
+			i_Myna.GetComponentsInChildren(r_BlinkRenderers);
+
+			for (int i = 0; i < r_BlinkRenderers.Count; ++i)
+			{
+				r_BlinkRenderers[i].sortingOrder += i_By;
+			}
+		}
+
+		/// <summary>
+		/// Where a summoned slave is drawn a fraction <paramref name="i_T"/> of the way through
+		/// its flight: along the straight line from the boss to its cell, lifted by a parabola
+		/// that peaks <paramref name="i_Height"/> above it halfway and is back on the line at
+		/// both ends.
+		/// </summary>
+		public static Vector3 SummonArcPosition(Vector3 i_From, Vector3 i_To, float i_Height, float i_T)
+		{
+			float t = Mathf.Clamp01(i_T);
+
+			return Vector3.Lerp(i_From, i_To, t) + Vector3.up * (i_Height * 4f * t * (1f - t));
 		}
 
 		/// <summary>

@@ -27,7 +27,7 @@ namespace BomberBird.Enemies
 		[SerializeField] private float m_StraightChance;
 
 		// A full turn, counted down as the spin runs out: the myna passes through every
-		// facing exactly once.
+		// facing once a turn.
 		private static readonly eFacing[] k_SpinOrder =
 		{
 			eFacing.Down,
@@ -46,6 +46,7 @@ namespace BomberBird.Enemies
 		private bool m_IsMoving;
 		private float m_SpinRemaining;
 		private float m_SpinQuarter;
+		private int m_SpinTurns;
 
 		public eFacing Facing
 		{
@@ -148,16 +149,33 @@ namespace BomberBird.Enemies
 		///
 		/// It starts wherever the myna is, mid-step included. Waiting to reach a cell centre
 		/// would delay the only feedback the player gets by up to a whole step.
+		///
+		/// More than one turn spins faster over the same time, which is how the escorts go when
+		/// the boss falls.
 		/// </summary>
-		public void Spin(float i_Seconds)
+		public void Spin(float i_Seconds, int i_Turns = 1)
 		{
 			if (i_Seconds <= 0f)
 			{
 				return;
 			}
 
+			m_SpinTurns = Mathf.Max(1, i_Turns);
 			m_SpinRemaining = i_Seconds;
-			m_SpinQuarter = i_Seconds / 4f;
+			m_SpinQuarter = i_Seconds / (k_SpinOrder.Length * m_SpinTurns);
+		}
+
+		/// <summary>
+		/// The facing a spin shows with <paramref name="i_Remaining"/> seconds left, each quarter
+		/// turn lasting <paramref name="i_Quarter"/>. Counted down from the end, so every turn
+		/// passes through the four facings in the same order.
+		/// </summary>
+		public static eFacing SpinFacing(float i_Remaining, float i_Quarter, int i_Turns)
+		{
+			int quarter = i_Quarter <= 0f ? 0 : (int)(i_Remaining / i_Quarter);
+			int last = k_SpinOrder.Length * Mathf.Max(1, i_Turns) - 1;
+
+			return k_SpinOrder[Mathf.Clamp(quarter, 0, last) % k_SpinOrder.Length];
 		}
 
 		private void Update()
@@ -201,9 +219,7 @@ namespace BomberBird.Enemies
 
 			if (m_SpinRemaining > 0f)
 			{
-				int quarter = m_SpinQuarter <= 0f ? 0 : (int)(m_SpinRemaining / m_SpinQuarter);
-
-				m_Facing = k_SpinOrder[Mathf.Clamp(quarter, 0, k_SpinOrder.Length - 1)];
+				m_Facing = SpinFacing(m_SpinRemaining, m_SpinQuarter, m_SpinTurns);
 
 				return;
 			}
