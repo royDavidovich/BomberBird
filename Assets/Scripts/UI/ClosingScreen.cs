@@ -192,7 +192,9 @@ namespace BomberBird.UI
 			// their own right, and a hard cut between two of them read as a glitch.
 			if (GameFlow.Instance != null)
 			{
-				GameFlow.Instance.FadeThrough(() => showPage(next));
+				// The music is kept through every turn but the first: only leaving the valley
+				// changes the track, and that swap wants the quiet of the duck to hide in.
+				GameFlow.Instance.FadeThrough(() => showPage(next), m_Page != 0);
 			}
 			else
 			{

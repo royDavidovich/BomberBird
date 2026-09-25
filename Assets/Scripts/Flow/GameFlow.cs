@@ -64,6 +64,7 @@ namespace BomberBird.Flow
 		private float m_MusicVolume = 1f;
 		private Coroutine m_MusicFade;
 		private bool m_IsTransitioning;
+		private bool m_IsMusicKept;
 
 		/// <summary>
 		/// Raised when a stage ends, before anything is loaded, so a results screen can show
@@ -635,8 +636,11 @@ namespace BomberBird.Flow
 		/// The same fade a change of screen gets, for a change inside one scene: the closing
 		/// screens turning from one beat to the next, so the ending reads as one sequence of
 		/// screens rather than a sequence with some cuts in it.
+		///
+		/// <paramref name="i_KeepsMusic"/> leaves the music at full through the black, for a
+		/// turn that carries the same track on: ducking it there only sounds like a hiccup.
 		/// </summary>
-		public void FadeThrough(Action i_AtBlack)
+		public void FadeThrough(Action i_AtBlack, bool i_KeepsMusic = false)
 		{
 			// Thrown inside the coroutine, a null would leave the flag set and every screen deaf.
 			if (i_AtBlack == null)
@@ -645,10 +649,10 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			fadeThrough(m_FadeSeconds, i_AtBlack);
+			fadeThrough(m_FadeSeconds, i_AtBlack, i_KeepsMusic);
 		}
 
-		private void fadeThrough(float i_Seconds, Action i_AtBlack)
+		private void fadeThrough(float i_Seconds, Action i_AtBlack, bool i_KeepsMusic = false)
 		{
 			if (m_IsTransitioning)
 			{
@@ -665,16 +669,17 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			StartCoroutine(transition(i_Seconds, i_AtBlack));
+			StartCoroutine(transition(i_Seconds, i_AtBlack, i_KeepsMusic));
 		}
 
 		/// <summary>
 		/// Out to black, the work, back in. Shared by scene loads and by the closing screens'
 		/// page turns, so the work is not always a load.
 		/// </summary>
-		private IEnumerator transition(float i_Seconds, Action i_AtBlack)
+		private IEnumerator transition(float i_Seconds, Action i_AtBlack, bool i_KeepsMusic)
 		{
 			m_IsTransitioning = true;
+			m_IsMusicKept = i_KeepsMusic;
 
 			// A fade-out still running would write the volume every frame that setCover does,
 			// and the two would fight over the same field all the way to black.
@@ -692,6 +697,7 @@ namespace BomberBird.Flow
 			yield return fade(1f, 0f, i_Seconds);
 
 			m_IsTransitioning = false;
+			m_IsMusicKept = false;
 		}
 
 		/// <summary>
@@ -756,13 +762,14 @@ namespace BomberBird.Flow
 		/// <summary>
 		/// The cover and the music move together off one number. At full black the music is at
 		/// its floor, which is where <see cref="PlayMusic"/> swaps the track and therefore the
-		/// quietest place to do it.
+		/// quietest place to do it - unless the transition keeps the music, when only the cover
+		/// moves.
 		/// </summary>
 		private void setCover(float i_Alpha)
 		{
 			m_Fade.Cover(i_Alpha);
 
-			if (m_Music != null)
+			if (m_Music != null && !m_IsMusicKept)
 			{
 				m_Music.volume = m_MusicVolume * Mathf.Lerp(1f, m_MusicDuckFloor, i_Alpha);
 			}
