@@ -585,6 +585,13 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void FadeThrough(Action i_AtBlack)
 		{
+			// Thrown inside the coroutine, a null would leave the flag set and every screen deaf.
+			if (i_AtBlack == null)
+			{
+				Debug.LogError(name + ": FadeThrough was given nothing to do at black.", this);
+				return;
+			}
+
 			fadeThrough(m_FadeSeconds, i_AtBlack);
 		}
 
@@ -608,6 +615,10 @@ namespace BomberBird.Flow
 			StartCoroutine(transition(i_Seconds, i_AtBlack));
 		}
 
+		/// <summary>
+		/// Out to black, the work, back in. Shared by scene loads and by the closing screens'
+		/// page turns, so the work is not always a load.
+		/// </summary>
 		private IEnumerator transition(float i_Seconds, Action i_AtBlack)
 		{
 			m_IsTransitioning = true;
