@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.21, 2026-09-25 |
+| Document version | v0.22, 2026-09-25 |
 
 ## 1. High Concept
 
@@ -135,7 +135,7 @@ of switching bird.
 |---|---|---|---|
 | Move | WASD or arrow keys | Left stick or D-pad | Not planned |
 | Place seed pod | Space | Main action button | Not planned |
-| Confirm or retry | Enter or Space | Main action button | Not planned |
+| Confirm or retry | Enter | Main action button | Not planned |
 | Pause or back | Escape | Start or back button | Not planned |
 
 Gameplay input is disabled while paused and during stage transitions. Losing focus pauses the game. Keyboard support is required; gamepad support is polish if time allows.
@@ -292,3 +292,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.19 | 2026-09-20 | Turned the mynas toggle into a choice the player is shown. The menu's third button stated the difficulty and flipped it when pressed, so the only way to find out what else was on offer was to change the setting. It now reads DIFFICULTY and opens a panel: a slider, easiest on the left, with the myna that stands for each setting riding the lever and each setting named under its own notch. **No change to the difficulty itself** - the same one stored flag, the same easier flock, the same PlayerPrefs memory between sittings; only how it is offered changed. The button is set in Pixelify at the painted labels' own gold and outline rather than commissioned as a word sprite, and the three menu buttons moved from a 100px pitch to 150px, because three buttons 20px apart read as clamped on the screen that is the game's face. Built to hold a third setting: the ladder is one file, and Hard needs its tuning decided before it is added. |
 | v0.20 | 2026-09-24 | Settled the gameplay HUD, which section 5 had left to be decided after the first playable arena. The corner counters became one olive tree standing in the left third of the screen, with the arena framed into the right two-thirds. Its canopy shows the habitat the stage is set in, a sign on its branch names the stage and the habitat, and hollows in its trunk hold the lives and the pods, so a lost life reads as an empty hollow rather than a smaller number. At 16:9 the arena grew about a tenth on the regular stages, because the camera now fits it from its cells rather than from a fixed size. **No rule changed** - the HUD still carries exactly the pods, the stage and the lives it did. |
 | v0.21 | 2026-09-25 | Made the cage answer the player who tries to bomb it open. A burst stopped by the cage used to stop in silence, the same as at a hard block, and silence reads as "not enough pods yet", so the likeliest wrong guess about the first feather stage was also the one the game quietly encouraged. The cage now clanks and shakes every time a burst reaches it; the first time in a run, a line over it says pods cannot break it and the mynas must be cleared; and the first cage stage of a run states the rule over the cage while the stage waits for Space. **No rule changed** - the cage is exactly as solid as before, and every word shown restates section 3. This is feedback on an existing rule, the §8.2 line about stronger visual and audio feedback. |
+| v0.22 | 2026-09-25 | Took Space off confirming in the menus. Space is the pod key and the key that starts a waiting stage, so a player still pressing it after a GAME OVER or a Restart could confirm a menu choice they never meant, most easily a bird on the selection screen. Menus now confirm on Enter (either Enter key), a click, or the gamepad's main button, and the bird selection screen says so under the cards: "PRESS ENTER TO CHOOSE". **No rule changed.** This is a control change to the confirm row of section 4, approved by the owner. |
