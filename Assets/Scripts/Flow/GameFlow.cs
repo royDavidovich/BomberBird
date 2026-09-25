@@ -375,25 +375,11 @@ namespace BomberBird.Flow
 			m_Run.AddStageTotals(i_MynasDefeated, i_PodsPlaced, i_Seconds);
 			m_Run.AdvanceStage();
 
-			// Past the last stage the campaign is over. Until now this fell through to
-			// StartStage, which loaded a Gameplay scene the campaign had no stage for, and
-			// StageSetup quietly used the scene's own default arena instead.
-			if (m_Campaign != null && m_Run.StageNumber > m_Campaign.StageCount)
-			{
-				GoToClosing();
-				return;
-			}
-
-			// Every stage after the intro is chosen into, but only once there is something to
-			// choose. A roster of one would show the player a decision already made.
-			if (m_Run.HasBirdChoice)
-			{
-				GoToBirdSelect();
-			}
-			else
-			{
-				StartStage();
-			}
+			// Past the last stage the campaign is over. Before the closing screens existed this
+			// fell through to StartStage, which loaded a Gameplay scene the campaign had no stage
+			// for, and StageSetup quietly used the scene's own default arena instead. With no
+			// campaign there is no last stage to be past.
+			go(m_Run.RouteAfterAdvance(m_Campaign == null ? int.MaxValue : m_Campaign.StageCount));
 		}
 
 		/// <summary>
@@ -421,15 +407,7 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			if (m_Run.HasBirdChoice)
-			{
-				m_Run.MarkChoosingForReplay();
-				GoToBirdSelect();
-			}
-			else
-			{
-				ReplayStage();
-			}
+			go(m_Run.RouteToAnotherAttempt());
 		}
 
 		/// <summary>Reports the outcome, and says whether anyone was listening.</summary>
@@ -582,13 +560,35 @@ namespace BomberBird.Flow
 				return;
 			}
 
-			if (m_Run.ClaimReplayAfterChoice())
+			go(m_Run.RouteAfterChoice());
+		}
+
+		/// <summary>Loads the screen <see cref="RunState"/> routed the run to.</summary>
+		private void go(eStageRoute i_Route)
+		{
+			switch (i_Route)
 			{
-				ReplayStage();
-			}
-			else
-			{
-				StartStage();
+				case eStageRoute.HabitatCard:
+					StartStage();
+					break;
+
+				case eStageRoute.Arena:
+					ReplayStage();
+					break;
+
+				case eStageRoute.BirdSelect:
+					GoToBirdSelect();
+					break;
+
+				case eStageRoute.Closing:
+					GoToClosing();
+					break;
+
+				default:
+					// A route added without a screen here would otherwise strand the player on the
+					// screen they are leaving, with nothing in the console to say why.
+					Debug.LogError(name + ": no screen for route " + i_Route + ".", this);
+					break;
 			}
 		}
 
