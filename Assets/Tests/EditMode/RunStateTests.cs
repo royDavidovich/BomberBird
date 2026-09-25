@@ -301,6 +301,24 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
+		public void AChoiceForAReplayIsClaimedOnceAndForgottenByARestart()
+		{
+			RunState run = makeRun();
+
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "a choice nobody marked arrives at the stage");
+
+			run.MarkChoosingForReplay();
+
+			Assert.IsTrue(run.ClaimReplayAfterChoice(), "the choice after a retry replays");
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "the next choice, after a clear, arrives");
+
+			run.MarkChoosingForReplay();
+			run.Restart();
+
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "a fresh campaign carries no replay over");
+		}
+
+		[Test]
 		public void TheCageStrikeIsExplainedOnceARunAndAgainAfterARestart()
 		{
 			RunState run = makeRun();

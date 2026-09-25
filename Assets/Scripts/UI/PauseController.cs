@@ -111,7 +111,10 @@ namespace BomberBird.UI
 			setPaused(false);
 		}
 
-		/// <summary>Wired to the overlay's Restart button. Replays the stage, and costs no life.</summary>
+		/// <summary>
+		/// Wired to the overlay's Restart button. Replays the stage, after a choice of bird when
+		/// the roster holds one, and costs no life.
+		/// </summary>
 		public void RestartStage()
 		{
 			if (GameFlow.Instance == null)

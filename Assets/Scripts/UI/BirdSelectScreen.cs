@@ -8,19 +8,22 @@ using UnityEngine.EventSystems;
 namespace BomberBird.UI
 {
 	/// <summary>
-	/// The screen between stages: every bird the campaign can hand out, the earned ones
-	/// playable and the rest as silhouettes.
+	/// The screen between stages, and before another attempt at a stage lost or restarted:
+	/// every bird the campaign can hand out, the earned ones playable and the rest as
+	/// silhouettes.
 	///
 	/// Choosing is the whole interaction. There is no Continue to press afterwards - the player
 	/// moves onto a card and presses it, and the stage starts. A locked card can be moved onto
-	/// and read, but pressing it refuses.
+	/// and read, but pressing it refuses. Whether the habitat card comes next is GameFlow's
+	/// call, not this screen's: a replay goes straight back to the arena.
 	///
 	/// It shows the locked birds on purpose. At stage 2 the roster is still one bird, and the
 	/// three silhouettes beside it are the screen saying there is more game here than the
 	/// player has seen yet.
 	///
-	/// It never appears before the intro. That falls out of the routing rather than a rule:
-	/// stage 1 is only reached from Play, and every later stage from CompleteStage.
+	/// It never appears before the intro is first played. That falls out of the routing
+	/// rather than a rule: stage 1 is only reached from Play, every later stage from
+	/// CompleteStage, and a retry comes here only when the roster already holds a choice.
 	/// </summary>
 	public class BirdSelectScreen : MonoBehaviour
 	{
@@ -112,7 +115,7 @@ namespace BomberBird.UI
 					+ "bird it already had.", this);
 			}
 
-			GameFlow.Instance.StartStage();
+			GameFlow.Instance.ContinueFromBirdSelect();
 		}
 
 		private void buildCards()

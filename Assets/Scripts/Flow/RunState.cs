@@ -27,6 +27,7 @@ namespace BomberBird.Flow
 		private bool m_HasSeenInstructions;
 		private bool m_HasShownCageRule;
 		private bool m_HasExplainedCageStrike;
+		private bool m_IsChoosingForReplay;
 		private int m_StageNumber;
 		private BirdProfile m_SelectedBird;
 		private int m_TotalMynasDefeated;
@@ -110,6 +111,7 @@ namespace BomberBird.Flow
 			m_HasSeenInstructions = false;
 			m_HasShownCageRule = false;
 			m_HasExplainedCageStrike = false;
+			m_IsChoosingForReplay = false;
 			m_TotalMynasDefeated = 0;
 			m_TotalPodsPlaced = 0;
 			m_TotalSeconds = 0f;
@@ -178,6 +180,29 @@ namespace BomberBird.Flow
 			m_HasExplainedCageStrike = true;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Notes that the selection screen about to open is choosing for another attempt at this
+		/// stage, not for arriving at the next one. The screen is the same either way; only what
+		/// follows the choice differs, and a scene load carries nothing across but the run.
+		/// </summary>
+		public void MarkChoosingForReplay()
+		{
+			m_IsChoosingForReplay = true;
+		}
+
+		/// <summary>
+		/// Whether the choice just made was for a replay, forgetting it either way, so the next
+		/// visit to the selection screen - after a stage is cleared - arrives as normal.
+		/// </summary>
+		public bool ClaimReplayAfterChoice()
+		{
+			bool isReplay = m_IsChoosingForReplay;
+
+			m_IsChoosingForReplay = false;
+
+			return isReplay;
 		}
 
 		/// <summary>
