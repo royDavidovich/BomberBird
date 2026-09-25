@@ -563,6 +563,33 @@ namespace BomberBird.Flow
 		/// </summary>
 		private void loadScene(string i_Scene, float i_Seconds, Action i_AtBlack = null)
 		{
+			fadeThrough(i_Seconds, () =>
+			{
+				// Only now. Held until full black, a Restart from the pause overlay does not run
+				// the arena for an eighth of a second behind the cover on its way out.
+				Time.timeScale = 1f;
+
+				if (i_AtBlack != null)
+				{
+					i_AtBlack();
+				}
+
+				SceneManager.LoadScene(i_Scene);
+			});
+		}
+
+		/// <summary>
+		/// The same fade a change of screen gets, for a change inside one scene: the closing
+		/// screens turning from one beat to the next, so the ending reads as one sequence of
+		/// screens rather than a sequence with some cuts in it.
+		/// </summary>
+		public void FadeThrough(Action i_AtBlack)
+		{
+			fadeThrough(m_FadeSeconds, i_AtBlack);
+		}
+
+		private void fadeThrough(float i_Seconds, Action i_AtBlack)
+		{
 			if (m_IsTransitioning)
 			{
 				// A second request while one is already running: Retry pressed twice, or a
@@ -574,21 +601,14 @@ namespace BomberBird.Flow
 			{
 				// No cover on this object. The hard cut is what the game did before this
 				// existed, so a GameFlow without one is plain rather than broken.
-				Time.timeScale = 1f;
-
-				if (i_AtBlack != null)
-				{
-					i_AtBlack();
-				}
-
-				SceneManager.LoadScene(i_Scene);
+				i_AtBlack();
 				return;
 			}
 
-			StartCoroutine(transition(i_Scene, i_Seconds, i_AtBlack));
+			StartCoroutine(transition(i_Seconds, i_AtBlack));
 		}
 
-		private IEnumerator transition(string i_Scene, float i_Seconds, Action i_AtBlack)
+		private IEnumerator transition(float i_Seconds, Action i_AtBlack)
 		{
 			m_IsTransitioning = true;
 
@@ -598,18 +618,9 @@ namespace BomberBird.Flow
 
 			yield return fade(0f, 1f, i_Seconds);
 
-			// Only now. Held until full black, a Restart from the pause overlay does not run
-			// the arena for an eighth of a second behind the cover on its way out.
-			Time.timeScale = 1f;
+			i_AtBlack();
 
-			if (i_AtBlack != null)
-			{
-				i_AtBlack();
-			}
-
-			SceneManager.LoadScene(i_Scene);
-
-			// One frame for the new scene's Awake and Start, so it is dressed before it is
+			// One frame for a new scene's Awake and Start, so it is dressed before it is
 			// uncovered: SceneMusic asks for its track there, and it should arrive under
 			// black rather than a beat after the picture.
 			yield return null;

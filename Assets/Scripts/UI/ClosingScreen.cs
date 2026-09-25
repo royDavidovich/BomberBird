@@ -186,7 +186,18 @@ namespace BomberBird.UI
 				return;
 			}
 
-			showPage(m_Page + 1);
+			int next = m_Page + 1;
+
+			// Through black, the same as every change of screen: the beats are screens in
+			// their own right, and a hard cut between two of them read as a glitch.
+			if (GameFlow.Instance != null)
+			{
+				GameFlow.Instance.FadeThrough(() => showPage(next));
+			}
+			else
+			{
+				showPage(next);
+			}
 		}
 
 		/// <summary>
