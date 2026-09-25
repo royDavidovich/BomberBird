@@ -87,6 +87,15 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
+		public void NeverChoosesTheBirdsOwnCell()
+		{
+			Vector2Int bird = new Vector2Int(11, 10);
+			Vector2Int cell;
+
+			Assert.IsFalse(choose(bird, candidate => candidate == bird, out cell));
+		}
+
+		[Test]
 		public void FailsOnlyWhenNoCellIsOpen()
 		{
 			Vector2Int cell;

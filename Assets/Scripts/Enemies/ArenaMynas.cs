@@ -55,7 +55,8 @@ namespace BomberBird.Enemies
 		[Tooltip("Seconds a summoned helper is harmless for after it appears. It blinks until then.")]
 		[SerializeField] private float m_SummonGrace = 1f;
 
-		[Tooltip("Blinks per second while a summoned helper is harmless.")]
+		[Tooltip("Times a second a harmless helper flips between shown and hidden, the same "
+			+ "measure as BirdDeath's flash.")]
 		[SerializeField] private float m_SummonBlinkRate = 10f;
 
 		[Header("The boss falling")]
@@ -229,7 +230,18 @@ namespace BomberBird.Enemies
 		{
 			float until;
 
-			return r_HarmlessUntil.TryGetValue(i_Myna, out until) && Time.time < until;
+			return r_HarmlessUntil.TryGetValue(i_Myna, out until)
+				&& (Time.time < until || isUnderTheBird(i_Myna));
+		}
+
+		/// <summary>
+		/// Blinking told the player this one is safe, so it stays safe for as long as the bird
+		/// is still standing in it: turning lethal under the bird would be the same unfair death
+		/// the grace exists to prevent, only a second later.
+		/// </summary>
+		private bool isUnderTheBird(MynaMovement i_Myna)
+		{
+			return m_Bird != null && m_Bird.Cell == i_Myna.Cell;
 		}
 
 		/// <summary>
@@ -248,7 +260,7 @@ namespace BomberBird.Enemies
 
 			float remaining = until - Time.time;
 
-			if (remaining <= 0f)
+			if (remaining <= 0f && !isUnderTheBird(i_Myna))
 			{
 				r_HarmlessUntil.Remove(i_Myna);
 				setDrawn(i_Myna, true);
@@ -420,7 +432,7 @@ namespace BomberBird.Enemies
 		///
 		/// When the bird is so placed that no open cell is far enough, the open cell farthest
 		/// from it is used instead, because a boss hit must never go unanswered just because
-		/// the bird stood close. False only when there is no open cell at all.
+		/// the bird stood close. False only when no open cell but the bird's own is left.
 		/// </summary>
 		public static bool ChooseSummonCell(
 			Vector2Int i_Boss,
@@ -462,8 +474,9 @@ namespace BomberBird.Enemies
 							return true;
 						}
 
-						// Strictly farther, so among equals the one nearer the boss is kept.
-						if (fromBird > farthest)
+						// Strictly farther, so among equals the one nearer the boss is kept. Never
+						// the bird's own cell, however little else is open.
+						if (fromBird > farthest && fromBird > 0)
 						{
 							farthest = fromBird;
 							o_Cell = candidate;
