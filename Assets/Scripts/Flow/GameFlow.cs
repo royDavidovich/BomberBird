@@ -229,8 +229,11 @@ namespace BomberBird.Flow
 		/// and this decides whether anything changes: asking for the track already playing is
 		/// ignored, so returning to the arena after a results card does not restart the loop
 		/// half way through.
+		///
+		/// A track that is a piece rather than a loop, like the closing celebration, asks not to
+		/// repeat: it ends where it ends, and whatever the next screen plays follows it.
 		/// </summary>
-		public void PlayMusic(AudioClip i_Clip)
+		public void PlayMusic(AudioClip i_Clip, bool i_IsLooping = true)
 		{
 			if (m_Music == null || i_Clip == null || (m_Music.clip == i_Clip && m_Music.isPlaying))
 			{
@@ -238,6 +241,7 @@ namespace BomberBird.Flow
 			}
 
 			m_Music.clip = i_Clip;
+			m_Music.loop = i_IsLooping;
 			m_Music.Play();
 		}
 

@@ -81,7 +81,7 @@ namespace BomberBird.UI
 		[SerializeField] private float m_PulseFloor = 0.3f;
 
 		[Header("Music")]
-		[Tooltip("The celebration under the valley panel.")]
+		[Tooltip("The celebration under the valley panel. Played once, not looped.")]
 		[SerializeField] private AudioClip m_ValleyMusic;
 
 		[Tooltip("The ending track, from the rescued birds to the end.")]
@@ -200,11 +200,19 @@ namespace BomberBird.UI
 			setShown(m_RescuedPanel, i_Page == 1);
 			setShown(m_NotePanel, i_Page == 2);
 
-			// The celebration belongs to the valley alone; the ending track starts with the
-			// birds and carries on through the note, where PlayMusic ignores the repeat.
+			// The celebration belongs to the valley alone, and plays once: a fanfare that
+			// starts over reads as a glitch. The ending track starts with the birds and loops
+			// on through the note, where PlayMusic ignores the repeat.
 			if (GameFlow.Instance != null)
 			{
-				GameFlow.Instance.PlayMusic(i_Page == 0 ? m_ValleyMusic : m_EndingMusic);
+				if (i_Page == 0)
+				{
+					GameFlow.Instance.PlayMusic(m_ValleyMusic, false);
+				}
+				else
+				{
+					GameFlow.Instance.PlayMusic(m_EndingMusic);
+				}
 			}
 
 			restartHint(i_Page == 0 ? m_ValleyHold : i_Page == 1 ? m_RescuedHold : m_NoteHold);
