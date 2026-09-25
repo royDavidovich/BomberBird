@@ -1,6 +1,8 @@
 using BomberBird.Flow;
 using BomberBird.Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace BomberBird.UI
 {
@@ -27,11 +29,23 @@ namespace BomberBird.UI
 			+ "which reads as the press not registering when the game behind is frozen anyway.")]
 		[SerializeField] private AudioClip m_Confirm;
 
+		[Header("Volume")]
+		[Tooltip("Sets SoundLevels.Music. Heard on Resume: the music is held while paused.")]
+		[SerializeField] private Slider m_MusicSlider;
+
+		[Tooltip("Sets SoundLevels.Effects.")]
+		[SerializeField] private Slider m_EffectsSlider;
+
+		[Tooltip("Played at the new level on each step of the effects slider, so the player hears "
+			+ "what they chose without leaving the overlay.")]
+		[SerializeField] private AudioClip m_EffectsPreview;
+
 		[Header("Input to suspend")]
 		[SerializeField] private BirdMovement m_Movement;
 		[SerializeField] private BirdPodPlacer m_Placer;
 
 		private bool m_IsPaused;
+		private AudioSource m_PreviewPlaying;
 
 		public bool IsPaused
 		{
@@ -47,11 +61,24 @@ namespace BomberBird.UI
 				return;
 			}
 
+			if (m_MusicSlider != null)
+			{
+				m_MusicSlider.onValueChanged.AddListener(musicSlider_ValueChanged);
+			}
+
+			if (m_EffectsSlider != null)
+			{
+				m_EffectsSlider.onValueChanged.AddListener(effectsSlider_ValueChanged);
+			}
+
 			setPaused(false);
 		}
 
 		private void OnDisable()
 		{
+			// Restart and Main Menu leave through here rather than through setPaused.
+			SoundLevels.Save();
+
 			// Never leave the game frozen, or silent, because this object went away mid-pause.
 			if (m_IsPaused)
 			{
@@ -144,9 +171,54 @@ namespace BomberBird.UI
 			GameFlow.Instance.GoToMainMenu();
 		}
 
+		private void musicSlider_ValueChanged(float i_Level)
+		{
+			SoundLevels.Music = i_Level;
+		}
+
+		private void effectsSlider_ValueChanged(float i_Level)
+		{
+			SoundLevels.Effects = i_Level;
+
+			// A drag changes the value every frame. Cut the last preview rather than stack a copy
+			// per frame, which is heard as a buzz instead of the level chosen.
+			if (m_PreviewPlaying != null)
+			{
+				m_PreviewPlaying.Stop();
+			}
+
+			m_PreviewPlaying = UiSound.Play(m_EffectsPreview);
+		}
+
 		private void setPaused(bool i_IsPaused)
 		{
 			m_IsPaused = i_IsPaused;
+
+			if (i_IsPaused)
+			{
+				// Hiding the overlay does not clear the selection, so without this it would reopen
+				// on whatever was focused last instead of waiting to hand the first key to Resume.
+				if (EventSystem.current != null)
+				{
+					EventSystem.current.SetSelectedGameObject(null);
+				}
+
+				// Without notifying: showing the stored level is not the player changing it, and
+				// the effects slider would otherwise play its preview as the overlay opens.
+				if (m_MusicSlider != null)
+				{
+					m_MusicSlider.SetValueWithoutNotify(SoundLevels.Music);
+				}
+
+				if (m_EffectsSlider != null)
+				{
+					m_EffectsSlider.SetValueWithoutNotify(SoundLevels.Effects);
+				}
+			}
+			else
+			{
+				SoundLevels.Save();
+			}
 
 			Time.timeScale = i_IsPaused ? 0f : 1f;
 			m_Overlay.SetActive(i_IsPaused);

@@ -1,3 +1,4 @@
+using BomberBird.Flow;
 using UnityEngine;
 
 namespace BomberBird.UI
@@ -12,7 +13,8 @@ namespace BomberBird.UI
 	/// clip ends.
 	///
 	/// A refusal does not load anything and would survive without this, but it goes through the
-	/// same door so that there is one way a menu makes a noise rather than two.
+	/// same door so that there is one way a menu makes a noise rather than two. Being the one
+	/// door is also what lets the player's effects level reach every menu sound from here.
 	/// </summary>
 	public static class UiSound
 	{
@@ -39,7 +41,7 @@ namespace BomberBird.UI
 
 			AudioSource source = carrier.AddComponent<AudioSource>();
 			source.clip = i_Clip;
-			source.volume = i_Volume;
+			source.volume = i_Volume * SoundLevels.Effects;
 			source.playOnAwake = false;
 			source.loop = false;
 			source.Play();
