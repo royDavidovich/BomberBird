@@ -356,14 +356,13 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// The size to draw a portrait at. The stops are wildly different sprites - the hollow
-		/// is 240x160, the myna a 32x32 bird - so neither a fixed box nor the native size works:
-		/// one would stretch the hollow, the other would leave the myna thumbnail-sized.
+		/// The size to draw a portrait at. Both stops are authored at 240x160 and draw at 1x, but
+		/// a sprite drawn smaller - a game-sized bird for a future stop - would sit
+		/// thumbnail-sized at its native size, and a fixed box would stretch it.
 		///
 		/// Instead each is blown up by the largest **whole** multiple that still fits the slot.
 		/// Whole numbers matter more than filling the slot exactly: this is point-filtered pixel
-		/// art, and a fractional scale is what turns crisp edges into mush. At the authored
-		/// sizes both stops happen to land on the same height.
+		/// art, and a fractional scale is what turns crisp edges into mush.
 		/// </summary>
 		private Vector2 fitToSlot(Sprite i_Sprite)
 		{
