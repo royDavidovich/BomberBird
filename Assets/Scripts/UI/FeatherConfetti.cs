@@ -37,7 +37,7 @@ namespace BomberBird.UI
 		[SerializeField] private int m_BurstPerSide = 22;
 
 		[Tooltip("Launch speed range, in canvas pixels a second.")]
-		[SerializeField] private Vector2 m_BurstSpeed = new Vector2(900f, 1500f);
+		[SerializeField] private Vector2 m_BurstSpeed = new Vector2(1500f, 2000f);
 
 		[Tooltip("Launch angle range above the horizontal, in degrees, thrown towards the middle.")]
 		[SerializeField] private Vector2 m_BurstAngle = new Vector2(50f, 75f);
