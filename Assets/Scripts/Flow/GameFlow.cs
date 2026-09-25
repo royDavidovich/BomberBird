@@ -229,10 +229,22 @@ namespace BomberBird.Flow
 		/// and this decides whether anything changes: asking for the track already playing is
 		/// ignored, so returning to the arena after a results card does not restart the loop
 		/// half way through.
+		///
+		/// A track that is a piece rather than a loop, like the closing celebration, asks not to
+		/// repeat: it ends where it ends, and whatever the next screen plays follows it.
 		/// </summary>
-		public void PlayMusic(AudioClip i_Clip)
+		public void PlayMusic(AudioClip i_Clip, bool i_IsLooping = true)
 		{
-			if (m_Music == null || i_Clip == null || (m_Music.clip == i_Clip && m_Music.isPlaying))
+			if (m_Music == null || i_Clip == null)
+			{
+				return;
+			}
+
+			// Taken even when the track is already playing, so asking for it once more still
+			// decides whether it repeats.
+			m_Music.loop = i_IsLooping;
+
+			if (m_Music.clip == i_Clip && m_Music.isPlaying)
 			{
 				return;
 			}
@@ -385,15 +397,38 @@ namespace BomberBird.Flow
 
 		/// <summary>
 		/// Another attempt at this stage after the last life was spent. The lives come back;
-		/// the stage reached, the birds earned and the campaign totals do not move.
+		/// the stage reached, the birds earned and the campaign totals do not move. The bird
+		/// may: a player who ran out with one bird is offered the others before trying again.
 		/// </summary>
 		public void RetryAfterGameOver()
 		{
 			m_Run.RestoreLives();
+			chooseThenReplay();
+		}
 
-			// A replay, not an arrival: this is the stage they just lost on, and they have
-			// read its habitat card already.
-			ReplayStage();
+		/// <summary>
+		/// Another attempt at this stage, by way of the selection screen when the roster holds a
+		/// choice. Still a replay, not an arrival: this is the stage they just played, and they
+		/// have read its habitat card already, so the choice leads straight back to the arena.
+		/// </summary>
+		private void chooseThenReplay()
+		{
+			if (m_IsTransitioning)
+			{
+				// loadScene would drop this request, and the mark would outlive it and turn the
+				// next ordinary visit to the selection screen into a replay.
+				return;
+			}
+
+			if (m_Run.HasBirdChoice)
+			{
+				m_Run.MarkChoosingForReplay();
+				GoToBirdSelect();
+			}
+			else
+			{
+				ReplayStage();
+			}
 		}
 
 		/// <summary>Reports the outcome, and says whether anyone was listening.</summary>
@@ -476,7 +511,10 @@ namespace BomberBird.Flow
 			loadScene(k_ClosingScene, m_FadeSeconds);
 		}
 
-		/// <summary>The screen between stages, where the player picks the bird to fly.</summary>
+		/// <summary>
+		/// The screen where the player picks the bird to fly: between stages, and before
+		/// another attempt at the one just lost or restarted.
+		/// </summary>
 		public void GoToBirdSelect()
 		{
 			loadScene(k_BirdSelectScene, m_FadeSeconds);
@@ -484,8 +522,8 @@ namespace BomberBird.Flow
 
 		/// <summary>
 		/// Arrives at the stage the run is on, by way of its habitat screen. What Play
-		/// calls, what the selection screen calls, and what following one stage with the
-		/// next calls.
+		/// calls, what the selection screen leads to between stages, and what following one
+		/// stage with the next calls.
 		///
 		/// The intro is reached only from Play and every later stage only from
 		/// <see cref="CompleteStage"/>, which is what keeps the selection screen out of the
@@ -512,18 +550,45 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
-		/// The same stage over again, with no habitat card in the way. A death, a Retry
-		/// after game over, and the pause overlay's Restart all mean this.
+		/// The same stage over again, with no habitat card in the way. A death means this
+		/// directly; a Retry after game over and a Restart mean it once the bird is chosen.
 		/// </summary>
 		public void ReplayStage()
 		{
 			loadArena(m_ReplayFadeSeconds);
 		}
 
-		/// <summary>Replays the stage without spending a life, for the pause overlay.</summary>
+		/// <summary>
+		/// Replays the stage without spending a life, for the pause overlay and the cleared
+		/// card's Retry. The player gets to change bird first, the same as after game over.
+		/// </summary>
 		public void RestartStage()
 		{
-			ReplayStage();
+			chooseThenReplay();
+		}
+
+		/// <summary>
+		/// Where the selection screen goes once a bird is chosen: back into the arena when the
+		/// choice was for another attempt, on through the habitat card when it was for the
+		/// next stage.
+		/// </summary>
+		public void ContinueFromBirdSelect()
+		{
+			if (m_IsTransitioning)
+			{
+				// A card pressed while the screen is still fading in. Claiming now would spend
+				// the replay on a load that is about to be dropped.
+				return;
+			}
+
+			if (m_Run.ClaimReplayAfterChoice())
+			{
+				ReplayStage();
+			}
+			else
+			{
+				StartStage();
+			}
 		}
 
 		private void loadArena(float i_Seconds)
@@ -551,6 +616,40 @@ namespace BomberBird.Flow
 		/// </summary>
 		private void loadScene(string i_Scene, float i_Seconds, Action i_AtBlack = null)
 		{
+			fadeThrough(i_Seconds, () =>
+			{
+				// Only now. Held until full black, a Restart from the pause overlay does not run
+				// the arena for an eighth of a second behind the cover on its way out.
+				Time.timeScale = 1f;
+
+				if (i_AtBlack != null)
+				{
+					i_AtBlack();
+				}
+
+				SceneManager.LoadScene(i_Scene);
+			});
+		}
+
+		/// <summary>
+		/// The same fade a change of screen gets, for a change inside one scene: the closing
+		/// screens turning from one beat to the next, so the ending reads as one sequence of
+		/// screens rather than a sequence with some cuts in it.
+		/// </summary>
+		public void FadeThrough(Action i_AtBlack)
+		{
+			// Thrown inside the coroutine, a null would leave the flag set and every screen deaf.
+			if (i_AtBlack == null)
+			{
+				Debug.LogError(name + ": FadeThrough was given nothing to do at black.", this);
+				return;
+			}
+
+			fadeThrough(m_FadeSeconds, i_AtBlack);
+		}
+
+		private void fadeThrough(float i_Seconds, Action i_AtBlack)
+		{
 			if (m_IsTransitioning)
 			{
 				// A second request while one is already running: Retry pressed twice, or a
@@ -562,21 +661,18 @@ namespace BomberBird.Flow
 			{
 				// No cover on this object. The hard cut is what the game did before this
 				// existed, so a GameFlow without one is plain rather than broken.
-				Time.timeScale = 1f;
-
-				if (i_AtBlack != null)
-				{
-					i_AtBlack();
-				}
-
-				SceneManager.LoadScene(i_Scene);
+				i_AtBlack();
 				return;
 			}
 
-			StartCoroutine(transition(i_Scene, i_Seconds, i_AtBlack));
+			StartCoroutine(transition(i_Seconds, i_AtBlack));
 		}
 
-		private IEnumerator transition(string i_Scene, float i_Seconds, Action i_AtBlack)
+		/// <summary>
+		/// Out to black, the work, back in. Shared by scene loads and by the closing screens'
+		/// page turns, so the work is not always a load.
+		/// </summary>
+		private IEnumerator transition(float i_Seconds, Action i_AtBlack)
 		{
 			m_IsTransitioning = true;
 
@@ -586,18 +682,9 @@ namespace BomberBird.Flow
 
 			yield return fade(0f, 1f, i_Seconds);
 
-			// Only now. Held until full black, a Restart from the pause overlay does not run
-			// the arena for an eighth of a second behind the cover on its way out.
-			Time.timeScale = 1f;
+			i_AtBlack();
 
-			if (i_AtBlack != null)
-			{
-				i_AtBlack();
-			}
-
-			SceneManager.LoadScene(i_Scene);
-
-			// One frame for the new scene's Awake and Start, so it is dressed before it is
+			// One frame for a new scene's Awake and Start, so it is dressed before it is
 			// uncovered: SceneMusic asks for its track there, and it should arrive under
 			// black rather than a beat after the picture.
 			yield return null;
