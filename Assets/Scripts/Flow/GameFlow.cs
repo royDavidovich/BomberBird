@@ -235,13 +235,21 @@ namespace BomberBird.Flow
 		/// </summary>
 		public void PlayMusic(AudioClip i_Clip, bool i_IsLooping = true)
 		{
-			if (m_Music == null || i_Clip == null || (m_Music.clip == i_Clip && m_Music.isPlaying))
+			if (m_Music == null || i_Clip == null)
+			{
+				return;
+			}
+
+			// Taken even when the track is already playing, so asking for it once more still
+			// decides whether it repeats.
+			m_Music.loop = i_IsLooping;
+
+			if (m_Music.clip == i_Clip && m_Music.isPlaying)
 			{
 				return;
 			}
 
 			m_Music.clip = i_Clip;
-			m_Music.loop = i_IsLooping;
 			m_Music.Play();
 		}
 
