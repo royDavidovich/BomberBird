@@ -762,7 +762,8 @@ namespace BomberBird.Flow
 		/// <summary>
 		/// The cover and the music move together off one number. At full black the music is at
 		/// its floor, which is where <see cref="PlayMusic"/> swaps the track and therefore the
-		/// quietest place to do it.
+		/// quietest place to do it - unless the transition keeps the music, when only the cover
+		/// moves.
 		/// </summary>
 		private void setCover(float i_Alpha)
 		{
