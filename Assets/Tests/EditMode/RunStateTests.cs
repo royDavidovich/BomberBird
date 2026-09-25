@@ -287,6 +287,30 @@ namespace BomberBird.Tests
 			Assert.AreEqual(50f, run.TotalSeconds, 0.001f);
 		}
 
+		/// <summary>
+		/// The rules panel opens on the way into the intro stage, so every death there, and every
+		/// continue after the last life, passes the same spot. Only a new campaign may show it again.
+		/// </summary>
+		[Test]
+		public void TheInstructionsAreShownOnceARunAndAgainAfterARestart()
+		{
+			RunState run = makeRun();
+
+			Assert.IsTrue(run.MarkInstructionsSeen(), "the first time into the intro stage");
+
+			run.LoseLife();
+
+			Assert.IsFalse(run.MarkInstructionsSeen(), "a death does not show it again");
+
+			run.RestoreLives();
+
+			Assert.IsFalse(run.MarkInstructionsSeen(), "nor does continuing after the last life");
+
+			run.Restart();
+
+			Assert.IsTrue(run.MarkInstructionsSeen(), "a fresh campaign teaches it again");
+		}
+
 		[Test]
 		public void TheCageRuleIsShownOnceARunAndAgainAfterARestart()
 		{
@@ -298,6 +322,24 @@ namespace BomberBird.Tests
 			run.Restart();
 
 			Assert.IsTrue(run.MarkCageRuleShown(), "a fresh campaign teaches it again");
+		}
+
+		[Test]
+		public void AChoiceForAReplayIsClaimedOnceAndForgottenByARestart()
+		{
+			RunState run = makeRun();
+
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "a choice nobody marked arrives at the stage");
+
+			run.MarkChoosingForReplay();
+
+			Assert.IsTrue(run.ClaimReplayAfterChoice(), "the choice after a retry replays");
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "the next choice, after a clear, arrives");
+
+			run.MarkChoosingForReplay();
+			run.Restart();
+
+			Assert.IsFalse(run.ClaimReplayAfterChoice(), "a fresh campaign carries no replay over");
 		}
 
 		[Test]

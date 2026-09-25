@@ -18,9 +18,10 @@ namespace BomberBird.UI
 	/// Docs/GDD.md section 7 asks of presentation.
 	///
 	/// Reached only by <see cref="GameFlow.StartStage"/>, which is arriving at a stage. A
-	/// replay - a death, a Retry, the pause overlay's Restart - goes to the arena directly, so
-	/// the card never stands between a player and another attempt. That rule lives in the
-	/// routing rather than in a flag here: see <see cref="GameFlow.ReplayStage"/>.
+	/// replay - a death, a Retry, the pause overlay's Restart - goes to the arena without it,
+	/// by way of the selection screen at most, so the card never stands between a player and
+	/// another attempt. That rule lives in the routing rather than in a flag here: see
+	/// <see cref="GameFlow.ReplayStage"/>.
 	/// </summary>
 	public class StageIntroScreen : MonoBehaviour
 	{
