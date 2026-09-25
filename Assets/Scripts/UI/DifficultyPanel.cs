@@ -70,7 +70,7 @@ namespace BomberBird.UI
 
 		[Header("Keys")]
 		[Tooltip("What takes the difficulty the lever is standing on and closes the panel. "
-			+ "Deliberately only Return: the arrows move the lever, and the choice is not made "
+			+ "Deliberately only Enter, either key: the arrows move the lever, and the choice is not made "
 			+ "until the player says so.")]
 		[SerializeField]
 		private KeyCode[] m_ChooseKeys = { KeyCode.Return, KeyCode.KeypadEnter };
