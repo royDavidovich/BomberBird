@@ -69,7 +69,7 @@ is scoped.
 |---|---|
 | Move | WASD or arrow keys |
 | Place seed pod | Space |
-| Confirm or retry | Enter or Space |
+| Confirm or retry | Enter |
 | Pause or back | Escape |
 
 ## Documentation
