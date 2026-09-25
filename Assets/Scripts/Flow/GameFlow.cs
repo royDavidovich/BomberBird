@@ -397,15 +397,38 @@ namespace BomberBird.Flow
 
 		/// <summary>
 		/// Another attempt at this stage after the last life was spent. The lives come back;
-		/// the stage reached, the birds earned and the campaign totals do not move.
+		/// the stage reached, the birds earned and the campaign totals do not move. The bird
+		/// may: a player who ran out with one bird is offered the others before trying again.
 		/// </summary>
 		public void RetryAfterGameOver()
 		{
 			m_Run.RestoreLives();
+			chooseThenReplay();
+		}
 
-			// A replay, not an arrival: this is the stage they just lost on, and they have
-			// read its habitat card already.
-			ReplayStage();
+		/// <summary>
+		/// Another attempt at this stage, by way of the selection screen when the roster holds a
+		/// choice. Still a replay, not an arrival: this is the stage they just played, and they
+		/// have read its habitat card already, so the choice leads straight back to the arena.
+		/// </summary>
+		private void chooseThenReplay()
+		{
+			if (m_IsTransitioning)
+			{
+				// loadScene would drop this request, and the mark would outlive it and turn the
+				// next ordinary visit to the selection screen into a replay.
+				return;
+			}
+
+			if (m_Run.HasBirdChoice)
+			{
+				m_Run.MarkChoosingForReplay();
+				GoToBirdSelect();
+			}
+			else
+			{
+				ReplayStage();
+			}
 		}
 
 		/// <summary>Reports the outcome, and says whether anyone was listening.</summary>
@@ -488,7 +511,10 @@ namespace BomberBird.Flow
 			loadScene(k_ClosingScene, m_FadeSeconds);
 		}
 
-		/// <summary>The screen between stages, where the player picks the bird to fly.</summary>
+		/// <summary>
+		/// The screen where the player picks the bird to fly: between stages, and before
+		/// another attempt at the one just lost or restarted.
+		/// </summary>
 		public void GoToBirdSelect()
 		{
 			loadScene(k_BirdSelectScene, m_FadeSeconds);
@@ -496,8 +522,8 @@ namespace BomberBird.Flow
 
 		/// <summary>
 		/// Arrives at the stage the run is on, by way of its habitat screen. What Play
-		/// calls, what the selection screen calls, and what following one stage with the
-		/// next calls.
+		/// calls, what the selection screen leads to between stages, and what following one
+		/// stage with the next calls.
 		///
 		/// The intro is reached only from Play and every later stage only from
 		/// <see cref="CompleteStage"/>, which is what keeps the selection screen out of the
@@ -524,18 +550,45 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
-		/// The same stage over again, with no habitat card in the way. A death, a Retry
-		/// after game over, and the pause overlay's Restart all mean this.
+		/// The same stage over again, with no habitat card in the way. A death means this
+		/// directly; a Retry after game over and a Restart mean it once the bird is chosen.
 		/// </summary>
 		public void ReplayStage()
 		{
 			loadArena(m_ReplayFadeSeconds);
 		}
 
-		/// <summary>Replays the stage without spending a life, for the pause overlay.</summary>
+		/// <summary>
+		/// Replays the stage without spending a life, for the pause overlay and the cleared
+		/// card's Retry. The player gets to change bird first, the same as after game over.
+		/// </summary>
 		public void RestartStage()
 		{
-			ReplayStage();
+			chooseThenReplay();
+		}
+
+		/// <summary>
+		/// Where the selection screen goes once a bird is chosen: back into the arena when the
+		/// choice was for another attempt, on through the habitat card when it was for the
+		/// next stage.
+		/// </summary>
+		public void ContinueFromBirdSelect()
+		{
+			if (m_IsTransitioning)
+			{
+				// A card pressed while the screen is still fading in. Claiming now would spend
+				// the replay on a load that is about to be dropped.
+				return;
+			}
+
+			if (m_Run.ClaimReplayAfterChoice())
+			{
+				ReplayStage();
+			}
+			else
+			{
+				StartStage();
+			}
 		}
 
 		private void loadArena(float i_Seconds)
