@@ -29,6 +29,17 @@ namespace BomberBird.Pods
 		/// </summary>
 		public static List<Vector2Int> GetCoveredCells(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range)
 		{
+			return GetCoveredCells(i_Grid, i_Origin, i_Range, null);
+		}
+
+		/// <summary>
+		/// The same cells, and also every indestructible cell that stopped an arm, added to
+		/// <paramref name="io_Stops"/> when given one. It has to be read from the arena as it
+		/// was before the burst: once the soft blocks it covered are destroyed, an arm that one
+		/// of them absorbed would look as if it ran on into whatever lay behind.
+		/// </summary>
+		public static List<Vector2Int> GetCoveredCells(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range, List<Vector2Int> io_Stops)
+		{
 			List<Vector2Int> covered = new List<Vector2Int>();
 
 			if (i_Grid == null || !i_Grid.IsInside(i_Origin))
@@ -40,36 +51,15 @@ namespace BomberBird.Pods
 
 			foreach (Vector2Int direction in sr_Directions)
 			{
-				walkArm(i_Grid, i_Origin, direction, i_Range, covered);
-			}
+				Vector2Int? stop = walkArm(i_Grid, i_Origin, direction, i_Range, covered);
 
-			return covered;
-		}
-
-		/// <summary>
-		/// Whether a burst from <paramref name="i_Origin"/> is stopped by
-		/// <paramref name="i_Cell"/>: an arm reaches it within range and it is one of the
-		/// cells a burst cannot pass. Lets the cage answer a pod aimed at it, so a player
-		/// trying to break it out hears that it holds.
-		/// </summary>
-		public static bool StopsAt(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range, Vector2Int i_Cell)
-		{
-			if (i_Grid == null || !i_Grid.IsInside(i_Origin))
-			{
-				return false;
-			}
-
-			foreach (Vector2Int direction in sr_Directions)
-			{
-				Vector2Int? stop = walkArm(i_Grid, i_Origin, direction, i_Range, null);
-
-				if (stop.HasValue && stop.Value == i_Cell)
+				if (stop.HasValue && io_Stops != null)
 				{
-					return true;
+					io_Stops.Add(stop.Value);
 				}
 			}
 
-			return false;
+			return covered;
 		}
 
 		/// <summary>

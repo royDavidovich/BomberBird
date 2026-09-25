@@ -39,6 +39,13 @@ namespace BomberBird.Pods
 		/// <summary>Raised when a pod detonates, with every cell its burst covers.</summary>
 		public event Action<Vector2Int, IList<Vector2Int>> PodExploded;
 
+		/// <summary>
+		/// Raised right after <see cref="PodExploded"/>, with the indestructible cells that
+		/// stopped the burst's arms - worked out before its soft blocks were destroyed, so an
+		/// arm a bush absorbed never counts as reaching what stood behind the bush.
+		/// </summary>
+		public event Action<Vector2Int, IList<Vector2Int>> BurstStopped;
+
 		public int ActivePodCount
 		{
 			get { return r_Pods.Count; }
@@ -192,7 +199,8 @@ namespace BomberBird.Pods
 			i_Pod.IsSpent = true;
 			r_Pods.Remove(i_Pod);
 
-			List<Vector2Int> covered = BurstShape.GetCoveredCells(r_Grid, i_Pod.Cell, m_BurstRange);
+			List<Vector2Int> stops = new List<Vector2Int>();
+			List<Vector2Int> covered = BurstShape.GetCoveredCells(r_Grid, i_Pod.Cell, m_BurstRange, stops);
 
 			// Destroy first, so a listener drawing the burst sees the arena as it now is.
 			foreach (Vector2Int cell in covered)
@@ -201,6 +209,7 @@ namespace BomberBird.Pods
 			}
 
 			OnPodExploded(i_Pod.Cell, covered);
+			OnBurstStopped(i_Pod.Cell, stops);
 
 			// Chain: anything the burst reached goes off too. Collected first so the list
 			// is not modified while it is being walked.
@@ -269,6 +278,11 @@ namespace BomberBird.Pods
 		private void OnPodPlaced(Vector2Int i_Cell)
 		{
 			PodPlaced?.Invoke(i_Cell);
+		}
+
+		private void OnBurstStopped(Vector2Int i_Cell, IList<Vector2Int> i_Stops)
+		{
+			BurstStopped?.Invoke(i_Cell, i_Stops);
 		}
 
 		private void OnPodExploded(Vector2Int i_Cell, IList<Vector2Int> i_Covered)

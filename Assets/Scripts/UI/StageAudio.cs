@@ -322,6 +322,11 @@ namespace BomberBird.UI
 				missing += " cageOpen";
 			}
 
+			if (m_CageClank == null)
+			{
+				missing += " cageClank";
+			}
+
 			if (m_FeatherCollect == null)
 			{
 				missing += " featherCollect";

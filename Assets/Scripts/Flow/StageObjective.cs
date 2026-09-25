@@ -60,6 +60,7 @@ namespace BomberBird.Flow
 		private bool m_AwardsFeather;
 		private bool m_IsCageOpen;
 		private bool m_IsFeatherCollected;
+		private int m_LastStruckFrame = -1;
 
 		/// <summary>
 		/// Raised the moment the bird walks onto the freed feather, with the cell it lay on.
@@ -147,26 +148,48 @@ namespace BomberBird.Flow
 			if (m_AwardsFeather)
 			{
 				placeCagedFeather();
-				m_Pods.Field.PodExploded += podField_PodExploded;
+				listenForStrikes();
 			}
+		}
+
+		/// <summary>
+		/// The pods only feed the cage's answer to a strike, never the rule, so a missing
+		/// reference costs the clank and the shake and leaves the stage playable.
+		/// </summary>
+		private void listenForStrikes()
+		{
+			if (m_Pods == null || m_Pods.Field == null)
+			{
+				Debug.LogWarning(name + ": m_Pods is not assigned, so the cage cannot answer a burst.", this);
+				return;
+			}
+
+			m_Pods.Field.BurstStopped += podField_BurstStopped;
 		}
 
 		private void OnDestroy()
 		{
 			if (m_Pods != null && m_Pods.Field != null)
 			{
-				m_Pods.Field.PodExploded -= podField_PodExploded;
+				m_Pods.Field.BurstStopped -= podField_BurstStopped;
 			}
 		}
 
-		private void podField_PodExploded(Vector2Int i_Origin, IList<Vector2Int> i_Covered)
+		/// <summary>
+		/// Once per frame at most: a chain of pods ringing the cage resolves in one frame, and
+		/// one clank says it as well as five stacked on top of each other.
+		/// </summary>
+		private void podField_BurstStopped(Vector2Int i_Origin, IList<Vector2Int> i_Stops)
 		{
 			Vector2Int cage = m_Arena.Grid.CageCell;
 
-			if (!m_IsCageOpen && BurstShape.StopsAt(m_Arena.Grid, i_Origin, m_Pods.Field.BurstRange, cage))
+			if (m_IsCageOpen || Time.frameCount == m_LastStruckFrame || !i_Stops.Contains(cage))
 			{
-				CageStruck?.Invoke(cage);
+				return;
 			}
+
+			m_LastStruckFrame = Time.frameCount;
+			OnCageStruck(cage);
 		}
 
 		private void Update()
@@ -283,6 +306,11 @@ namespace BomberBird.Flow
 			FeatherCollected?.Invoke(i_Cell);
 		}
 
+		private void OnCageStruck(Vector2Int i_Cell)
+		{
+			CageStruck?.Invoke(i_Cell);
+		}
+
 		private void OnCageOpened(Vector2Int i_Cell)
 		{
 			CageOpened?.Invoke(i_Cell);
@@ -321,12 +349,6 @@ namespace BomberBird.Flow
 			if (m_Bird == null)
 			{
 				Debug.LogError(name + ": m_Bird is not assigned.", this);
-				return false;
-			}
-
-			if (m_Pods == null || m_Pods.Field == null)
-			{
-				Debug.LogError(name + ": m_Pods is not assigned or has no field.", this);
 				return false;
 			}
 

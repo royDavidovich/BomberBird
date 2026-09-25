@@ -386,5 +386,48 @@ namespace BomberBird.Tests
 			List<Vector2Int> expected = BurstShape.GetCoveredCells(grid, origin, k_Range);
 			CollectionAssert.AreEquivalent(expected, reported);
 		}
+
+		// Row 0 is the top row. A bush at (3, 2) sits right on top of the cage at (3, 1).
+		private const string k_BushOverCageRows =
+			"#######\n" +
+			"#.....#\n" +
+			"#..s..#\n" +
+			"#..c..#\n" +
+			"#######";
+
+		[Test]
+		public void ABushThatAbsorbsTheArmIsNotReportedAsTheCageStoppingIt()
+		{
+			// The arm dies in the bush. The bush is then destroyed, and read after that the
+			// arena shows open floor running straight into the cage - which is why the stops
+			// have to be worked out before anything is destroyed.
+			ArenaGrid grid = new ArenaGrid(k_BushOverCageRows);
+			PodField field = makeField(grid);
+			List<Vector2Int> stops = null;
+			field.BurstStopped += (i_Origin, i_Stops) => stops = new List<Vector2Int>(i_Stops);
+			Vector2Int pod = new Vector2Int(3, 3);
+
+			field.TryPlace(pod);
+			field.TryDetonateAt(pod);
+
+			Assert.IsNotNull(stops, "BurstStopped was raised");
+			CollectionAssert.DoesNotContain(stops, new Vector2Int(3, 1));
+			Assert.AreEqual(eCell.Floor, grid.GetCell(new Vector2Int(3, 2)), "the bush did go");
+		}
+
+		[Test]
+		public void AnOpenLineIntoTheCageIsReportedAsTheCageStoppingIt()
+		{
+			ArenaGrid grid = new ArenaGrid(k_BushOverCageRows);
+			PodField field = makeField(grid);
+			List<Vector2Int> stops = null;
+			field.BurstStopped += (i_Origin, i_Stops) => stops = new List<Vector2Int>(i_Stops);
+			Vector2Int pod = new Vector2Int(2, 1);
+
+			field.TryPlace(pod);
+			field.TryDetonateAt(pod);
+
+			Assert.Contains(new Vector2Int(3, 1), stops);
+		}
 	}
 }

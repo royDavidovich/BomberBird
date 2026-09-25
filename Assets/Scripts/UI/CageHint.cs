@@ -36,6 +36,9 @@ namespace BomberBird.UI
 		[Tooltip("Seconds the strike line stays up, the last of them fading out.")]
 		[SerializeField] private float m_StrikeSeconds = 3f;
 
+		[Tooltip("Of those, the seconds spent fading out.")]
+		[SerializeField] private float m_StrikeFadeSeconds = 0.5f;
+
 		[Header("The bars")]
 		[Tooltip("How much bigger the cage grows at the top of each breath while the rule is up.")]
 		[SerializeField] private float m_PulseGrowth = 0.08f;
@@ -49,6 +52,9 @@ namespace BomberBird.UI
 		[Tooltip("Seconds a strike's shake lasts.")]
 		[SerializeField] private float m_ShakeSeconds = 0.25f;
 
+		[Tooltip("Side-to-side swings per second while it shakes. Fast enough to read as a rattle.")]
+		[SerializeField] private float m_ShakeSwingsPerSecond = 10f;
+
 		private bool m_IsDeciding;
 		private bool m_IsShowingRule;
 		private Coroutine m_Shake;
@@ -59,6 +65,7 @@ namespace BomberBird.UI
 			if (m_Objective != null)
 			{
 				m_Objective.CageStruck += objective_CageStruck;
+				m_Objective.CageOpened += objective_CageOpened;
 			}
 		}
 
@@ -67,6 +74,7 @@ namespace BomberBird.UI
 			if (m_Objective != null)
 			{
 				m_Objective.CageStruck -= objective_CageStruck;
+				m_Objective.CageOpened -= objective_CageOpened;
 			}
 		}
 
@@ -174,6 +182,21 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
+		/// One burst can take the last myna and hit the cage at once. The cage then opens moments
+		/// later, and a line telling the player to clear the mynas must not stand over it.
+		/// </summary>
+		private void objective_CageOpened(Vector2Int i_Cell)
+		{
+			if (m_StrikeFade != null)
+			{
+				StopCoroutine(m_StrikeFade);
+				m_StrikeFade = null;
+			}
+
+			showLabel(m_StrikeLabel, false);
+		}
+
+		/// <summary>
 		/// A side-to-side rattle that dies away, ending back on the cage's own cell so a strike
 		/// can never leave the bars off their tile.
 		/// </summary>
@@ -184,7 +207,7 @@ namespace BomberBird.UI
 			while (elapsed < m_ShakeSeconds && i_Bars != null)
 			{
 				float left = 1f - elapsed / m_ShakeSeconds;
-				float swing = Mathf.Sin(elapsed * 60f) * m_ShakeDistance * left;
+				float swing = Mathf.Sin(elapsed * m_ShakeSwingsPerSecond * 2f * Mathf.PI) * m_ShakeDistance * left;
 
 				i_Bars.localPosition = i_Home + Vector3.right * swing;
 				elapsed += Time.unscaledDeltaTime;
@@ -202,8 +225,6 @@ namespace BomberBird.UI
 
 		private IEnumerator showStrike()
 		{
-			const float k_FadeSeconds = 0.5f;
-
 			m_StrikeLabel.alpha = 1f;
 			showLabel(m_StrikeLabel, true);
 
@@ -211,9 +232,9 @@ namespace BomberBird.UI
 
 			while (elapsed < m_StrikeSeconds)
 			{
-				float fadeFrom = m_StrikeSeconds - k_FadeSeconds;
+				float fadeFrom = m_StrikeSeconds - m_StrikeFadeSeconds;
 
-				m_StrikeLabel.alpha = elapsed < fadeFrom ? 1f : 1f - (elapsed - fadeFrom) / k_FadeSeconds;
+				m_StrikeLabel.alpha = elapsed < fadeFrom ? 1f : 1f - (elapsed - fadeFrom) / Mathf.Max(m_StrikeFadeSeconds, 0.01f);
 				elapsed += Time.unscaledDeltaTime;
 
 				yield return null;
