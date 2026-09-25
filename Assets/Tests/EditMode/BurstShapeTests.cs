@@ -199,5 +199,77 @@ namespace BomberBird.Tests
 				BurstShape.GetCoveredCells(caged, origin, k_Range).Contains(target),
 				"a cage in the same place is not");
 		}
+
+		// Row 0 is the top row. The cage stands at (2, 3), a soft block at (4, 3), a hard
+		// block at (2, 1).
+		private const string k_CageRows =
+			"#######\n" +
+			"#.....#\n" +
+			"#.....#\n" +
+			"#.c.s.#\n" +
+			"#.....#\n" +
+			"#.H...#\n" +
+			"#######";
+
+		private static readonly Vector2Int sr_Cage = new Vector2Int(2, 3);
+
+		private static List<Vector2Int> stopsOf(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range)
+		{
+			List<Vector2Int> stops = new List<Vector2Int>();
+
+			BurstShape.GetCoveredCells(i_Grid, i_Origin, i_Range, stops);
+
+			return stops;
+		}
+
+		[Test]
+		public void ABurstInRangeOnAnOpenLineIsStoppedByTheCage()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			Assert.Contains(sr_Cage, stopsOf(grid, new Vector2Int(2, 5), 2));
+		}
+
+		[Test]
+		public void AnArmThatRunsOutOfRangeFirstNeverReachesTheCage()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			CollectionAssert.DoesNotContain(stopsOf(grid, new Vector2Int(2, 5), 1), sr_Cage);
+		}
+
+		[Test]
+		public void APodRightBesideTheCageReachesIt()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			Assert.Contains(sr_Cage, stopsOf(grid, new Vector2Int(2, 2), 1));
+		}
+
+		[Test]
+		public void ASoftBlockInTheWayAbsorbsTheBurstBeforeTheCage()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			CollectionAssert.DoesNotContain(stopsOf(grid, new Vector2Int(5, 3), 3), sr_Cage);
+		}
+
+		[Test]
+		public void AFloorCellTheBurstCoversIsNotWhereItStops()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			CollectionAssert.DoesNotContain(stopsOf(grid, new Vector2Int(2, 5), 2), new Vector2Int(2, 4));
+		}
+
+		[Test]
+		public void AnOpenedCageNoLongerStopsTheBurst()
+		{
+			ArenaGrid grid = new ArenaGrid(k_CageRows);
+
+			grid.TryOpen(sr_Cage);
+
+			CollectionAssert.DoesNotContain(stopsOf(grid, new Vector2Int(2, 5), 2), sr_Cage);
+		}
 	}
 }

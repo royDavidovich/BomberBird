@@ -29,6 +29,17 @@ namespace BomberBird.Pods
 		/// </summary>
 		public static List<Vector2Int> GetCoveredCells(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range)
 		{
+			return GetCoveredCells(i_Grid, i_Origin, i_Range, null);
+		}
+
+		/// <summary>
+		/// The same cells, and also every indestructible cell that stopped an arm, added to
+		/// <paramref name="io_Stops"/> when given one. It has to be read from the arena as it
+		/// was before the burst: once the soft blocks it covered are destroyed, an arm that one
+		/// of them absorbed would look as if it ran on into whatever lay behind.
+		/// </summary>
+		public static List<Vector2Int> GetCoveredCells(ArenaGrid i_Grid, Vector2Int i_Origin, int i_Range, List<Vector2Int> io_Stops)
+		{
 			List<Vector2Int> covered = new List<Vector2Int>();
 
 			if (i_Grid == null || !i_Grid.IsInside(i_Origin))
@@ -40,13 +51,23 @@ namespace BomberBird.Pods
 
 			foreach (Vector2Int direction in sr_Directions)
 			{
-				addArm(i_Grid, i_Origin, direction, i_Range, covered);
+				Vector2Int? stop = walkArm(i_Grid, i_Origin, direction, i_Range, covered);
+
+				if (stop.HasValue && io_Stops != null)
+				{
+					io_Stops.Add(stop.Value);
+				}
 			}
 
 			return covered;
 		}
 
-		private static void addArm(
+		/// <summary>
+		/// Walks one arm, adding what it covers to <paramref name="io_Covered"/> when given one,
+		/// and returns the indestructible cell that stopped it, or null when the arm ran out of
+		/// range, left the grid, or was absorbed by a soft block.
+		/// </summary>
+		private static Vector2Int? walkArm(
 			ArenaGrid i_Grid,
 			Vector2Int i_Origin,
 			Vector2Int i_Direction,
@@ -59,7 +80,7 @@ namespace BomberBird.Pods
 
 				if (!i_Grid.IsInside(cell))
 				{
-					break;
+					return null;
 				}
 
 				eCell contents = i_Grid.GetCell(cell);
@@ -69,17 +90,22 @@ namespace BomberBird.Pods
 					// Indestructible: the arm stops short and does not cover this cell. A cage
 					// belongs here and not with the soft blocks - nothing the player aims at it
 					// opens it, because clearing the arena is what earns the feather inside.
-					break;
+					return cell;
 				}
 
-				io_Covered.Add(cell);
+				if (io_Covered != null)
+				{
+					io_Covered.Add(cell);
+				}
 
 				if (contents == eCell.SoftBlock)
 				{
 					// The block absorbs the burst. It is destroyed, but nothing behind it is.
-					break;
+					return null;
 				}
 			}
+
+			return null;
 		}
 	}
 }

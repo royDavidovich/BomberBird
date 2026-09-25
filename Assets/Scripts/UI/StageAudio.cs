@@ -40,8 +40,12 @@ namespace BomberBird.UI
 		[SerializeField] private AudioClip m_MynaDefeated;
 
 		[Tooltip("The last myna falls and the cage gives up the feather. The cage is never "
-			+ "struck: clearing the arena is the only thing that opens it.")]
+			+ "broken: clearing the arena is the only thing that opens it.")]
 		[SerializeField] private AudioClip m_CageOpen;
+
+		[Tooltip("A burst reaches the closed cage and it holds. Every time, so a player aiming "
+			+ "pods at it hears the answer rather than silence. Must never sound like it opening.")]
+		[SerializeField] private AudioClip m_CageClank;
 
 		[Tooltip("The bird picks up the freed feather.")]
 		[SerializeField] private AudioClip m_FeatherCollect;
@@ -107,6 +111,7 @@ namespace BomberBird.UI
 			if (m_Objective != null)
 			{
 				m_Objective.CageOpened += objective_CageOpened;
+				m_Objective.CageStruck += objective_CageStruck;
 				m_Objective.FeatherCollected += objective_FeatherCollected;
 			}
 
@@ -143,6 +148,7 @@ namespace BomberBird.UI
 			if (m_Objective != null)
 			{
 				m_Objective.CageOpened -= objective_CageOpened;
+				m_Objective.CageStruck -= objective_CageStruck;
 				m_Objective.FeatherCollected -= objective_FeatherCollected;
 			}
 
@@ -179,6 +185,11 @@ namespace BomberBird.UI
 			// Straight through. StageObjective holds the whole moment back - bars, effect and
 			// this - so a second wait here would only pull the sound off the picture again.
 			play(m_CageOpen);
+		}
+
+		private void objective_CageStruck(Vector2Int i_Cell)
+		{
+			play(m_CageClank);
 		}
 
 		private void objective_FeatherCollected(Vector2Int i_Cell)
@@ -309,6 +320,11 @@ namespace BomberBird.UI
 			if (m_CageOpen == null)
 			{
 				missing += " cageOpen";
+			}
+
+			if (m_CageClank == null)
+			{
+				missing += " cageClank";
 			}
 
 			if (m_FeatherCollect == null)

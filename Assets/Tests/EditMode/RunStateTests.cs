@@ -286,5 +286,41 @@ namespace BomberBird.Tests
 			Assert.AreEqual(8, run.TotalPodsPlaced);
 			Assert.AreEqual(50f, run.TotalSeconds, 0.001f);
 		}
+
+		[Test]
+		public void TheCageRuleIsShownOnceARunAndAgainAfterARestart()
+		{
+			RunState run = makeRun();
+
+			Assert.IsTrue(run.MarkCageRuleShown(), "the first cage stage of the run");
+			Assert.IsFalse(run.MarkCageRuleShown(), "a retry, or the next cage stage");
+
+			run.Restart();
+
+			Assert.IsTrue(run.MarkCageRuleShown(), "a fresh campaign teaches it again");
+		}
+
+		[Test]
+		public void TheCageStrikeIsExplainedOnceARunAndAgainAfterARestart()
+		{
+			RunState run = makeRun();
+
+			Assert.IsTrue(run.MarkCageStrikeExplained());
+			Assert.IsFalse(run.MarkCageStrikeExplained());
+
+			run.Restart();
+
+			Assert.IsTrue(run.MarkCageStrikeExplained());
+		}
+
+		[Test]
+		public void TheTwoCageLessonsAreClaimedSeparately()
+		{
+			RunState run = makeRun();
+
+			run.MarkCageRuleShown();
+
+			Assert.IsTrue(run.MarkCageStrikeExplained(), "reading the rule does not use up the strike label");
+		}
 	}
 }

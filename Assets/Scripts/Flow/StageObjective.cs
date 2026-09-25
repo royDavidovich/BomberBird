@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using BomberBird.Enemies;
 using BomberBird.Player;
+using BomberBird.Pods;
 using UnityEngine;
 
 namespace BomberBird.Flow
@@ -26,6 +28,10 @@ namespace BomberBird.Flow
 
 		[Header("Who collects the feather")]
 		[SerializeField] private BirdMovement m_Bird;
+
+		[Header("What can strike the cage")]
+		[Tooltip("Read so a burst that reaches the cage can be answered. It never opens it.")]
+		[SerializeField] private ArenaPods m_Pods;
 
 		[Header("The cage")]
 		[Tooltip("Drawn over the feather, so its bars must be see-through.")]
@@ -54,6 +60,7 @@ namespace BomberBird.Flow
 		private bool m_AwardsFeather;
 		private bool m_IsCageOpen;
 		private bool m_IsFeatherCollected;
+		private int m_LastStruckFrame = -1;
 
 		/// <summary>
 		/// Raised the moment the bird walks onto the freed feather, with the cell it lay on.
@@ -69,6 +76,19 @@ namespace BomberBird.Flow
 		/// so.
 		/// </summary>
 		public event Action<Vector2Int> CageOpened;
+
+		/// <summary>
+		/// Raised whenever a burst reaches the closed cage, with the cage's cell. Nothing
+		/// changes - the cage holds - but a player aiming pods at it needs to hear that it
+		/// holds, or silence reads as "not enough pods yet".
+		/// </summary>
+		public event Action<Vector2Int> CageStruck;
+
+		/// <summary>The cage's bars while they stand, for anything that shakes them; null once open.</summary>
+		public Transform CageVisual
+		{
+			get { return m_CageVisual == null ? null : m_CageVisual.transform; }
+		}
 
 		/// <summary>
 		/// The bird whose feather was actually picked up this stage, or null if none was.
@@ -128,7 +148,48 @@ namespace BomberBird.Flow
 			if (m_AwardsFeather)
 			{
 				placeCagedFeather();
+				listenForStrikes();
 			}
+		}
+
+		/// <summary>
+		/// The pods only feed the cage's answer to a strike, never the rule, so a missing
+		/// reference costs the clank and the shake and leaves the stage playable.
+		/// </summary>
+		private void listenForStrikes()
+		{
+			if (m_Pods == null || m_Pods.Field == null)
+			{
+				Debug.LogWarning(name + ": m_Pods is not assigned, so the cage cannot answer a burst.", this);
+				return;
+			}
+
+			m_Pods.Field.BurstStopped += podField_BurstStopped;
+		}
+
+		private void OnDestroy()
+		{
+			if (m_Pods != null && m_Pods.Field != null)
+			{
+				m_Pods.Field.BurstStopped -= podField_BurstStopped;
+			}
+		}
+
+		/// <summary>
+		/// Once per frame at most: a chain of pods ringing the cage resolves in one frame, and
+		/// one clank says it as well as five stacked on top of each other.
+		/// </summary>
+		private void podField_BurstStopped(Vector2Int i_Origin, IList<Vector2Int> i_Stops)
+		{
+			Vector2Int cage = m_Arena.Grid.CageCell;
+
+			if (m_IsCageOpen || Time.frameCount == m_LastStruckFrame || !i_Stops.Contains(cage))
+			{
+				return;
+			}
+
+			m_LastStruckFrame = Time.frameCount;
+			OnCageStruck(cage);
 		}
 
 		private void Update()
@@ -243,6 +304,11 @@ namespace BomberBird.Flow
 		private void OnFeatherCollected(Vector2Int i_Cell)
 		{
 			FeatherCollected?.Invoke(i_Cell);
+		}
+
+		private void OnCageStruck(Vector2Int i_Cell)
+		{
+			CageStruck?.Invoke(i_Cell);
 		}
 
 		private void OnCageOpened(Vector2Int i_Cell)
