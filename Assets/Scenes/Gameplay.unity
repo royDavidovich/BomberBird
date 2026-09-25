@@ -8884,6 +8884,10 @@ MonoBehaviour:
   m_EasySpeedScale: 0.5
   m_EasyStraightChance: 0.8
   m_LethalSeconds: 0.45
+  m_Bird: {fileID: 1600481133}
+  m_SummonClearance: 6
+  m_SummonGrace: 1
+  m_SummonBlinkRate: 10
   m_ScatterSeconds: 1.25
   m_ScatterSpeed: 3
 --- !u!114 &1688113804

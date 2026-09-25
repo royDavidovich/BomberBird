@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.23, 2026-09-25 |
+| Document version | v0.24, 2026-09-25 |
 
 ## 1. High Concept
 
@@ -183,8 +183,10 @@ enemy and moves by the same rules, but it survives five bursts instead of one, a
 stage begins with the boss alone so the player reads it before the arena fills. Each
 non-fatal hit turns it a full circle on the spot, makes it slightly faster, and calls in
 one more ordinary myna than the hit before - one, then two, three, and four, so ten
-across the fight. The speed gain is capped, because the growing escort is the escalation
-and a boss that accelerates unchecked stops being catchable. The fifth hit kills it and
+across the fight. The escorts appear near the boss but at least six steps from the
+player's bird, and each one blinks and is harmless for its first second, so an escort can
+never kill the player the moment it arrives. The speed gain is capped, because the growing
+escort is the escalation and a boss that accelerates unchecked stops being catchable. The fifth hit kills it and
 calls nobody, and every slave still standing scatters and dies with it, harmless to the
 player as it flees, so the arena empties on the blow that ends the fight rather than
 peaking there. The boss arena is two cells wider than the others to give all of this room.
@@ -294,3 +296,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.21 | 2026-09-25 | Made the cage answer the player who tries to bomb it open. A burst stopped by the cage used to stop in silence, the same as at a hard block, and silence reads as "not enough pods yet", so the likeliest wrong guess about the first feather stage was also the one the game quietly encouraged. The cage now clanks and shakes every time a burst reaches it; the first time in a run, a line over it says pods cannot break it and the mynas must be cleared; and the first cage stage of a run states the rule over the cage while the stage waits for Space. **No rule changed** - the cage is exactly as solid as before, and every word shown restates section 3. This is feedback on an existing rule, the §8.2 line about stronger visual and audio feedback. |
 | v0.22 | 2026-09-25 | Gave the end of the campaign a celebration before the list of birds. The closing screens opened straight onto the rescued birds, which reads as a report, and the finale card's own headline had been the line that said the player had won. That line now stands alone as the first beat of the closing screens, over the valley, with feathers of the valley's birds thrown in from both sides and a short triumphant theme under it; the ending track starts with the rescued birds rather than on the finale card, so it is heard once, from the top. **No rule changed.** This is the §8.2 line about stronger visual and audio feedback. |
 | v0.23 | 2026-09-25 | Let the player change bird before trying a stage again. A Retry after GAME OVER, a Retry from the cleared card and the pause overlay's Restart used to replay the stage with whatever bird had just played it, so a player who ran out of lives with one bird had to clear a stage before being offered another. Each now opens bird selection first, with the bird just flown already picked, so trying again with the same one is a single press; the choice leads straight back into the arena, not through the habitat screen, which still belongs to arriving. A roster of one skips selection as before, and a death with lives in hand still replays at once with the same bird. **A flow change, not a rule change** - the lives, the stage reached and the birds earned move exactly as they did; only the route to the next attempt is new. |
+| v0.24 | 2026-09-25 | Stopped the boss's escorts from killing the player the instant they arrived. Each escort appeared on the free cell nearest the boss, and the bird has usually just hit the boss from close by, so an escort could appear on top of the bird or beside it and end the run before the player could have seen it. Escorts now appear at least six steps from the bird, still as near the boss as that allows, and each one blinks and is harmless for its first second so the player can see it arrive. The boss itself is untouched - its five hits, its speed and the number of escorts are exactly as before, and the stage's own mynas spawn where they did. A fairness fix, approved by the owner. |

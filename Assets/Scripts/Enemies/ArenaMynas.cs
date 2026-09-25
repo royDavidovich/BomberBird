@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BomberBird.Player;
 using BomberBird.Pods;
 using UnityEngine;
 
@@ -44,6 +45,20 @@ namespace BomberBird.Enemies
 		[Tooltip("Seconds a burst keeps killing mynas. Keep this in step with BirdDeath.")]
 		[SerializeField] private float m_LethalSeconds = 0.45f;
 
+		[Header("The boss summoning")]
+		[Tooltip("The bird, so the mynas the boss calls in appear away from it rather than on it.")]
+		[SerializeField] private BirdMovement m_Bird;
+
+		[Tooltip("Walking steps from the bird a summoned helper must appear at least.")]
+		[SerializeField] private int m_SummonClearance = 6;
+
+		[Tooltip("Seconds a summoned helper is harmless for after it appears. It blinks until then.")]
+		[SerializeField] private float m_SummonGrace = 1f;
+
+		[Tooltip("Times a second a harmless helper flips between shown and hidden, the same "
+			+ "measure as BirdDeath's flash.")]
+		[SerializeField] private float m_SummonBlinkRate = 10f;
+
 		[Header("The boss falling")]
 		[Tooltip("Seconds the slaves scatter for after the boss dies, before they are gone.")]
 		[SerializeField] private float m_ScatterSeconds = 1.25f;
@@ -52,12 +67,10 @@ namespace BomberBird.Enemies
 			+ "rout, not so much that it looks like a glitch.")]
 		[SerializeField] private float m_ScatterSpeed = 3f;
 
-		// Far enough to clear a boss boxed in by pods and hard blocks, near enough that a
-		// summoned slave still reads as having come from the boss.
-		private const int k_MaxSummonRadius = 4;
-
 		private readonly List<MynaMovement> r_Living = new List<MynaMovement>();
 		private readonly BurstDanger r_Danger = new BurstDanger();
+		private readonly Dictionary<MynaMovement, float> r_HarmlessUntil = new Dictionary<MynaMovement, float>();
+		private readonly List<SpriteRenderer> r_BlinkRenderers = new List<SpriteRenderer>();
 
 		private BomberBird.Arena.Arena m_Arena;
 		private PodField m_Field;
@@ -94,14 +107,18 @@ namespace BomberBird.Enemies
 			get { return m_SpawnedCount; }
 		}
 
-		/// <summary>True when a living myna is standing on this cell.</summary>
+		/// <summary>
+		/// True when a living myna that can hurt the bird is standing on this cell. A slave
+		/// still in its first moments is left out, so one the bird walks into before it has
+		/// finished blinking in does not end the run.
+		/// </summary>
 		public bool IsMynaAt(Vector2Int i_Cell)
 		{
 			bool found = false;
 
 			for (int i = 0; i < r_Living.Count && !found; ++i)
 			{
-				found = r_Living[i].Cell == i_Cell;
+				found = r_Living[i].Cell == i_Cell && !isHarmless(r_Living[i]);
 			}
 
 			return found;
@@ -144,6 +161,12 @@ namespace BomberBird.Enemies
 				Debug.LogError(name + ": the Arena has no layout or grid.", this);
 				enabled = false;
 				return;
+			}
+
+			if (m_Bird == null)
+			{
+				// Not fatal: the boss still summons, only without keeping clear of the bird.
+				Debug.LogError(name + ": m_Bird is not assigned, so a summoned myna may appear on the bird.", this);
 			}
 
 			if (m_Pods != null)
@@ -190,12 +213,70 @@ namespace BomberBird.Enemies
 					Vector2Int cell = myna.Cell;
 
 					r_Living.RemoveAt(i);
+					r_HarmlessUntil.Remove(myna);
 					Destroy(myna.gameObject);
 
 					// Read before the destroy, because the myna is gone by the time anyone
 					// listening gets to ask it where it was.
 					OnMynaDefeated(cell);
+					continue;
 				}
+
+				blinkWhileHarmless(myna);
+			}
+		}
+
+		private bool isHarmless(MynaMovement i_Myna)
+		{
+			float until;
+
+			return r_HarmlessUntil.TryGetValue(i_Myna, out until)
+				&& (Time.time < until || isUnderTheBird(i_Myna));
+		}
+
+		/// <summary>
+		/// Blinking told the player this one is safe, so it stays safe for as long as the bird
+		/// is still standing in it: turning lethal under the bird would be the same unfair death
+		/// the grace exists to prevent, only a second later.
+		/// </summary>
+		private bool isUnderTheBird(MynaMovement i_Myna)
+		{
+			return m_Bird != null && m_Bird.Cell == i_Myna.Cell;
+		}
+
+		/// <summary>
+		/// Flashes a newly summoned slave for as long as it is harmless, so the player can see
+		/// which mynas cannot hurt them yet. Once the grace is over it is left drawn and
+		/// forgotten, and from then on it is an ordinary myna.
+		/// </summary>
+		private void blinkWhileHarmless(MynaMovement i_Myna)
+		{
+			float until;
+
+			if (!r_HarmlessUntil.TryGetValue(i_Myna, out until))
+			{
+				return;
+			}
+
+			float remaining = until - Time.time;
+
+			if (remaining <= 0f && !isUnderTheBird(i_Myna))
+			{
+				r_HarmlessUntil.Remove(i_Myna);
+				setDrawn(i_Myna, true);
+				return;
+			}
+
+			setDrawn(i_Myna, Mathf.FloorToInt(remaining * m_SummonBlinkRate) % 2 == 0);
+		}
+
+		private void setDrawn(MynaMovement i_Myna, bool i_IsDrawn)
+		{
+			i_Myna.GetComponentsInChildren(r_BlinkRenderers);
+
+			for (int i = 0; i < r_BlinkRenderers.Count; ++i)
+			{
+				r_BlinkRenderers[i].enabled = i_IsDrawn;
 			}
 		}
 
@@ -271,6 +352,13 @@ namespace BomberBird.Enemies
 				MynaMovement slave = r_Living[i];
 
 				r_Living.RemoveAt(i);
+
+				// A slave caught mid-blink would otherwise flee half drawn, or not at all.
+				if (r_HarmlessUntil.Remove(slave))
+				{
+					setDrawn(slave, true);
+				}
+
 				slave.Speed = m_ScatterSpeed;
 				Destroy(slave.gameObject, m_ScatterSeconds);
 			}
@@ -279,9 +367,13 @@ namespace BomberBird.Enemies
 		}
 
 		/// <summary>
-		/// Calls this hit's slaves in beside the boss, working outward when the ring around
-		/// it cannot hold them all. A wave that does not fit spawns short rather than putting
-		/// a myna inside a wall.
+		/// Calls this hit's slaves in near the boss but away from the bird, working outward
+		/// when the cells around the boss cannot hold them all. A wave that does not fit
+		/// spawns short rather than putting a myna inside a wall.
+		///
+		/// Each one starts harmless for a moment. The bird has usually just hit the boss from
+		/// close by, and a myna appearing on or beside it used to kill it before the player
+		/// could have seen it coming.
 		/// </summary>
 		private void summonSlaves(Vector2Int i_Around, int i_Count)
 		{
@@ -294,24 +386,68 @@ namespace BomberBird.Enemies
 					return;
 				}
 
-				spawnMyna(m_Prefab, cell, "Slave " + (m_SpawnedCount + 1));
+				MynaMovement slave = spawnMyna(m_Prefab, cell, "Slave " + (m_SpawnedCount + 1));
+
+				if (slave != null)
+				{
+					r_HarmlessUntil[slave] = Time.time + m_SummonGrace;
+				}
 			}
 		}
 
 		/// <summary>
-		/// The nearest free cell to the boss, searched ring by ring. Walkable, unclaimed by
-		/// another myna, not the cell a pod is sitting in, and not still alight.
+		/// A free cell for a slave: walkable, unclaimed by another myna, not the cell a pod is
+		/// sitting in, and not still alight.
 		///
-		/// That last one is the whole reason this searches outward. A slave is an ordinary
-		/// myna and dies to a burning cell like any other, and the burst that summoned it is
-		/// still burning on and around the boss - so summoning into the flames spawned the
-		/// wave and killed it in the same breath, and the fight never escalated.
+		/// That last one is the reason the search leaves the boss's own cell. A slave is an
+		/// ordinary myna and dies to a burning cell like any other, and the burst that
+		/// summoned it is still burning on and around the boss - so summoning into the flames
+		/// spawned the wave and killed it in the same breath, and the fight never escalated.
+		///
+		/// The search may reach across the whole arena, because keeping clear of the bird can
+		/// push a slave well away from the boss.
 		/// </summary>
 		private bool tryFindSlaveCell(Vector2Int i_Around, out Vector2Int o_Cell)
 		{
-			o_Cell = i_Around;
+			Vector2Int bird = m_Bird != null ? m_Bird.Cell : i_Around;
+			int clearance = m_Bird != null ? m_SummonClearance : 0;
+			int maxRadius = Mathf.Max(m_Arena.Grid.Width, m_Arena.Grid.Height);
 
-			for (int radius = 1; radius <= k_MaxSummonRadius; ++radius)
+			return ChooseSummonCell(
+				i_Around,
+				bird,
+				clearance,
+				maxRadius,
+				cell => m_Arena.Grid.IsWalkable(cell)
+					&& !m_AlsoBlocked(cell)
+					&& !r_Danger.IsBurning(cell, Time.time),
+				out o_Cell);
+		}
+
+		/// <summary>
+		/// Picks where a summoned slave appears: the open cell nearest the boss that is at
+		/// least <paramref name="i_MinFromBird"/> walking steps from the bird, searched ring by
+		/// ring out to <paramref name="i_MaxRadius"/>. Nearest the boss wins so a slave still
+		/// reads as hers.
+		///
+		/// When the bird is so placed that no open cell is far enough, the open cell farthest
+		/// from it is used instead, because a boss hit must never go unanswered just because
+		/// the bird stood close. False only when no open cell but the bird's own is left.
+		/// </summary>
+		public static bool ChooseSummonCell(
+			Vector2Int i_Boss,
+			Vector2Int i_Bird,
+			int i_MinFromBird,
+			int i_MaxRadius,
+			Predicate<Vector2Int> i_IsOpen,
+			out Vector2Int o_Cell)
+		{
+			bool foundOpen = false;
+			int farthest = -1;
+
+			o_Cell = i_Boss;
+
+			for (int radius = 1; radius <= i_MaxRadius; ++radius)
 			{
 				for (int x = -radius; x <= radius; ++x)
 				{
@@ -323,20 +459,34 @@ namespace BomberBird.Enemies
 							continue;
 						}
 
-						Vector2Int candidate = i_Around + new Vector2Int(x, y);
+						Vector2Int candidate = i_Boss + new Vector2Int(x, y);
 
-						if (m_Arena.Grid.IsWalkable(candidate)
-							&& !m_AlsoBlocked(candidate)
-							&& !r_Danger.IsBurning(candidate, Time.time))
+						if (!i_IsOpen(candidate))
+						{
+							continue;
+						}
+
+						int fromBird = Mathf.Abs(candidate.x - i_Bird.x) + Mathf.Abs(candidate.y - i_Bird.y);
+
+						if (fromBird >= i_MinFromBird)
 						{
 							o_Cell = candidate;
 							return true;
+						}
+
+						// Strictly farther, so among equals the one nearer the boss is kept. Never
+						// the bird's own cell, however little else is open.
+						if (fromBird > farthest && fromBird > 0)
+						{
+							farthest = fromBird;
+							o_Cell = candidate;
+							foundOpen = true;
 						}
 					}
 				}
 			}
 
-			return false;
+			return foundOpen;
 		}
 
 		private void spawnFromLayout()
