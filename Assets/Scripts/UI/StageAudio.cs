@@ -241,7 +241,7 @@ namespace BomberBird.UI
 			// not console noise every time the player places a pod.
 			if (i_Clip != null)
 			{
-				m_Source.PlayOneShot(i_Clip);
+				m_Source.PlayOneShot(i_Clip, SoundLevels.Effects);
 			}
 		}
 
