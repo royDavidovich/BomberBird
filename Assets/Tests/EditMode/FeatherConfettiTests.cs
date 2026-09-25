@@ -43,6 +43,16 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
+		public void AFeatherAlreadyFallingFasterKeepsItsSpeed()
+		{
+			// Only reachable by lowering the cap in the Inspector mid-flight. The feather is
+			// left to fall rather than yanked upwards to the new cap.
+			Vector2 next = FeatherConfetti.Fall(new Vector2(0f, -400f), 0.1f, k_Gravity, k_Drag, k_FallSpeed);
+
+			Assert.AreEqual(-400f, next.y, 0.001f);
+		}
+
+		[Test]
 		public void DragSlowsTheThrowWithoutReversingIt()
 		{
 			Vector2 velocity = new Vector2(1000f, 0f);

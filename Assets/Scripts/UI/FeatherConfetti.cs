@@ -12,8 +12,9 @@ namespace BomberBird.UI
 	/// UI images moved by hand rather than a ParticleSystem, because the closing canvas is Screen
 	/// Space - Overlay and particles do not draw over an Overlay canvas.
 	///
-	/// Starts on enable, so the panel it sits on decides when the burst happens, and a panel shown
-	/// twice bursts twice.
+	/// Armed on enable, so the panel it sits on decides when the burst happens, and a panel shown
+	/// twice bursts twice. Thrown once the screen has faded in, not on enable itself: the scene
+	/// loads under black, and on that first frame the canvas may not have sized this rect yet.
 	/// </summary>
 	[RequireComponent(typeof(RectTransform))]
 	public class FeatherConfetti : MonoBehaviour
@@ -23,6 +24,7 @@ namespace BomberBird.UI
 			public RectTransform Rect;
 			public Vector2 Position;
 			public Vector2 Velocity;
+			public float Angle;
 			public float Spin;
 			public float SwayPhase;
 		}
@@ -66,6 +68,7 @@ namespace BomberBird.UI
 		private readonly Stack<RectTransform> r_Spare = new Stack<RectTransform>();
 		private RectTransform m_Area;
 		private float m_DrizzleOwed;
+		private bool m_IsBurstOwed;
 
 		private void Awake()
 		{
@@ -80,19 +83,7 @@ namespace BomberBird.UI
 			}
 
 			m_DrizzleOwed = 0f;
-
-			if (m_Feathers == null || m_Feathers.Length == 0)
-			{
-				return;
-			}
-
-			Vector2 half = m_Area.rect.size * 0.5f;
-
-			for (int i = 0; i < m_BurstPerSide; ++i)
-			{
-				throwFromSide(-1f, half);
-				throwFromSide(1f, half);
-			}
+			m_IsBurstOwed = true;
 		}
 
 		private void Update()
@@ -100,6 +91,19 @@ namespace BomberBird.UI
 			if (m_Feathers == null || m_Feathers.Length == 0)
 			{
 				return;
+			}
+
+			// Nothing falls until the screen can be seen, so the burst is the first thing the
+			// player sees rather than something already half over.
+			if (m_IsBurstOwed)
+			{
+				if (!UiInput.IsListening() || m_Area.rect.width <= 0f)
+				{
+					return;
+				}
+
+				m_IsBurstOwed = false;
+				burst(m_Area.rect.size * 0.5f);
 			}
 
 			// Unscaled, because the screen before this one may have left the clock stopped. Capped,
@@ -134,8 +138,9 @@ namespace BomberBird.UI
 				// off the screen however long it falls.
 				float sway = Mathf.Sin(now * 2.2f + piece.SwayPhase) * m_SwayWidth;
 
+				piece.Angle += piece.Spin * deltaTime;
 				piece.Rect.anchoredPosition = piece.Position + new Vector2(sway, 0f);
-				piece.Rect.localRotation = Quaternion.Euler(0f, 0f, piece.Rect.localEulerAngles.z + piece.Spin * deltaTime);
+				piece.Rect.localRotation = Quaternion.Euler(0f, 0f, piece.Angle);
 			}
 		}
 
@@ -157,6 +162,15 @@ namespace BomberBird.UI
 			}
 
 			return new Vector2(x, y);
+		}
+
+		private void burst(Vector2 i_Half)
+		{
+			for (int i = 0; i < m_BurstPerSide; ++i)
+			{
+				throwFromSide(-1f, i_Half);
+				throwFromSide(1f, i_Half);
+			}
 		}
 
 		/// <param name="i_Side">-1 for the left edge, 1 for the right.</param>
@@ -185,7 +199,9 @@ namespace BomberBird.UI
 
 			rect.gameObject.SetActive(true);
 			rect.GetComponent<Image>().sprite = m_Feathers[Random.Range(0, m_Feathers.Length)];
-			rect.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+			float angle = Random.Range(0f, 360f);
+
+			rect.localRotation = Quaternion.Euler(0f, 0f, angle);
 			rect.anchoredPosition = i_Position;
 
 			r_Live.Add(new Piece
@@ -193,6 +209,7 @@ namespace BomberBird.UI
 				Rect = rect,
 				Position = i_Position,
 				Velocity = i_Velocity,
+				Angle = angle,
 				Spin = Random.Range(-180f, 180f),
 				SwayPhase = Random.Range(0f, 2f * Mathf.PI),
 			});
