@@ -206,6 +206,47 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
+		/// Where the run goes once a cleared stage has been advanced past: the closing screens
+		/// after the last one, otherwise the next stage - by way of bird selection only when the
+		/// roster holds a choice, since a roster of one would show a decision already made.
+		/// </summary>
+		public eStageRoute RouteAfterAdvance(int i_StageCount)
+		{
+			if (m_StageNumber > i_StageCount)
+			{
+				return eStageRoute.Closing;
+			}
+
+			return HasBirdChoice ? eStageRoute.BirdSelect : eStageRoute.HabitatCard;
+		}
+
+		/// <summary>
+		/// Where another attempt at this stage goes: bird selection when there is a choice,
+		/// marked so the choice leads back to the arena, otherwise straight into the arena.
+		/// </summary>
+		public eStageRoute RouteToAnotherAttempt()
+		{
+			if (!HasBirdChoice)
+			{
+				return eStageRoute.Arena;
+			}
+
+			MarkChoosingForReplay();
+
+			return eStageRoute.BirdSelect;
+		}
+
+		/// <summary>
+		/// Where a bird choice leads: back into the arena when it was for another attempt, since
+		/// the player has read this stage's habitat card already, and on through the card when it
+		/// was for arriving at the next stage.
+		/// </summary>
+		public eStageRoute RouteAfterChoice()
+		{
+			return ClaimReplayAfterChoice() ? eStageRoute.Arena : eStageRoute.HabitatCard;
+		}
+
+		/// <summary>
 		/// Adds a bird to the roster. Returns whether it was actually new, so a caller can
 		/// tell a first unlock from a feather collected on a replayed stage.
 		/// </summary>
