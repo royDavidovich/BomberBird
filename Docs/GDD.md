@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.26, 2026-09-25 |
+| Document version | v0.27, 2026-09-26 |
 
 ## 1. High Concept
 
@@ -183,13 +183,14 @@ enemy and moves by the same rules, but it survives five bursts instead of one, a
 stage begins with the boss alone so the player reads it before the arena fills. Each
 non-fatal hit turns it a full circle on the spot, makes it slightly faster, and calls in
 one more ordinary myna than the hit before - one, then two, three, and four, so ten
-across the fight. The escorts appear near the boss but at least six steps from the
-player's bird, and each one blinks and is harmless for its first second, so an escort can
+across the fight. The escorts spin out of the boss, turning as she does when hit, to cells
+near her but at least six steps from the player's bird, so the wave reads as hers; each one
+is harmless on the way out and for its first second on its cell, blinking, so an escort can
 never kill the player the moment it arrives. The speed gain is capped, because the growing
 escort is the escalation and a boss that accelerates unchecked stops being catchable. The fifth hit kills it and
-calls nobody, and every slave still standing scatters and dies with it, harmless to the
-player as it flees, so the arena empties on the blow that ends the fight rather than
-peaking there. The boss arena is two cells wider than the others to give all of this room.
+calls nobody, and every slave still standing reels on the spot, spinning fast and
+blinking, harmless to the player, and is gone a moment later, so the arena empties on the
+blow that ends the fight rather than peaking there. The boss arena is two cells wider than the others to give all of this room.
 It has no attack of its own beyond touching the player, which every myna already does.
 This keeps the campaign's climax inside systems that already exist rather than adding a
 behaviour system in the final weeks. Ghost enemies are not part of the design. Other hazards, if used, will have fictional or abstract designs.
@@ -299,3 +300,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.24 | 2026-09-25 | Stopped the boss's escorts from killing the player the instant they arrived. Each escort appeared on the free cell nearest the boss, and the bird has usually just hit the boss from close by, so an escort could appear on top of the bird or beside it and end the run before the player could have seen it. Escorts now appear at least six steps from the bird, still as near the boss as that allows, and each one blinks and is harmless for its first second so the player can see it arrive. The boss itself is untouched - its five hits, its speed and the number of escorts are exactly as before, and the stage's own mynas spawn where they did. A fairness fix, approved by the owner. |
 | v0.25 | 2026-09-25 | Took Space off confirming in the menus. Space is the pod key and the key that starts a waiting stage, so a player still pressing it after a GAME OVER or a Restart could confirm a menu choice they never meant, most easily a bird on the selection screen. Menus now confirm on Enter (either Enter key), a click, or the gamepad's main button, and the bird selection screen says so under the cards: "PRESS ENTER TO CHOOSE". **No rule changed.** This is a control change to the confirm row of section 4, approved by the owner. |
 | v0.26 | 2026-09-25 | Gave the player a say in how loud the game is. There was no volume setting anywhere, so a player whose speakers were too loud, or who wanted the music gone and the pod timing still audible, had only the system volume, which moves both together. The pause overlay now carries a Music slider and an Effects slider under its three entries, and both levels are remembered between sittings. **No rule changed.** A settings addition outside the section 8 lists, approved by the owner. |
+| v0.27 | 2026-09-26 | Made the boss's escorts come out of the boss. Each one used to appear on its cell with nothing tying it to her, so the wave read as mynas turning up rather than as her calling them. Each now spins out of the boss to its cell over half a second, turning a full circle the way she does when hit and passing over the walls; it is harmless and out of the flames' reach on the way, and the blinking grace of v0.24 starts on landing. It uses the myna's existing frames - the spin is the same facing cycle as the boss's. And when the boss falls, the escorts still standing no longer run off faster and vanish: each spins fast on the spot, blinking, for the same moment and then is gone, so the end of the fight reads as the flock coming apart where it stood. **No rule changed** - the cells, the numbers, the six-step clearance and the grace are exactly as before; only how an escort arrives is new. This is the §8.2 line about stronger visual feedback, approved by the owner. |

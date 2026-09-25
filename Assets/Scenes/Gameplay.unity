@@ -9871,7 +9871,7 @@ MonoBehaviour:
   m_SummonGrace: 1
   m_SummonBlinkRate: 10
   m_ScatterSeconds: 1.25
-  m_ScatterSpeed: 3
+  m_ScatterTurns: 5
 --- !u!114 &1688113804
 MonoBehaviour:
   m_ObjectHideFlags: 0
