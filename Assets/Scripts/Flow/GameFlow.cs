@@ -199,6 +199,7 @@ namespace BomberBird.Flow
 
 			s_Instance = this;
 			DontDestroyOnLoad(gameObject);
+			SoundLevels.Changed += soundLevels_Changed;
 
 			if (m_Campaign != null)
 			{
@@ -218,6 +219,7 @@ namespace BomberBird.Flow
 				// Read once and kept, because the duck writes over the live value and would
 				// otherwise ratchet the track quieter with every scene change.
 				m_MusicVolume = m_Music.volume;
+				m_Music.volume = musicLevel();
 			}
 
 			m_Run = new RunState(m_StartingLives, m_Campaign == null ? null : m_Campaign.StartingBird);
@@ -309,6 +311,29 @@ namespace BomberBird.Flow
 				// Entering Play Mode without a domain reload keeps statics alive, and a stale
 				// reference to a destroyed object is worse than none.
 				s_Instance = null;
+				SoundLevels.Changed -= soundLevels_Changed;
+			}
+		}
+
+		/// <summary>
+		/// The music source's full volume: the level it was authored at, scaled by the player's
+		/// music setting. Every fade and duck works down from this.
+		/// </summary>
+		private float musicLevel()
+		{
+			return m_MusicVolume * SoundLevels.Music;
+		}
+
+		/// <summary>
+		/// A slider moved. A running fade-out reads the level every frame and will pick it up
+		/// itself, and so does a transition's duck through setCover; otherwise the music is set
+		/// straight to the new level.
+		/// </summary>
+		private void soundLevels_Changed()
+		{
+			if (m_Music != null && m_MusicFade == null && !m_IsTransitioning)
+			{
+				m_Music.volume = musicLevel();
 			}
 		}
 
@@ -716,7 +741,7 @@ namespace BomberBird.Flow
 
 			if (m_Music != null)
 			{
-				m_Music.volume = m_MusicVolume;
+				m_Music.volume = musicLevel();
 			}
 		}
 
@@ -727,7 +752,7 @@ namespace BomberBird.Flow
 			for (float t = ScreenFade.Ramp(elapsed, m_MusicFadeSeconds); t < 1f;
 				t = ScreenFade.Ramp(elapsed, m_MusicFadeSeconds))
 			{
-				m_Music.volume = m_MusicVolume * (1f - t);
+				m_Music.volume = musicLevel() * (1f - t);
 
 				yield return null;
 
@@ -738,7 +763,7 @@ namespace BomberBird.Flow
 
 			// Back to the stored level rather than left at zero: the next track to play reads
 			// its volume from this source, and one stopped at zero would come back silent.
-			m_Music.volume = m_MusicVolume;
+			m_Music.volume = musicLevel();
 			m_MusicFade = null;
 		}
 
@@ -763,15 +788,26 @@ namespace BomberBird.Flow
 		/// The cover and the music move together off one number. At full black the music is at
 		/// its floor, which is where <see cref="PlayMusic"/> swaps the track and therefore the
 		/// quietest place to do it - unless the transition keeps the music, when only the cover
-		/// moves.
+		/// moves and the music stays at the player's level.
 		/// </summary>
 		private void setCover(float i_Alpha)
 		{
 			m_Fade.Cover(i_Alpha);
 
-			if (m_Music != null && !m_IsMusicKept)
+			if (m_Music == null)
 			{
-				m_Music.volume = m_MusicVolume * Mathf.Lerp(1f, m_MusicDuckFloor, i_Alpha);
+				return;
+			}
+
+			if (!m_IsMusicKept)
+			{
+				m_Music.volume = musicLevel() * Mathf.Lerp(1f, m_MusicDuckFloor, i_Alpha);
+			}
+			else if (m_MusicFade == null)
+			{
+				// A transition that keeps the music still holds it at the player's level, so a
+				// slider moved during one is not lost until the next fade.
+				m_Music.volume = musicLevel();
 			}
 		}
 	}
