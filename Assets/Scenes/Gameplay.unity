@@ -3901,7 +3901,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <font="Handjet SDF"><b>1)</b></font> WALK
+  m_text: <font="Handjet SDF"><b><voffset=0.13em><size=73%>(</size></voffset>1<voffset=0.13em><size=73%>)</size></voffset></b></font> WALK
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
   m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
@@ -12280,7 +12280,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <font="Handjet SDF"><b>3)</b></font> IT BURSTS
+  m_text: <font="Handjet SDF"><b><voffset=0.13em><size=73%>(</size></voffset>3<voffset=0.13em><size=73%>)</size></voffset></b></font> IT BURSTS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
   m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
@@ -12693,7 +12693,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <font="Handjet SDF"><b>2)</b></font> PLACE A POD
+  m_text: <font="Handjet SDF"><b><voffset=0.13em><size=73%>(</size></voffset>2<voffset=0.13em><size=73%>)</size></voffset></b></font> PLACE A POD
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
   m_sharedMaterial: {fileID: 196418020442839675, guid: e2b6e6e361684459298ef9bfe9f37522, type: 2}
