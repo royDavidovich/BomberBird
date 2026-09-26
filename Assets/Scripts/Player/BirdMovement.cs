@@ -19,7 +19,7 @@ namespace BomberBird.Player
 
 		// The on-screen stick of the Web build on phones, read as the gamepad it emulates.
 		// Below the dead zone a resting thumb counts as no push at all.
-		private const float k_StickDeadZone = 0.4f;
+		private const float k_StickDeadZone = 0.3f;
 
 		// sin 22.5 degrees: an axis counts once the push leans that far towards it, which cuts
 		// the circle into four straight sectors and four diagonal ones between them.

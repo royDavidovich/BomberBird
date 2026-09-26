@@ -15,7 +15,7 @@ namespace BomberBird.Tests
 		public void ARestingThumbIsNoPush()
 		{
 			Assert.AreEqual(Vector2Int.zero, BirdMovement.StickAxes(Vector2.zero));
-			Assert.AreEqual(Vector2Int.zero, BirdMovement.StickAxes(new Vector2(0.3f, 0.2f)));
+			Assert.AreEqual(Vector2Int.zero, BirdMovement.StickAxes(new Vector2(0.2f, 0.1f)));
 		}
 
 		[Test]
@@ -47,7 +47,7 @@ namespace BomberBird.Tests
 		public void ASmallPushCountsByDirectionNotSize()
 		{
 			// Just past the dead zone, straight up: the lean decides, not how far the thumb went.
-			Assert.AreEqual(Vector2Int.up, BirdMovement.StickAxes(new Vector2(0f, 0.45f)));
+			Assert.AreEqual(Vector2Int.up, BirdMovement.StickAxes(new Vector2(0f, 0.35f)));
 		}
 	}
 }

@@ -67,7 +67,7 @@ is scoped.
 
 | Action | Keyboard | Touch (Web build on a phone) |
 |---|---|---|
-| Move | WASD or arrow keys | Floating stick, left side |
+| Move | WASD or arrow keys | A stick that comes up wherever the thumb lands |
 | Place seed pod | Space | Pod button, bottom right |
 | Confirm or retry | Enter | Tap the button, or tap to continue |
 | Pause or back | Escape | Pause button, top right |

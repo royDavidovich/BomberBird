@@ -60,12 +60,25 @@ namespace BomberBird.Tests
 		}
 
 		[Test]
-		public void TheStickIsTheLeftStickAndFollowsTheThumb()
+		public void TheStickIsTheLeftStick()
 		{
-			OnScreenStick stick = m_Pad.Find("Stick").GetComponent<OnScreenStick>();
+			FloatingStick stick = m_Pad.Find("StickZone").GetComponent<FloatingStick>();
 
 			Assert.AreEqual("<Gamepad>/leftStick", stick.controlPath);
-			Assert.AreEqual(OnScreenStick.Behaviour.ExactPositionWithDynamicOrigin, stick.behaviour);
+		}
+
+		/// <summary>
+		/// The stick's zone covers the whole screen, so it has to be drawn first: the buttons
+		/// after it keep their own taps instead of starting a drag.
+		/// </summary>
+		[Test]
+		public void TheButtonsAreDrawnOverTheStickZone()
+		{
+			Transform zone = m_Pad.Find("StickZone");
+
+			Assert.AreEqual(0, zone.GetSiblingIndex());
+			Assert.Greater(m_Pad.Find("PodButton").GetSiblingIndex(), zone.GetSiblingIndex());
+			Assert.Greater(m_Pad.Find("PauseButton").GetSiblingIndex(), zone.GetSiblingIndex());
 		}
 
 		[Test]
