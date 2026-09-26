@@ -150,7 +150,7 @@ namespace BomberBird.Flow
 		}
 
 		/// <summary>
-		/// Claims the one showing of the cage rule this run - "the cage opens when every myna
+		/// Claims the one showing of the cage rule this run - "the cage will open when every myna
 		/// is gone" - at the first stage that holds a cage. Run-scoped for the same reasons as
 		/// <see cref="MarkInstructionsSeen"/>: a retry does not repeat it, a new campaign does.
 		/// </summary>

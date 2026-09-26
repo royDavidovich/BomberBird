@@ -3759,7 +3759,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'The cage opens
+  m_text: 'The cage will open
 
     when every myna is gone'
   m_isRightToLeft: 0
