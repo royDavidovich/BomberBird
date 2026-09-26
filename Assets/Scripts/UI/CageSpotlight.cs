@@ -28,6 +28,23 @@ namespace BomberBird.UI
 		private static readonly int sr_RingWidth = Shader.PropertyToID("_RingWidth");
 		private static readonly int sr_RingAlpha = Shader.PropertyToID("_RingAlpha");
 
+		// The dip below the final radius runs over the last 40% of the close.
+		private const float k_DipStart = 0.6f;
+		private const float k_DipLength = 0.4f;
+
+		// Seconds the ring takes to come up once the hole lands.
+		private const float k_RingInSeconds = 0.25f;
+
+		// Share of the close spent darkening, so the hole is visible before it is small.
+		private const float k_WashInShare = 0.5f;
+
+		// Narrowest edge or ring the shader is given: smoothstep with equal edges is undefined
+		// in GLSL ES, which WebGL runs.
+		private const float k_MinWidth = 0.001f;
+
+		// Smallest the words shrink to under m_KeepBelow; any smaller and they stop reading.
+		private const float k_MinWordsScale = 0.5f;
+
 		[Header("Parts")]
 		[Tooltip("The full-screen wash, using a UISpotlight material. Stretched over the whole "
 			+ "canvas so its UVs match the camera's viewport.")]
@@ -39,6 +56,13 @@ namespace BomberBird.UI
 
 		[Tooltip("Fades the words in and out together.")]
 		[SerializeField] private CanvasGroup m_WordsGroup;
+
+		[Tooltip("Text the words must stay under, the stage's start prompt. On a squarer screen "
+			+ "the words shrink rather than run into it.")]
+		[SerializeField] private RectTransform m_KeepBelow;
+
+		[Tooltip("Gap kept between the words and m_KeepBelow, in canvas units.")]
+		[SerializeField] private float m_KeepBelowGap = 16f;
 
 		[Header("The hole")]
 		[Tooltip("Radius the hole settles at, in arena cells. A little over one, so the whole "
@@ -89,6 +113,7 @@ namespace BomberBird.UI
 		[Tooltip("Seconds for everything to fade out once the stage starts.")]
 		[SerializeField] private float m_FadeSeconds = 0.45f;
 
+		private readonly Vector3[] r_Corners = new Vector3[4];
 		private Material m_Material;
 		private Camera m_Camera;
 		private Vector3 m_WorldPoint;
@@ -108,9 +133,9 @@ namespace BomberBird.UI
 			float remaining = 1f - progress;
 			float closing = i_To + (i_From - i_To) * remaining * remaining * remaining;
 
-			// The dip runs over the last 40% and is a single half sine, so it is zero at both of
+			// The dip is a single half sine, so it is zero at both of
 			// its ends and the curve still lands on i_To.
-			float dipProgress = Mathf.Clamp01((progress - 0.6f) / 0.4f);
+			float dipProgress = Mathf.Clamp01((progress - k_DipStart) / k_DipLength);
 			float dip = i_To * i_Overshoot * Mathf.Sin(dipProgress * Mathf.PI);
 
 			return closing - dip;
@@ -201,18 +226,18 @@ namespace BomberBird.UI
 			m_Material.SetVector(sr_Center, m_Center);
 			m_Material.SetFloat(sr_Aspect, washRect.rect.width / Mathf.Max(washRect.rect.height, 1f));
 			m_Material.SetFloat(sr_Radius, IrisRadius(closing, m_StartRadius, targetRadius, m_Overshoot));
-			m_Material.SetFloat(sr_Softness, m_SoftCells * m_CellHeight);
-			m_Material.SetFloat(sr_RingWidth, m_RingCells * m_CellHeight);
+			m_Material.SetFloat(sr_Softness, Mathf.Max(m_SoftCells * m_CellHeight, k_MinWidth));
+			m_Material.SetFloat(sr_RingWidth, Mathf.Max(m_RingCells * m_CellHeight, k_MinWidth));
 
 			// The ring comes up as the hole lands, then breathes: brightest when the bars are
 			// biggest, which is when UiPulse is at its floor.
-			float ringIn = Mathf.Clamp01(sinceLanded / 0.25f);
+			float ringIn = Mathf.Clamp01(sinceLanded / k_RingInSeconds);
 			float breath = 1f - UiPulse.Alpha(now, m_PulseSeconds, 0f);
 			m_Material.SetFloat(sr_RingAlpha, m_RingAlpha * ringIn * Mathf.Lerp(m_RingFloor, 1f, breath));
 
 			// The wash darkens over the first half of the close, so the hole is already
 			// visible by the time it is small enough to follow.
-			float washIn = m_CloseSeconds > 0f ? Mathf.Clamp01(sinceShown / (m_CloseSeconds * 0.5f)) : 1f;
+			float washIn = m_CloseSeconds > 0f ? Mathf.Clamp01(sinceShown / (m_CloseSeconds * k_WashInShare)) : 1f;
 			Color wash = m_Wash.color;
 			wash.a = m_Dim * washIn * fading;
 			m_Wash.color = wash;
@@ -245,6 +270,28 @@ namespace BomberBird.UI
 			m_Words.anchorMax = m_Words.anchorMin;
 			m_Words.pivot = new Vector2(0.5f, isAbove ? 0f : 1f);
 			m_Words.anchoredPosition = new Vector2(0f, (isAbove ? edge : -edge) * canvas.height);
+			m_Words.localScale = Vector3.one * (isAbove ? roomUnderKeepBelow(canvas, edge) : 1f);
+		}
+
+		/// <summary>
+		/// How far the words must shrink to end under m_KeepBelow, as a scale: 1 when they fit.
+		/// Scaled about their bottom pivot, so only their top edge comes down.
+		/// </summary>
+		private float roomUnderKeepBelow(Rect i_Canvas, float i_Edge)
+		{
+			if (m_KeepBelow == null || m_Words.rect.height <= 0f)
+			{
+				return 1f;
+			}
+
+			m_KeepBelow.GetWorldCorners(r_Corners);
+
+			// Corner 0 is bottom left; measured in the wash's own units, from its bottom edge.
+			float keepBelowBottom = m_Wash.rectTransform.InverseTransformPoint(r_Corners[0]).y - i_Canvas.yMin;
+			float wordsBottom = (m_Center.y + i_Edge) * i_Canvas.height;
+			float room = keepBelowBottom - m_KeepBelowGap - wordsBottom;
+
+			return Mathf.Clamp(room / m_Words.rect.height, k_MinWordsScale, 1f);
 		}
 	}
 }

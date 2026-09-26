@@ -127,6 +127,23 @@ namespace BomberBird.Tests
 			Assert.IsNotNull(readReference(instructions, "m_Confirm"));
 		}
 
+		/// <summary>
+		/// The overlay is a prefab, so these links live in the scene as instance overrides,
+		/// where reverting the instance would silently point them back at nothing.
+		/// </summary>
+		[TestCase("Resume", "Resume")]
+		[TestCase("Restart", "RestartStage")]
+		[TestCase("MainMenuButton", "GoToMainMenu")]
+		[TestCase("PausePanel/HelpIcon", "ShowInstructions")]
+		public void TheOverlayButtonsCallThePauseController(string i_Button, string i_Method)
+		{
+			Button button = findOverlay<Button>(i_Button);
+
+			Assert.AreEqual(1, button.onClick.GetPersistentEventCount(), i_Button);
+			Assert.AreSame(m_Pause, button.onClick.GetPersistentTarget(0), i_Button);
+			Assert.AreEqual(i_Method, button.onClick.GetPersistentMethodName(0), i_Button);
+		}
+
 		private static PauseController findPauseController(Scene i_Scene)
 		{
 			PauseController found = null;
