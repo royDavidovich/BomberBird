@@ -14,11 +14,20 @@ namespace BomberBird.UI
 		[TextArea]
 		[SerializeField] private string m_TouchText;
 
+		[Tooltip("Optional. Hidden on a phone along with the keyboard text - a key drawn beside "
+			+ "the label that the touch text no longer names.")]
+		[SerializeField] private GameObject m_KeyboardOnly;
+
 		private void Awake()
 		{
 			if (Application.isMobilePlatform && !string.IsNullOrEmpty(m_TouchText))
 			{
 				GetComponent<TMP_Text>().text = m_TouchText;
+
+				if (m_KeyboardOnly != null)
+				{
+					m_KeyboardOnly.SetActive(false);
+				}
 			}
 		}
 	}
