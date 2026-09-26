@@ -9,8 +9,9 @@ namespace BomberBird.UI
 	/// Teaches the cage where the player is looking at it, so nobody tries to bomb the
 	/// feather free.
 	///
-	/// At the first cage stage of a run, the rule is written over the cage while the stage
-	/// waits for Space, and the bars breathe to draw the eye. Every burst that reaches the
+	/// At the first cage stage of a run, a spotlight closes onto the cage with the rule written
+	/// beside it while the stage waits for Space, and the bars breathe to draw the eye. The
+	/// spotlight fades as the stage starts (<see cref="CageSpotlight"/>). Every burst that reaches the
 	/// cage shakes it, and the first one of the run adds a line saying why it held. The
 	/// clank that goes with the shake is <see cref="StageAudio"/>'s, off the same event.
 	///
@@ -23,10 +24,15 @@ namespace BomberBird.UI
 		[SerializeField] private BomberBird.Arena.Arena m_Arena;
 		[SerializeField] private StageReady m_Ready;
 
-		[Header("Words")]
-		[Tooltip("Shown over the cage while the first cage stage of the run waits for Space.")]
-		[SerializeField] private TMP_Text m_RuleLabel;
+		[Header("The rule")]
+		[Tooltip("Closes onto the cage, with the rule beside it, while the first cage stage of "
+			+ "the run waits for Space.")]
+		[SerializeField] private CageSpotlight m_Spotlight;
 
+		[Tooltip("The camera the arena is seen through, to find the cage on screen.")]
+		[SerializeField] private Camera m_Camera;
+
+		[Header("Words")]
 		[Tooltip("Shown over the cage the first time in the run a burst reaches it.")]
 		[SerializeField] private TMP_Text m_StrikeLabel;
 
@@ -80,7 +86,6 @@ namespace BomberBird.UI
 
 		private void Start()
 		{
-			showLabel(m_RuleLabel, false);
 			showLabel(m_StrikeLabel, false);
 
 			if (m_Arena == null || m_Arena.Grid == null || !m_Arena.Grid.HasCage)
@@ -91,7 +96,6 @@ namespace BomberBird.UI
 
 			Vector3 above = m_Arena.Grid.CellToWorld(m_Arena.Grid.CageCell) + Vector3.up * m_LabelHeight;
 
-			placeLabel(m_RuleLabel, above);
 			placeLabel(m_StrikeLabel, above);
 
 			m_IsDeciding = true;
@@ -112,7 +116,14 @@ namespace BomberBird.UI
 			bool isHeld = m_Ready != null && m_Ready.IsHolding;
 
 			m_IsShowingRule = hasBars && isHeld && flow != null && flow.ClaimCageRuleShowing();
-			showLabel(m_RuleLabel, m_IsShowingRule);
+
+			if (m_IsShowingRule && m_Spotlight != null)
+			{
+				// The cell is in the arena's own space; the camera needs it in the world's.
+				Vector3 cage = m_Arena.transform.TransformPoint(m_Arena.Grid.CellToWorld(m_Arena.Grid.CageCell));
+
+				m_Spotlight.Show(cage, m_Camera);
+			}
 		}
 
 		/// <summary>
@@ -135,7 +146,11 @@ namespace BomberBird.UI
 			if (m_Ready == null || !m_Ready.IsHolding)
 			{
 				m_IsShowingRule = false;
-				showLabel(m_RuleLabel, false);
+
+				if (m_Spotlight != null)
+				{
+					m_Spotlight.Hide();
+				}
 
 				if (bars != null)
 				{
