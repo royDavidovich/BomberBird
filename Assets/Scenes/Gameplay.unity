@@ -1117,6 +1117,8 @@ MonoBehaviour:
   m_Wash: {fileID: 224154350}
   m_Words: {fileID: 1755526448}
   m_WordsGroup: {fileID: 1755526449}
+  m_KeepBelow: {fileID: 159897215}
+  m_KeepBelowGap: 16
   m_HoleCells: 1.3
   m_SoftCells: 0.5
   m_StartRadius: 1.3
