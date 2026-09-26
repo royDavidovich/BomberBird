@@ -89,6 +89,16 @@ namespace BomberBird.Tests
 			Assert.AreEqual("<Gamepad>/buttonSouth", pod.controlPath);
 		}
 
+		/// <summary>Where Roy's thumb found it on the phone, 2026-09-26.</summary>
+		[Test]
+		public void ThePodButtonSitsInTheBottomRightCorner()
+		{
+			RectTransform pod = (RectTransform)m_Pad.Find("PodButton");
+
+			Assert.AreEqual(new Vector2(1f, 0f), pod.anchorMin);
+			Assert.AreEqual(new Vector2(-190f, 190f), pod.anchoredPosition);
+		}
+
 		[Test]
 		public void ThePauseButtonPauses()
 		{
