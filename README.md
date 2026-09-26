@@ -12,7 +12,7 @@ bombs to clear obstacles, defeat enemies, and reach the exit.
 
 ## How to play
 
-![The in-game How to Play card, showing three panels: walk with WASD or the arrow keys, place a pod with Space and step away, and the pod bursting in four directions two seconds later](Docs/Images/how-to-play.png)
+![The in-game How to Play card, over the dimmed stage, showing three numbered panels: walk with WASD or the arrow keys, place a pod with Space and step away, and the pod bursting in four directions two seconds later, with the Esc key marked as pausing the game at any time](Docs/Images/how-to-play.png)
 
 Clear every common myna from the arena. A burst does not care who placed it, so the pod that
 opens a path will take the bird that placed it just as readily. Some habitats cage a feather:
@@ -36,7 +36,7 @@ The enemy is the [common myna](Docs/ArtReferences/Birds/common-myna-approved-con
 invasive species that takes the nesting cavities the native birds depend on. A larger one holds
 the final stage.
 
-![The bird selection screen: four field-guide cards over a dusk orchard, showing the hoopoe, kingfisher and pelican with their speed, burst and pod numbers, and a fourth card still locked](Docs/Images/bird-select.png)
+![The bird selection screen: four field-guide cards over a dusk orchard, showing the hoopoe, kingfisher and pelican with their speed, burst and pod numbers, a fourth card still locked, and Press Enter to Choose on a plate beneath them](Docs/Images/bird-select.png)
 
 ## The habitats
 
