@@ -15,6 +15,9 @@ namespace BomberBird.UI
 	/// A refusal does not load anything and would survive without this, but it goes through the
 	/// same door so that there is one way a menu makes a noise rather than two. Being the one
 	/// door is also what lets the player's effects level reach every menu sound from here.
+	///
+	/// The results cards' stings are music rather than effects, so they come through
+	/// <see cref="PlayMusic"/> and follow the player's music level instead.
 	/// </summary>
 	public static class UiSound
 	{
@@ -29,6 +32,17 @@ namespace BomberBird.UI
 		/// </summary>
 		public static AudioSource Play(AudioClip i_Clip, float i_Volume)
 		{
+			return play(i_Clip, i_Volume * SoundLevels.Effects);
+		}
+
+		/// <summary>A short piece of music, such as a results card's sting, at the music level.</summary>
+		public static AudioSource PlayMusic(AudioClip i_Clip)
+		{
+			return play(i_Clip, SoundLevels.Music);
+		}
+
+		private static AudioSource play(AudioClip i_Clip, float i_Volume)
+		{
 			// An unassigned slot should be silence, not an error every time the player presses
 			// a button. PlayOneShot and Play both log on a null clip.
 			if (i_Clip == null)
@@ -41,7 +55,7 @@ namespace BomberBird.UI
 
 			AudioSource source = carrier.AddComponent<AudioSource>();
 			source.clip = i_Clip;
-			source.volume = i_Volume * SoundLevels.Effects;
+			source.volume = i_Volume;
 			source.playOnAwake = false;
 			source.loop = false;
 			source.Play();
