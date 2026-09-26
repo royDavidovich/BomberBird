@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using BomberBird.Flow;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace BomberBird.UI
 {
@@ -12,6 +15,8 @@ namespace BomberBird.UI
 	/// </summary>
 	public static class UiInput
 	{
+		private static readonly List<RaycastResult> sr_Hits = new List<RaycastResult>();
+
 		/// <summary>
 		/// Whether a modifier is being held, which means whatever else is pressed belongs to
 		/// the operating system rather than to the game.
@@ -60,6 +65,53 @@ namespace BomberBird.UI
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// A finger landing on the screen, for the screens that wait on a key: on a phone there
+		/// is no key to press. Kept apart from <see cref="WasKeyPressed"/>, which must go on
+		/// refusing the mouse, and silent on a desktop, which has no touches.
+		/// </summary>
+		public static bool WasTapped()
+		{
+			if (!IsListening())
+			{
+				return false;
+			}
+
+			for (int i = 0; i < Input.touchCount; ++i)
+			{
+				Touch touch = Input.GetTouch(i);
+
+				if (touch.phase == TouchPhase.Began && !landsOnAButton(touch.position))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// A finger on a button is that button's, the way a click is: pressing the pause button
+		/// while a stage waits must pause it, not also start it. Only buttons count - the
+		/// full-screen panels that take a tap are raycast targets too, and must still take it.
+		/// </summary>
+		private static bool landsOnAButton(Vector2 i_ScreenPosition)
+		{
+			if (EventSystem.current == null)
+			{
+				return false;
+			}
+
+			PointerEventData pointer = new PointerEventData(EventSystem.current);
+			pointer.position = i_ScreenPosition;
+			EventSystem.current.RaycastAll(pointer, sr_Hits);
+
+			bool isButton = sr_Hits.Count > 0 && sr_Hits[0].gameObject.GetComponentInParent<Selectable>() != null;
+			sr_Hits.Clear();
+
+			return isButton;
 		}
 	}
 }

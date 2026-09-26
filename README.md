@@ -65,12 +65,12 @@ is scoped.
 
 ## Controls
 
-| Action | Keyboard |
-|---|---|
-| Move | WASD or arrow keys |
-| Place seed pod | Space |
-| Confirm or retry | Enter |
-| Pause or back | Escape |
+| Action | Keyboard | Touch (Web build on a phone) |
+|---|---|---|
+| Move | WASD or arrow keys | A stick that comes up wherever the thumb lands |
+| Place seed pod | Space | Pod button, bottom right |
+| Confirm or retry | Enter | Tap the button, or tap to continue |
+| Pause or back | Escape | Pause button, top right |
 
 ## Documentation
 

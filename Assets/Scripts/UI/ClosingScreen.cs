@@ -281,12 +281,13 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
-		/// Any key or any mouse button. There is nothing to choose on either panel, so asking
-		/// the player to find a particular one would be a puzzle rather than a prompt.
+		/// Any key, any mouse button, or a finger on a phone. There is nothing to choose on
+		/// either panel, so asking the player to find a particular one would be a puzzle rather
+		/// than a prompt. A browser does not promise to report a touch as a key.
 		/// </summary>
 		private static bool wasPressed()
 		{
-			return Input.anyKeyDown;
+			return Input.anyKeyDown || UiInput.WasTapped();
 		}
 	}
 }
