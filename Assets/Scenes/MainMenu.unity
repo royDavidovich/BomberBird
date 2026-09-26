@@ -553,6 +553,10 @@ MonoBehaviour:
   m_Difficulty: {fileID: 659733010}
   m_Confirm: {fileID: 8300000, guid: 9e82f2421928449a1bd54f619aaee774, type: 3}
   m_QuitButton: {fileID: 1855394586}
+  m_ShiftedOnWeb:
+  - {fileID: 1192743230}
+  - {fileID: 895841381}
+  m_WebDrop: 52.5
 --- !u!4 &659733008
 Transform:
   m_ObjectHideFlags: 0
@@ -582,6 +586,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.FirstKeySelection
   m_FirstSelected: {fileID: 1192743229}
   m_Difficulty: {fileID: 659733010}
+  m_Pause: {fileID: 0}
 --- !u!114 &659733010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1838,6 +1843,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BomberBird.UI::BomberBird.UI.TouchText
   m_TouchText: SLIDE TO CHANGE
+  m_KeyboardOnly: {fileID: 0}
 --- !u!1 &1134486139
 GameObject:
   m_ObjectHideFlags: 0
