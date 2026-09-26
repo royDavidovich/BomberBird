@@ -237,6 +237,16 @@ namespace BomberBird.UI
 			else
 			{
 				SoundLevels.Save();
+
+				// The overlay is about to hide with one of its own buttons still selected. Left
+				// there, a screen behind it that is driven by the keyboard - bird selection -
+				// would find the selection taken by a button nobody can see, and its arrows and
+				// Enter would do nothing. Cleared, its own FirstKeySelection hands the next key
+				// back to the card the player was on.
+				if (EventSystem.current != null)
+				{
+					EventSystem.current.SetSelectedGameObject(null);
+				}
 			}
 
 			Time.timeScale = i_IsPaused ? 0f : 1f;

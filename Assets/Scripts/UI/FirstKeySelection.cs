@@ -42,6 +42,11 @@ namespace BomberBird.UI
 			+ "the rules panel.")]
 		[SerializeField] private DifficultyPanel m_Difficulty;
 
+		[Tooltip("A pause overlay drawn over this screen. Optional - only bird selection has "
+			+ "one; in the arena this screen's buttons are never up while the game is paused. "
+			+ "The overlay has its own FirstKeySelection, so this one stands down while it is up.")]
+		[SerializeField] private PauseController m_Pause;
+
 		private bool m_HasSeenIdle;
 		private GameObject m_LastSelected;
 
@@ -78,6 +83,14 @@ namespace BomberBird.UI
 
 		private void Update()
 		{
+			// Ahead of even the bookkeeping below. The overlay's buttons are selected while it
+			// is up, and remembering one of them would bring back a hidden Resume after the
+			// overlay closes instead of the card the player was on.
+			if (m_Pause != null && m_Pause.IsPaused)
+			{
+				return;
+			}
+
 			// Before the early returns below, so a click made while they hold still leaves
 			// something to come back to.
 			if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
