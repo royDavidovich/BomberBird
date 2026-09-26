@@ -28,12 +28,28 @@ namespace BomberBird.UI
 			+ "and Quit would do nothing.")]
 		[SerializeField] private GameObject m_QuitButton;
 
+		[Tooltip("The buttons left once Quit is hidden. Moved down together so the pair sits "
+			+ "where the three were centred, rather than high with a gap under it.")]
+		[SerializeField] private RectTransform[] m_ShiftedOnWeb;
+
+		[Tooltip("How far they move down, in canvas units. Half the gap from one button to the "
+			+ "next re-centres two where there were three.")]
+		[SerializeField] private float m_WebDrop = 52.5f;
+
 		private void Awake()
 		{
 #if UNITY_WEBGL && !UNITY_EDITOR
 			if (m_QuitButton != null)
 			{
 				m_QuitButton.SetActive(false);
+
+				foreach (RectTransform button in m_ShiftedOnWeb)
+				{
+					if (button != null)
+					{
+						button.anchoredPosition += Vector2.down * m_WebDrop;
+					}
+				}
 			}
 #endif
 		}
