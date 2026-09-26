@@ -10,6 +10,10 @@ bombs to clear obstacles, defeat enemies, and reach the exit.
 
 **Play it in the browser: [roydavidovich.itch.io/bomberbird](https://roydavidovich.itch.io/bomberbird)**
 
+![Nine seconds of play on stage two, Orchard Grove: the hoopoe moves between hard blocks and bushes and places a seed pod while common mynas roam the arena](Docs/Images/gameplay.gif)
+
+*A few seconds of a real run on stage two, Orchard Grove. [Full-quality video (MP4)](Docs/Videos/gameplay.mp4).*
+
 ## How to play
 
 ![The in-game How to Play card, over the dimmed stage, showing three numbered panels: walk with WASD or the arrow keys, place a pod with Space and step away, and the pod bursting in four directions two seconds later, with the Esc key marked as pausing the game at any time](Docs/Images/how-to-play.png)
