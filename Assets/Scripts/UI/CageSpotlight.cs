@@ -90,6 +90,8 @@ namespace BomberBird.UI
 		[SerializeField] private float m_FadeSeconds = 0.45f;
 
 		private Material m_Material;
+		private Camera m_Camera;
+		private Vector3 m_WorldPoint;
 		private Vector2 m_Center;
 		private float m_CellHeight;
 		private float m_ShownAt;
@@ -140,15 +142,10 @@ namespace BomberBird.UI
 				m_Wash.material = m_Material;
 			}
 
-			Vector3 viewport = i_Camera.WorldToViewportPoint(i_WorldPoint);
-
-			m_Center = new Vector2(viewport.x, viewport.y);
-
-			// One world unit is one arena cell, so this is a cell's height in screen heights.
-			m_CellHeight = i_Camera.WorldToViewportPoint(i_WorldPoint + Vector3.up).y - viewport.y;
+			m_Camera = i_Camera;
+			m_WorldPoint = i_WorldPoint;
 
 			gameObject.SetActive(true);
-			placeWords();
 
 			m_ShownAt = Time.unscaledTime;
 			m_HideStartedAt = -1f;
@@ -171,10 +168,20 @@ namespace BomberBird.UI
 
 		private void draw()
 		{
-			if (m_Material == null)
+			if (m_Material == null || m_Camera == null)
 			{
 				return;
 			}
+
+			// Found again every frame: the camera frames the arena after the first frame, and a
+			// resized window or a turned phone moves the cage on screen.
+			Vector3 viewport = m_Camera.WorldToViewportPoint(m_WorldPoint);
+
+			m_Center = new Vector2(viewport.x, viewport.y);
+
+			// One world unit is one arena cell, so this is a cell's height in screen heights.
+			m_CellHeight = m_Camera.WorldToViewportPoint(m_WorldPoint + Vector3.up).y - viewport.y;
+			placeWords();
 
 			float now = Time.unscaledTime;
 			float sinceShown = now - m_ShownAt;

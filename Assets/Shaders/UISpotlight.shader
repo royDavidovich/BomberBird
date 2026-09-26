@@ -12,7 +12,7 @@ Shader "BomberBird/UI/Spotlight"
 	Properties
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-		_DimColor ("Dim Color", Color) = (0.02, 0.02, 0.06, 0.7)
+		_DimColor ("Dim Color", Color) = (0.02, 0.02, 0.06, 1)
 		_Center ("Center (viewport)", Vector) = (0.5, 0.5, 0, 0)
 		_Aspect ("Aspect (width / height)", Float) = 1.7777
 		_Radius ("Hole Radius (screen heights)", Float) = 0.1
