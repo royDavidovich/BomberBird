@@ -406,7 +406,7 @@ namespace BomberBird.UI
 				flow.FadeOutMusic();
 			}
 
-			UiSound.Play(m_GameOverJingle);
+			UiSound.PlayMusic(m_GameOverJingle);
 		}
 
 		/// <summary>
@@ -434,7 +434,7 @@ namespace BomberBird.UI
 				yield return new WaitForSecondsRealtime(m_ClearedJingleDelay);
 			}
 
-			m_ClearedJinglePlaying = UiSound.Play(m_ClearedJingle);
+			m_ClearedJinglePlaying = UiSound.PlayMusic(m_ClearedJingle);
 		}
 
 		/// <summary>
