@@ -1,5 +1,6 @@
 using BomberBird.Pods;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BomberBird.Player
 {
@@ -44,8 +45,10 @@ namespace BomberBird.Player
 			// the bird slides between cells continuously.
 			field.MarkVacatedExcept(transform.position, m_Movement.HalfExtent);
 
-			// Input belongs in Update, never in FixedUpdate.
-			if (Input.GetButtonDown(k_PlaceButton))
+			// Input belongs in Update, never in FixedUpdate. The gamepad's south button is also
+			// what the pod button of the on-screen touch pad presses.
+			if (Input.GetButtonDown(k_PlaceButton)
+				|| (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame))
 			{
 				field.TryPlace(m_Movement.Cell);
 			}

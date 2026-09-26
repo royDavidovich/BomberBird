@@ -2,6 +2,7 @@ using System;
 using BomberBird.Arena;
 using BomberBird.Pods;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace BomberBird.Player
 {
@@ -15,6 +16,14 @@ namespace BomberBird.Player
 	{
 		private const string k_HorizontalAxis = "Horizontal";
 		private const string k_VerticalAxis = "Vertical";
+
+		// The on-screen stick of the Web build on phones, read as the gamepad it emulates.
+		// Below the dead zone a resting thumb counts as no push at all.
+		private const float k_StickDeadZone = 0.4f;
+
+		// sin 22.5 degrees: an axis counts once the push leans that far towards it, which cuts
+		// the circle into four straight sectors and four diagonal ones between them.
+		private const float k_StickAxisShare = 0.38f;
 
 		[Header("Arena")]
 		[SerializeField] private BomberBird.Arena.Arena m_Arena;
@@ -161,12 +170,39 @@ namespace BomberBird.Player
 			int horizontal = Mathf.RoundToInt(Input.GetAxisRaw(k_HorizontalAxis));
 			int vertical = Mathf.RoundToInt(Input.GetAxisRaw(k_VerticalAxis));
 
+			if (horizontal == 0 && vertical == 0 && Gamepad.current != null)
+			{
+				Vector2Int stick = StickAxes(Gamepad.current.leftStick.ReadValue());
+				horizontal = stick.x;
+				vertical = stick.y;
+			}
+
 			if (horizontal != 0 && vertical != 0)
 			{
 				// Both held: keep the axis the bird is already travelling along.
 				bool alreadyHorizontal = m_Facing == eFacing.Left || m_Facing == eFacing.Right;
 				return alreadyHorizontal ? new Vector2Int(horizontal, 0) : new Vector2Int(0, vertical);
 			}
+
+			return new Vector2Int(horizontal, vertical);
+		}
+
+		/// <summary>
+		/// A 360-degree stick as the arrow keys it stands in for. A diagonal push comes back
+		/// with both axes set, like two keys held, so the rule above keeps the bird on the
+		/// axis it is already travelling: the thumb has to lean clearly towards a turn before
+		/// the bird takes it.
+		/// </summary>
+		public static Vector2Int StickAxes(Vector2 i_Stick)
+		{
+			if (i_Stick.magnitude < k_StickDeadZone)
+			{
+				return Vector2Int.zero;
+			}
+
+			Vector2 direction = i_Stick.normalized;
+			int horizontal = Mathf.Abs(direction.x) > k_StickAxisShare ? (int)Mathf.Sign(direction.x) : 0;
+			int vertical = Mathf.Abs(direction.y) > k_StickAxisShare ? (int)Mathf.Sign(direction.y) : 0;
 
 			return new Vector2Int(horizontal, vertical);
 		}

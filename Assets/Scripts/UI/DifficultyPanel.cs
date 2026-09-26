@@ -237,6 +237,19 @@ namespace BomberBird.UI
 		}
 
 		/// <summary>
+		/// Wired to the CHOOSE button a phone shows in place of the Enter key. Closes the same
+		/// frame-late way the key does.
+		/// </summary>
+		public void Choose()
+		{
+			if (IsShown && !m_IsClosing)
+			{
+				take();
+				m_IsClosing = true;
+			}
+		}
+
+		/// <summary>
 		/// Takes the difficulty the lever is standing on.
 		///
 		/// The panel used to write the setting the moment the lever moved, on the grounds that

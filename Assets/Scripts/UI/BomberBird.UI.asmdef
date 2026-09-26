@@ -8,7 +8,8 @@
         "BomberBird.Flow",
         "BomberBird.Enemies",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

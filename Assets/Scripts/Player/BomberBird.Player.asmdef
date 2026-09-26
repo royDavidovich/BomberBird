@@ -3,7 +3,8 @@
     "rootNamespace": "BomberBird.Player",
     "references": [
         "BomberBird.Arena",
-        "BomberBird.Pods"
+        "BomberBird.Pods",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

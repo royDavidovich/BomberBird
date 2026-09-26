@@ -12,7 +12,7 @@
 | Display | Landscape, 1920 x 1080 reference resolution |
 | Expected session length | A few minutes per stage |
 | Submission deadline | 4 October 2026 |
-| Document version | v0.27, 2026-09-26 |
+| Document version | v0.28, 2026-09-26 |
 
 ## 1. High Concept
 
@@ -131,12 +131,12 @@ of switching bird.
 
 ## 4. Controls and Input
 
-| Action | Keyboard | Gamepad | Touch |
+| Action | Keyboard | Gamepad | Touch (Web build on a phone) |
 |---|---|---|---|
-| Move | WASD or arrow keys | Left stick or D-pad | Not planned |
-| Place seed pod | Space | Main action button | Not planned |
-| Confirm or retry | Enter | Main action button | Not planned |
-| Pause or back | Escape | Start or back button | Not planned |
+| Move | WASD or arrow keys | Left stick or D-pad | Floating stick, left side |
+| Place seed pod | Space | Main action button | Pod button, bottom right |
+| Confirm or retry | Enter | Main action button | Tap the button, or tap to continue |
+| Pause or back | Escape | Start or back button | Pause button, top right |
 
 Gameplay input is disabled while paused and during stage transitions. Losing focus pauses the game. Keyboard support is required; gamepad support is polish if time allows.
 
@@ -261,7 +261,7 @@ Only features that improve the actual implementation will remain. The architectu
 
 - Multiplayer or networking.
 - Procedural generation or a level editor.
-- Mobile builds and touch controls. The project commits to desktop only, so no mobile control scheme, portrait layout, or phone-sized UI pass is promised.
+- Mobile builds. The project commits to desktop only, so no mobile platform is declared and no portrait layout or phone-sized UI pass is promised. The Web build shared on itch.io carries touch controls as an undeclared extra, so it can be tried in a phone's browser held sideways; it is not a submitted platform.
 - 3D environments or an open world.
 - Large skill trees, complex narrative, or unique rule sets for every bird.
 - Online accounts, leaderboards, or cloud saves.
@@ -301,3 +301,4 @@ The idea and this GDD were approved by the lecturer through the designated cours
 | v0.25 | 2026-09-25 | Took Space off confirming in the menus. Space is the pod key and the key that starts a waiting stage, so a player still pressing it after a GAME OVER or a Restart could confirm a menu choice they never meant, most easily a bird on the selection screen. Menus now confirm on Enter (either Enter key), a click, or the gamepad's main button, and the bird selection screen says so under the cards: "PRESS ENTER TO CHOOSE". **No rule changed.** This is a control change to the confirm row of section 4, approved by the owner. |
 | v0.26 | 2026-09-25 | Gave the player a say in how loud the game is. There was no volume setting anywhere, so a player whose speakers were too loud, or who wanted the music gone and the pod timing still audible, had only the system volume, which moves both together. The pause overlay now carries a Music slider and an Effects slider under its three entries, and both levels are remembered between sittings. **No rule changed.** A settings addition outside the section 8 lists, approved by the owner. |
 | v0.27 | 2026-09-26 | Made the boss's escorts come out of the boss. Each one used to appear on its cell with nothing tying it to her, so the wave read as mynas turning up rather than as her calling them. Each now spins out of the boss to its cell over half a second, turning a full circle the way she does when hit and passing over the walls; it is harmless and out of the flames' reach on the way, and the blinking grace of v0.24 starts on landing. It uses the myna's existing frames - the spin is the same facing cycle as the boss's. And when the boss falls, the escorts still standing no longer run off faster and vanish: each spins fast on the spot, blinking, for the same moment and then is gone, so the end of the fight reads as the flock coming apart where it stood. **No rule changed** - the cells, the numbers, the six-step clearance and the grace are exactly as before; only how an escort arrives is new. This is the §8.2 line about stronger visual feedback, approved by the owner. |
+| v0.28 | 2026-09-26 | Made the Web build playable in a phone's browser, as an undeclared extra rather than a platform: §8.3 still keeps mobile out of scope, because a declared mobile version is graded in full. On a phone the arena gets a see-through stick that appears wherever the left thumb lands and resets when it lifts, a pod button and a pause button. The screens that waited on a key (the stage start, the habitat card, the rules panel) also take a tap, the difficulty panel gains a CHOOSE button, and the key prompts read as taps. The stick and pod button are Unity's Input System on-screen controls standing in for a gamepad's left stick and south button, the pattern the course demonstrated, so the package is added and Active Input Handling set to Both; every keyboard path is unchanged. **No rule changed.** An extra for the Web build outside the section 8 lists, approved by the owner. |

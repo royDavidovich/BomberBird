@@ -130,6 +130,25 @@ namespace BomberBird.UI
 			}
 		}
 
+		/// <summary>
+		/// Wired to the pause button of the on-screen touch pad, which a phone needs in place of
+		/// Escape.
+		/// </summary>
+		public void Pause()
+		{
+			// The same stand-down as Escape in Update: the rules panel owns the screen while up.
+			if (m_Instructions != null && m_Instructions.IsShown)
+			{
+				return;
+			}
+
+			if (!m_IsPaused)
+			{
+				UiSound.Play(m_Confirm);
+				setPaused(true);
+			}
+		}
+
 		/// <summary>Wired to the overlay's Resume button.</summary>
 		public void Resume()
 		{

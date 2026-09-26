@@ -114,7 +114,7 @@ namespace BomberBird.UI
 
 			pulseHint();
 
-			if (UiInput.WasKeyPressed())
+			if (UiInput.WasKeyPressed() || UiInput.WasTapped())
 			{
 				// On the press rather than a frame later with the closing, so the sound answers
 				// the key at the moment it is struck.

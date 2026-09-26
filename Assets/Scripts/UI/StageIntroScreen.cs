@@ -99,7 +99,7 @@ namespace BomberBird.UI
 
 			pulseHint();
 
-			if (!UiInput.WasKeyPressed())
+			if (!UiInput.WasKeyPressed() && !UiInput.WasTapped())
 			{
 				return;
 			}
